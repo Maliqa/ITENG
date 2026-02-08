@@ -1,0 +1,77 @@
+# =========================================================
+# VCM-3 Brüel & Kjær Vibro - STATIC FIX ONE CLICK
+# Case-based script (real field issue)
+# =========================================================
+
+# ====== KONFIGURASI TETAP ======
+$LaptopIP   = "192.168.2.10"
+$Prefix     = 24              # 255.255.255.0
+$VCM3_IP    = "192.168.2.202"
+# ==============================
+
+Write-Host ""
+Write-Host "=== VCM-3 STATIC NETWORK FIX STARTED ===" -ForegroundColor Cyan
+
+# 1. Cari Ethernet adapter AKTIF (USB LAN / ASIX / Ethernet)
+$Adapter = Get-NetAdapter |
+    Where-Object { $_.Status -eq "Up" -and $_.Name -like "Ethernet*" } |
+    Select-Object -First 1
+
+if (-not $Adapter) {
+    Write-Host "❌ Ethernet adapter NOT FOUND" -ForegroundColor Red
+    Pause
+    Exit
+}
+
+$AdapterName = $Adapter.Name
+Write-Host "✔ Adapter detected: $AdapterName" -ForegroundColor Green
+
+# 2. MATIKAN DHCP (ini sumber masalah utama lo)
+Write-Host ">> Disabling DHCP..."
+Set-NetIPInterface -InterfaceAlias $AdapterName -Dhcp Disabled
+
+# 3. HAPUS SEMUA IPv4 LAMA (wajib bersih)
+Write-Host ">> Removing old IPv4 addresses..."
+Get-NetIPAddress -InterfaceAlias $AdapterName -AddressFamily IPv4 `
+    -ErrorAction SilentlyContinue |
+    Remove-NetIPAddress -Confirm:$false
+
+# 4. SET IP STATIC LAPTOP
+Write-Host ">> Setting STATIC IP: $LaptopIP"
+New-NetIPAddress `
+    -InterfaceAlias $AdapterName `
+    -IPAddress $LaptopIP `
+    -PrefixLength $Prefix
+
+# 5. CLEAR ARP & DNS (biar gak nyangkut cache lama)
+Write-Host ">> Clearing ARP & DNS cache..."
+arp -d * | Out-Null
+ipconfig /flushdns | Out-Null
+
+# 6. SOFT RESET ADAPTER (tanpa reboot Windows)
+Write-Host ">> Resetting adapter..."
+Disable-NetAdapter -Name $AdapterName -Confirm:$false
+Start-Sleep -Seconds 3
+Enable-NetAdapter -Name $AdapterName -Confirm:$false
+Start-Sleep -Seconds 3
+
+# 7. TEST PING KE VCM-3
+Write-Host ""
+Write-Host ">> Testing connection to VCM-3 ($VCM3_IP)" -ForegroundColor Yellow
+$Ping = Test-Connection $VCM3_IP -Count 3 -Quiet
+
+if ($Ping) {
+    Write-Host "✅ VCM-3 REACHABLE" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "OPEN IN BROWSER:" -ForegroundColor Cyan
+    Write-Host "https://$VCM3_IP" -ForegroundColor White
+} else {
+    Write-Host "❌ Ping FAILED" -ForegroundColor Red
+    Write-Host "ACTION:" -ForegroundColor Yellow
+    Write-Host "- Pastikan VCM-3 LED = BLUE / DARK BLUE"
+    Write-Host "- Tekan & tahan tombol LOGO ±10 detik (temporary IP mode)"
+}
+
+Write-Host ""
+Write-Host "=== SCRIPT FINISHED ===" -ForegroundColor Cyan
+Pause
