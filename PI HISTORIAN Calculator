@@ -1,0 +1,94 @@
+import streamlit as st
+import pandas as pd
+
+st.title("PI Historian Engineering Calculator")
+
+st.write("Tool untuk menghitung kapasitas PI Data Archive dan kebutuhan network historian.")
+
+# INPUT
+tags = st.number_input("Jumlah PI Tags", min_value=1, value=1500)
+
+scan_rate = st.number_input("Sampling Interval (detik)", min_value=1, value=1)
+
+compression = st.slider("Compression (%)", 0, 95, 80)
+
+event_size = st.number_input("Ukuran Event (bytes)", value=20)
+
+archive_storage = st.number_input("Total Storage PI Archive (GB)", value=500)
+
+archive_file_size = st.number_input("Ukuran Archive File PI (GB)", value=2)
+
+# KONSTANTA
+seconds_per_day = 86400
+
+# HITUNG EVENT
+events_per_tag = seconds_per_day / scan_rate
+total_events = tags * events_per_tag
+
+# STORAGE
+bytes_per_day = total_events * event_size
+
+gb_per_day = bytes_per_day / (1024**3)
+
+compressed_gb_per_day = gb_per_day * (1 - compression/100)
+
+gb_per_month = compressed_gb_per_day * 30
+gb_per_year = compressed_gb_per_day * 365
+
+# DISK LIFE
+days_until_full = archive_storage / compressed_gb_per_day if compressed_gb_per_day > 0 else 0
+years_until_full = days_until_full / 365
+
+# NETWORK BANDWIDTH
+bits_per_event = event_size * 8
+bits_per_day = total_events * bits_per_event
+
+mbps = bits_per_day / seconds_per_day / (1024**2)
+
+# ARCHIVE FILE ESTIMATION
+archive_files_per_year = gb_per_year / archive_file_size if archive_file_size > 0 else 0
+
+# OUTPUT
+st.header("Perhitungan Historian")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.metric("Events per Day", f"{int(total_events):,}")
+    st.metric("Storage per Day (GB)", f"{compressed_gb_per_day:.4f}")
+    st.metric("Storage per Month (GB)", f"{gb_per_month:.2f}")
+    st.metric("Storage per Year (GB)", f"{gb_per_year:.2f}")
+
+with col2:
+    st.metric("Disk Full (Days)", f"{days_until_full:.0f}")
+    st.metric("Disk Full (Years)", f"{years_until_full:.2f}")
+    st.metric("Network Load (Mbps)", f"{mbps:.4f}")
+    st.metric("Archive Files per Year", f"{archive_files_per_year:.0f}")
+
+# TABLE
+data = {
+    "Metric":[
+        "Events per Day",
+        "Compressed Storage GB/day",
+        "Compressed Storage GB/month",
+        "Compressed Storage GB/year",
+        "Disk Full Days",
+        "Disk Full Years",
+        "Network Mbps",
+        "Archive Files per Year"
+    ],
+    "Value":[
+        int(total_events),
+        round(compressed_gb_per_day,4),
+        round(gb_per_month,2),
+        round(gb_per_year,2),
+        int(days_until_full),
+        round(years_until_full,2),
+        round(mbps,4),
+        round(archive_files_per_year,0)
+    ]
+}
+
+df = pd.DataFrame(data)
+
+st.table(df)
