@@ -1,0 +1,20 @@
+Install-WindowsFeature -Name `
+    Web-Server, `
+    Web-Default-Doc, `
+    Web-Static-Content, `
+    Web-Http-Errors, `
+    Web-Http-Redirect, `
+    Web-Windows-Auth, `
+    Web-Filtering, `
+    Web-IP-Security, `
+    Web-Net-Ext45, `
+    Web-Asp-Net45, `
+    Web-ISAPI-Ext, `
+    Web-ISAPI-Filter, `
+    Web-AppInit, `
+    Web-WebSockets, `
+    Web-Mgmt-Console, `
+    NET-WCF-HTTP-Activation45, `
+    NET-WCF-TCP-Activation45, `
+    NET-WCF-Pipe-Activation45 `
+    -IncludeManagementTools
