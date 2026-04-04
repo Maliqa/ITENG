@@ -18,6 +18,7 @@ from OSIsoft.AF.Data import AFUpdateOption, AFBufferOption
 PI_SERVER_NAME = "PISRVCISDEMO"
 PI_TAG_NAME    = "TEST_OPC"
 OPC_SERVER     = "Matrikon.OPC.Simulation.1"
+OPC_NODE       = "localhost"
 OPC_ITEM_ID    = "Random.Real8"
 SCAN_INTERVAL  = 5
 
@@ -25,7 +26,8 @@ SCAN_INTERVAL  = 5
 def connect_opc():
     print("[OPC] Connecting ke " + OPC_SERVER + "...")
     try:
-        opc = win32com.client.Dispatch(OPC_SERVER)
+        opc = win32com.client.Dispatch("OPC.Automation.1")
+        opc.Connect(OPC_SERVER, OPC_NODE)
         groups = opc.OPCGroups
         group = groups.Add("PIBridgeGroup")
         group.IsActive = True
@@ -87,14 +89,15 @@ def write_pi(pi_point, value):
 
 # === MAIN ===
 def main():
-    print("=" * 45)
+    print("=" * 50)
     print("  Matrikon OPC -> PI Data Archive Bridge")
-    print("=" * 45)
+    print("=" * 50)
     print("OPC Server : " + OPC_SERVER)
+    print("OPC Node   : " + OPC_NODE)
     print("OPC Item   : " + OPC_ITEM_ID)
     print("PI Tag     : " + PI_TAG_NAME)
     print("Interval   : " + str(SCAN_INTERVAL) + " detik")
-    print("=" * 45)
+    print("=" * 50)
 
     # Connect OPC
     opc, opc_item = connect_opc()
@@ -121,16 +124,14 @@ def main():
 
     while True:
         try:
-            # Baca dari Matrikon OPC
             value, quality = read_opc(opc_item)
 
             if value is not None:
-                # Tulis ke PI Archive
                 ok = write_pi(pi_point, value)
                 count += 1
                 now = datetime.now().strftime("%H:%M:%S")
                 status = "OK" if ok else "GAGAL"
-                print("[" + now + "] OPC Value: " + str(round(value, 4)) + " | Quality: " + str(quality) + " -> PI: " + status + " (#" + str(count) + ")")
+                print("[" + now + "] OPC: " + str(round(value, 4)) + " | Quality: " + str(quality) + " -> PI: " + status + " (#" + str(count) + ")")
             else:
                 fail += 1
                 print("[WARN] OPC read gagal (#" + str(fail) + ")")
