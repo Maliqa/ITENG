@@ -5,13 +5,15 @@ import random
 from datetime import datetime
 
 # Load PI AF SDK
-sys.path.append(r"C:\Program Files (x86)\PIPC\AF\PublicAssemblies\4.0")
+sdk_path = r"C:\Program Files (x86)\PIPC\AF\PublicAssemblies\4.0"
+sys.path.append(sdk_path)
 clr.AddReference("OSIsoft.AFSDK")
 
-from OSIsoft.AF import *
-from OSIsoft.AF.PI import *
-from OSIsoft.AF.Time import *
-from OSIsoft.AF.Asset import *
+from OSIsoft.AF import AFSystem
+from OSIsoft.AF.PI import PIServers, PIPoint
+from OSIsoft.AF.Asset import AFValue, AFValues
+from OSIsoft.AF.Time import AFTime
+from OSIsoft.AF.Data import AFUpdateOption, AFBufferOption
 
 # === KONFIGURASI ===
 PI_SERVER_NAME = "PISRVCISDEMO"
@@ -20,8 +22,8 @@ SCAN_INTERVAL  = 5
 
 def main():
     print("=== PI AFSDK -> PI Data Archive ===")
-    print("Tag: " + PI_TAG_NAME)
-    print("Server: " + PI_SERVER_NAME)
+    print("Tag    : " + PI_TAG_NAME)
+    print("Server : " + PI_SERVER_NAME)
     print("Interval: " + str(SCAN_INTERVAL) + " detik")
     print("===================================")
 
@@ -31,13 +33,13 @@ def main():
         pi_servers = PIServers()
         pi_server = pi_servers[PI_SERVER_NAME]
         pi_server.Connect()
-        print("[OK] Connected ke: " + str(pi_server.Name))
+        print("[OK] Connected: " + str(pi_server.Name))
     except Exception as e:
-        print("[ERROR] Gagal connect ke PI Server: " + str(e))
+        print("[ERROR] Connect gagal: " + str(e))
         return
 
-    # Step 2: Ambil PI Point
-    print("\n[2] Mencari PI tag: " + PI_TAG_NAME)
+    # Step 2: Cari PI Tag
+    print("\n[2] Mencari tag: " + PI_TAG_NAME)
     try:
         pi_point = PIPoint.FindPIPoint(pi_server, PI_TAG_NAME)
         print("[OK] Tag ditemukan: " + str(pi_point.Name))
@@ -46,28 +48,41 @@ def main():
         pi_server.Disconnect()
         return
 
-    # Step 3: Loop tulis data
-    print("\n[3] Mulai kirim data... (Ctrl+C untuk stop)\n")
+    # Step 3: Loop kirim data
+    print("\n[3] Kirim data tiap " + str(SCAN_INTERVAL) + " detik...")
+    print("     Ctrl+C untuk stop\n")
     count = 0
 
     while True:
         try:
+            # Generate nilai random simulasi
             value = round(random.uniform(0, 32767), 4)
-            ts = AFTime.Now
-            af_value = AFValue(value, ts)
-            pi_point.UpdateValue(af_value, AFUpdateOption.Replace)
+
+            # Buat AFValue
+            af_val = AFValue()
+            af_val.Value = System.Double(value)
+            af_val.Timestamp = AFTime.Now
+
+            # Tulis ke PI Archive
+            errors = pi_point.UpdateValue(
+                af_val,
+                AFUpdateOption.Replace,
+                AFBufferOption.BufferIfPossible
+            )
+
             count += 1
-            print("[" + str(datetime.now().strftime("%H:%M:%S")) + "] Value: " + str(value) + " -> OK (#" + str(count) + ")")
+            now = datetime.now().strftime("%H:%M:%S")
+            print("[" + now + "] Value: " + str(value) + " -> OK (#" + str(count) + ")")
             time.sleep(SCAN_INTERVAL)
 
         except KeyboardInterrupt:
-            print("\nDihentikan. Total kiriman: " + str(count))
+            print("\nDihentikan. Total: " + str(count) + " nilai terkirim.")
             break
         except Exception as e:
             print("[ERROR] " + str(e))
             time.sleep(SCAN_INTERVAL)
 
     pi_server.Disconnect()
-    print("Disconnected.")
+    print("Disconnected dari PI Server.")
 
 main()
