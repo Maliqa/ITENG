@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>README — PI Vision Trend Display Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #181b22;
+    --border: #1e2530;
+    --border-glow: #00c9ff33;
+    --accent: #00c9ff;
+    --accent2: #00ff9d;
+    --accent3: #ff6b35;
+    --text: #c8d4e0;
+    --text-dim: #5a6a7a;
+    --text-bright: #eaf4ff;
+    --danger: #ff3e3e;
+    --warn: #ffb347;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCANLINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,201,255,0.015) 2px,
+      rgba(0,201,255,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    padding: 60px 0 50px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: -100px; right: -100px;
+    height: 400px;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,201,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(0,255,157,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .header-grid {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .logo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(0,201,255,0.15), rgba(0,201,255,0.05));
+    border: 1px solid rgba(0,201,255,0.3);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    width: fit-content;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 8px rgba(0,201,255,0.2); }
+    50% { box-shadow: 0 0 20px rgba(0,201,255,0.4); }
+  }
+
+  .logo-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1;
+    color: var(--text-bright);
+    letter-spacing: -1px;
+    margin-top: 12px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+    margin-top: 8px;
+  }
+
+  .header-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .meta-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  /* FLOW DIAGRAM */
+  .flow-section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 40px 0;
+  }
+
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 32px;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .flow-diagram::before {
+    content: 'DATA FLOW';
+    position: absolute;
+    top: -10px; left: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    background: var(--surface);
+    padding: 0 8px;
+    letter-spacing: 2px;
+  }
+
+  .flow-node {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 12px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    min-width: 130px;
+  }
+
+  .flow-node.highlight {
+    border-color: var(--accent);
+    background: rgba(0,201,255,0.06);
+    box-shadow: 0 0 16px rgba(0,201,255,0.1);
+  }
+
+  .flow-node-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .flow-node-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text-bright);
+    text-transform: uppercase;
+  }
+
+  .flow-node-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .flow-arrow {
+    flex-shrink: 0;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 18px;
+    position: relative;
+  }
+
+  .flow-arrow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 4px; right: 4px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0.4;
+  }
+
+  /* MAIN CONTENT */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: sticky;
+    top: 24px;
+  }
+
+  .sidebar-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(30,37,48,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--text-dim);
+  }
+
+  .toc-item:hover {
+    color: var(--accent);
+    padding-left: 4px;
+  }
+
+  .toc-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .toc-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* MODULES */
+  .content { min-width: 0; }
+
+  .module {
+    margin-bottom: 40px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  .module:hover { border-color: rgba(0,201,255,0.2); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .module:nth-child(1) { animation-delay: 0.05s; }
+  .module:nth-child(2) { animation-delay: 0.1s; }
+  .module:nth-child(3) { animation-delay: 0.15s; }
+  .module:nth-child(4) { animation-delay: 0.2s; }
+  .module:nth-child(5) { animation-delay: 0.25s; }
+  .module:nth-child(6) { animation-delay: 0.3s; }
+  .module:nth-child(7) { animation-delay: 0.35s; }
+  .module:nth-child(8) { animation-delay: 0.4s; }
+
+  .module-header {
+    padding: 16px 24px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,201,255,0.08);
+    border: 1px solid rgba(0,201,255,0.2);
+    padding: 3px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .module-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .module-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .badge-prereq { background: rgba(255,107,53,0.15); color: var(--accent3); border: 1px solid rgba(255,107,53,0.3); }
+  .badge-core { background: rgba(0,201,255,0.1); color: var(--accent); border: 1px solid rgba(0,201,255,0.25); }
+  .badge-bonus { background: rgba(0,255,157,0.08); color: var(--accent2); border: 1px solid rgba(0,255,157,0.2); }
+
+  .module-body {
+    padding: 20px 24px;
+    background: var(--bg);
+  }
+
+  .module-goal {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .steps {
+    list-style: none;
+    counter-reset: steps;
+  }
+
+  .steps li {
+    counter-increment: steps;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .steps li::before {
+    content: counter(steps, decimal-leading-zero);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,201,255,0.08);
+    border: 1px solid rgba(0,201,255,0.2);
+    min-width: 30px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .steps li strong {
+    color: var(--text-bright);
+    font-weight: 600;
+  }
+
+  .steps li em {
+    color: var(--accent);
+    font-style: normal;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,201,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* TABLE */
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+
+  .config-table th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .config-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(30,37,48,0.7);
+    vertical-align: top;
+  }
+
+  .config-table tr:last-child td { border-bottom: none; }
+
+  .config-table tr:hover td { background: rgba(0,201,255,0.03); }
+
+  .config-table td:first-child {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    white-space: nowrap;
+  }
+
+  .config-table td:last-child {
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  /* CHECKPOINT BOX */
+  .checkpoint {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 1px solid rgba(0,255,157,0.2);
+    background: rgba(0,255,157,0.04);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--accent2);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .checkpoint-icon { font-size: 16px; flex-shrink: 0; }
+
+  .warning-box {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255,179,71,0.2);
+    background: rgba(255,179,71,0.04);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--warn);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* CHECKLIST */
+  .checklist-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+
+  .checklist-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--text-bright);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .checklist-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.3;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(30,37,48,0.6);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { padding-left: 4px; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .check-box:hover { border-color: var(--accent2); }
+  .check-box.checked { background: var(--accent2); border-color: var(--accent2); }
+  .check-box.checked::after { content: '✓'; font-size: 11px; color: #000; font-weight: 900; }
+
+  .check-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    width: 24px;
+    flex-shrink: 0;
+  }
+
+  .check-text { flex: 1; color: var(--text); }
+  .check-text.done { color: var(--text-dim); text-decoration: line-through; }
+
+  /* COMMON ERRORS */
+  .errors-section {
+    background: var(--surface);
+    border: 1px solid rgba(255,62,62,0.15);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+
+  .error-item {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(30,37,48,0.6);
+    align-items: flex-start;
+    font-size: 13px;
+  }
+
+  .error-item:last-child { border-bottom: none; }
+
+  .error-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--danger);
+    background: rgba(255,62,62,0.08);
+    border: 1px solid rgba(255,62,62,0.2);
+    padding: 2px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .error-cause { color: var(--text); }
+  .error-cause strong { color: var(--warn); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .footer-brand { color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .container { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .header-grid { grid-template-columns: 1fr; }
+    .header-meta { align-items: flex-start; }
+    .flow-diagram { gap: 8px; }
+    footer { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-grid">
+    <div class="logo-block">
+      <div class="logo-badge">AVEVA PI Vision 2024 · Lab Guide</div>
+      <h1>PI AF → <span>Trend</span><br>Display</h1>
+      <div class="subtitle">// SILABUS PRAKTIS — MENAMPILKAN DATA TREND</div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-chip">VERSION 1.0.0</div>
+      <div class="meta-chip">PLATFORM: PI VISION 2024</div>
+      <div class="meta-chip">LEVEL: BEGINNER → INTERMEDIATE</div>
+      <div class="meta-chip">LANG: INDONESIA</div>
+    </div>
+  </div>
+</header>
+
+<!-- FLOW DIAGRAM -->
+<section class="flow-section">
+  <div class="flow-diagram">
+    <div class="flow-node">
+      <div class="flow-node-icon">🏭</div>
+      <div class="flow-node-label">DCS / PLC</div>
+      <div class="flow-node-sub">Field Device</div>
+    </div>
+    <div class="flow-arrow">▶</div>
+    <div class="flow-node">
+      <div class="flow-node-icon">🔌</div>
+      <div class="flow-node-label">OPC / Interface</div>
+      <div class="flow-node-sub">OPCInt.exe / Connector</div>
+    </div>
+    <div class="flow-arrow">▶</div>
+    <div class="flow-node">
+      <div class="flow-node-icon">💾</div>
+      <div class="flow-node-label">PI Data Archive</div>
+      <div class="flow-node-sub">PI Tags</div>
+    </div>
+    <div class="flow-arrow">▶</div>
+    <div class="flow-node highlight">
+      <div class="flow-node-icon">🌿</div>
+      <div class="flow-node-label">PI Asset Framework</div>
+      <div class="flow-node-sub">Element → Attribute</div>
+    </div>
+    <div class="flow-arrow">▶</div>
+    <div class="flow-node highlight">
+      <div class="flow-node-icon">📊</div>
+      <div class="flow-node-label">PI Vision</div>
+      <div class="flow-node-sub">Trend Display</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">// Table of Contents</div>
+    <a href="#m1" class="toc-item"><span class="toc-num">01</span><span class="toc-label">Cek Fondasi AF</span></a>
+    <a href="#m2" class="toc-item"><span class="toc-num">02</span><span class="toc-label">Buka PI Vision</span></a>
+    <a href="#m3" class="toc-item"><span class="toc-num">03</span><span class="toc-label">Search AF Data</span></a>
+    <a href="#m4" class="toc-item"><span class="toc-num">04</span><span class="toc-label">Buat Trend Symbol</span></a>
+    <a href="#m5" class="toc-item"><span class="toc-num">05</span><span class="toc-label">Konfigurasi Trend</span></a>
+    <a href="#m6" class="toc-item"><span class="toc-num">06</span><span class="toc-label">Set Time Range</span></a>
+    <a href="#m7" class="toc-item"><span class="toc-num">07</span><span class="toc-label">Monitor & Analisis</span></a>
+    <a href="#m8" class="toc-item"><span class="toc-num">08</span><span class="toc-label">Ad Hoc Trend</span></a>
+    <a href="#checklist" class="toc-item"><span class="toc-num">✓</span><span class="toc-label">Checklist</span></a>
+    <a href="#errors" class="toc-item"><span class="toc-num">!</span><span class="toc-label">Common Errors</span></a>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- MODULE 1 -->
+    <div class="module" id="m1">
+      <div class="module-header">
+        <span class="module-num">MOD-01</span>
+        <span class="module-title">Pastikan Fondasi AF Sudah Siap</span>
+        <span class="module-badge badge-prereq">PREREQ</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Sebelum buka PI Vision, pastiin data di AF udah ada dan benar</div>
+        <ul class="steps">
+          <li>Buka <strong>PI System Explorer (PSE)</strong> dari Start Menu</li>
+          <li>Navigasi ke <strong>AF Database</strong> yang kamu pakai <em>(contoh: PlantSimulation)</em></li>
+          <li>Expand <strong>Elements</strong> → pilih asset target <em>(contoh: Pump_101)</em></li>
+          <li>Lihat tab <strong>Attributes</strong> → cek attribute yang mau ditampilkan, pastikan ada field <em>PI Point Data Reference</em></li>
+          <li>Klik kanan attribute → pilih <strong>"Preview"</strong> → konfirmasi data muncul dengan nilai valid</li>
+        </ul>
+        <div class="checkpoint">
+          <span class="checkpoint-icon">✅</span>
+          <span><strong>CHECKPOINT:</strong> Kalau preview kosong atau error, masalahnya ada di AF/tag mapping — BUKAN di PI Vision. Selesaikan dulu sebelum lanjut.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="module" id="m2">
+      <div class="module-header">
+        <span class="module-num">MOD-02</span>
+        <span class="module-title">Buka PI Vision & Buat Display Baru</span>
+        <span class="module-badge badge-core">CORE</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Setup kanvas kerja di PI Vision</div>
+        <ul class="steps">
+          <li>Buka browser → akses PI Vision: <em>http://&lt;servername&gt;/PIVision</em></li>
+          <li>Klik tombol <strong>"New Display"</strong> <em>(icon + atau dari menu utama)</em></li>
+          <li>Masuk ke <strong>Design Mode</strong> — klik icon pensil/edit di toolbar atas</li>
+          <li>Kasih nama display yang deskriptif → klik <strong>Save</strong> sebelum mulai nambah simbol</li>
+        </ul>
+        <div class="warning-box">
+          <span>⚠️</span>
+          <span><strong>PENTING:</strong> Design Mode HARUS aktif untuk bisa drag simbol ke display. Kalau drag nggak bisa, cek dulu apakah sudah dalam Design Mode.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 3 -->
+    <div class="module" id="m3">
+      <div class="module-header">
+        <span class="module-num">MOD-03</span>
+        <span class="module-title">Cari Data AF di Assets Pane</span>
+        <span class="module-badge badge-core">CORE</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Connect PI Vision ke AF Database dan temukan attribute target</div>
+        <ul class="steps">
+          <li>Di panel kiri, klik tab <strong>"Assets"</strong> — bukan tab "Tags"</li>
+          <li>Klik <strong>dropdown pilih AF Server</strong> → pilih server yang benar <em>(contoh: PISYSTEM)</em></li>
+          <li>Pilih <strong>AF Database</strong> yang berisi asset kamu <em>(contoh: PlantSimulation)</em></li>
+          <li>Browse tree: <em>Database → Element → Asset</em> sampai kelihatan daftar Attributes</li>
+          <li>Alternatif: gunakan <strong>Search bar</strong> di atas Assets pane → ketik nama attribute atau element</li>
+        </ul>
+        <div class="checkpoint">
+          <span class="checkpoint-icon">💡</span>
+          <span><strong>TIP:</strong> Kalau mau cari by PI Tag langsung tanpa struktur AF, pindah ke tab <em>"Tags"</em> dan search by tag name. Tapi untuk best practice, selalu gunakan AF attribute.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 4 -->
+    <div class="module" id="m4">
+      <div class="module-header">
+        <span class="module-num">MOD-04</span>
+        <span class="module-title">Buat Trend Symbol</span>
+        <span class="module-badge badge-core">CORE</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Drag attribute AF ke display sebagai grafik time-series</div>
+        <ul class="steps">
+          <li>Di <strong>Symbol Gallery</strong> (atas Assets pane), pastikan icon <em>Trend</em> terpilih — icon grafik garis, default pertama</li>
+          <li>Dari hasil search/browse di Assets pane, <strong>klik + drag</strong> attribute ke area display kosong</li>
+          <li>PI Vision otomatis insert <strong>Trend Symbol</strong> dengan trace pertama dari attribute itu</li>
+          <li>Untuk <strong>tambah trace ke-2, ke-3</strong>: drag attribute lain langsung ke dalam trend yang sudah ada</li>
+          <li>Resize trend dengan drag di sudut/tepi kotak — posisikan sesuai kebutuhan layout</li>
+        </ul>
+        <div class="checkpoint">
+          <span class="checkpoint-icon">✅</span>
+          <span><strong>HASIL:</strong> Satu Trend Symbol bisa isi beberapa attribute sekaligus (multi-trace). Ideal untuk compare beberapa parameter seperti temp, pressure, dan flow dalam satu grafik.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 5 -->
+    <div class="module" id="m5">
+      <div class="module-header">
+        <span class="module-num">MOD-05</span>
+        <span class="module-title">Konfigurasi Trend</span>
+        <span class="module-badge badge-core">CORE</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Rapikan tampilan trend biar informatif dan mudah dibaca</div>
+        <ul class="steps">
+          <li>Klik kanan pada trend → pilih <strong>"Configure Trend"</strong> untuk buka panel konfigurasi</li>
+          <li>Set konfigurasi berikut sesuai kebutuhan:</li>
+        </ul>
+        <table class="config-table">
+          <thead>
+            <tr>
+              <th>Opsi</th>
+              <th>Rekomendasi</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Plot Title</td>
+              <td>Isi nama jelas</td>
+              <td>Contoh: "Lube Oil Temperature"</td>
+            </tr>
+            <tr>
+              <td>Time Range</td>
+              <td>Display time range</td>
+              <td>Sinkron dengan Time Bar display</td>
+            </tr>
+            <tr>
+              <td>Scale Type</td>
+              <td>Multiple / Single</td>
+              <td>Multiple jika unit beda, Single jika sama</td>
+            </tr>
+            <tr>
+              <td>Scale Range</td>
+              <td>Autorange of dynamic values</td>
+              <td>Otomatis fit ke nilai aktual</td>
+            </tr>
+            <tr>
+              <td>Trace Color</td>
+              <td>Bedain tiap trace</td>
+              <td>Hindari warna serupa dalam satu trend</td>
+            </tr>
+            <tr>
+              <td>Legend Label</td>
+              <td>Nama manusiawi</td>
+              <td>Ganti raw tag name jadi readable</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="steps" style="margin-top:16px;">
+          <li>Klik <strong>tanda panah atas-kanan (X)</strong> panel Configure Trend untuk menutup</li>
+          <li>Klik <strong>Save</strong> display</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- MODULE 6 -->
+    <div class="module" id="m6">
+      <div class="module-header">
+        <span class="module-num">MOD-06</span>
+        <span class="module-title">Set Time Range Display</span>
+        <span class="module-badge badge-core">CORE</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Kontrol window waktu yang ditampilkan di semua simbol</div>
+        <ul class="steps">
+          <li>Keluar dari Design Mode terlebih dahulu — klik icon <em>Monitor Operations</em></li>
+          <li>Lihat <strong>Time Bar</strong> di bagian bawah display</li>
+          <li>Klik dropdown waktu → pilih range preset: <em>Last 8 Hours, Last 1 Day,</em> dll</li>
+          <li>Untuk custom: klik langsung pada <strong>start time</strong> dan <strong>end time</strong> → edit manual</li>
+          <li>Klik tombol <strong>"Now"</strong> untuk kembali ke real-time mode dengan data live</li>
+        </ul>
+        <div class="checkpoint">
+          <span class="checkpoint-icon">💡</span>
+          <span><strong>NOTE:</strong> Mengubah Time Range di Time Bar akan update SEMUA trend yang dikonfigurasi dengan "Display time range". Trend dengan "Custom time range" tidak ikut berubah.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 7 -->
+    <div class="module" id="m7">
+      <div class="module-header">
+        <span class="module-num">MOD-07</span>
+        <span class="module-title">Monitor & Analisis Trend (View Mode)</span>
+        <span class="module-badge badge-core">CORE</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Gunakan fitur interaktif bawaan PI Vision untuk analisis data</div>
+        <ul class="steps">
+          <li>Klik <strong>"Monitor Operations"</strong> (icon mata) → keluar dari Design Mode ke View Mode</li>
+          <li><strong>Trend Cursor:</strong> klik area dalam trend → muncul garis vertikal dengan nilai + timestamp di tiap trace. Cursor otomatis sinkron ke semua trend di display</li>
+          <li><strong>Pan timeline:</strong> arahkan cursor ke bagian bawah trend → drag kiri/kanan untuk geser waktu maju/mundur</li>
+          <li><strong>Zoom in:</strong> klik + drag area dalam trend → trend zoom ke rentang waktu yang dipilih. Semua simbol di display ikut update</li>
+          <li><strong>Undo zoom:</strong> tekan <em>CTRL+Z</em> untuk kembali ke zoom sebelumnya</li>
+          <li>Klik <strong>"Now"</strong> di Time Bar untuk kembali ke tampilan real-time</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- MODULE 8 -->
+    <div class="module" id="m8">
+      <div class="module-header">
+        <span class="module-num">MOD-08</span>
+        <span class="module-title">Ad Hoc Trend (Analisis Cepat)</span>
+        <span class="module-badge badge-bonus">BONUS</span>
+      </div>
+      <div class="module-body">
+        <div class="module-goal">// TUJUAN: Buat trend cepat untuk investigasi tanpa perlu bikin display dulu</div>
+        <ul class="steps">
+          <li>Dari halaman utama PI Vision, klik <strong>"New"</strong> → pilih <strong>"Ad Hoc Trend"</strong></li>
+          <li>Search dan drag attribute langsung ke canvas ad hoc trend</li>
+          <li>Analisis data sesuai kebutuhan — semua fitur trend tersedia</li>
+          <li>Kalau mau simpan hasilnya: klik <strong>"Convert to Display"</strong> → simpan sebagai display permanen</li>
+          <li>Untuk share ke kolega: klik <strong>"Share"</strong> → copy URL yang dihasilkan</li>
+        </ul>
+        <div class="checkpoint">
+          <span class="checkpoint-icon">💡</span>
+          <span><strong>USE CASE:</strong> Ad Hoc Trend ideal buat investigasi cepat pas ada alarm atau anomali — langsung buka, drag beberapa tag, bandingkan, lalu close. Tidak perlu save jika hanya untuk analisis sementara.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="checklist-section" id="checklist">
+      <div class="checklist-title">✓ Checklist Praktik</div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">01</span>
+        <span class="check-text">AF attribute sudah linked ke PI Tag dan ada datanya (verifikasi via Preview di PSE)</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">02</span>
+        <span class="check-text">Bisa akses PI Vision dari browser tanpa error</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">03</span>
+        <span class="check-text">Berhasil buat display baru dan masuk ke Design Mode</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">04</span>
+        <span class="check-text">Browse AF di Assets pane dan menemukan attribute target</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">05</span>
+        <span class="check-text">Drag attribute → Trend Symbol muncul di display dengan trace data</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">06</span>
+        <span class="check-text">Tambah attribute ke-2 ke trend yang sama (multi-trace berhasil)</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">07</span>
+        <span class="check-text">Configure Trend: kasih judul, bedakan warna trace, set time range</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">08</span>
+        <span class="check-text">Exit Design Mode → trend cursor berfungsi dan bisa baca nilai di titik waktu tertentu</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">09</span>
+        <span class="check-text">Berhasil zoom in dan pan di trend timeline</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <span class="check-num">10</span>
+        <span class="check-text">Display tersimpan dan bisa dibuka kembali</span>
+      </div>
+    </div>
+
+    <!-- COMMON ERRORS -->
+    <div class="errors-section" id="errors">
+      <div class="checklist-title" style="color: var(--danger);">⚡ Common Errors & Fix</div>
+
+      <div class="error-item">
+        <span class="error-label">ERR-01</span>
+        <span class="error-cause"><strong>Trend kosong / flatline</strong> — PI Tag belum menerima data dari interface/OPC. Cek status OPCInt.exe atau Connector, dan verifikasi tag ada valuenya di PI SMT.</span>
+      </div>
+      <div class="error-item">
+        <span class="error-label">ERR-02</span>
+        <span class="error-cause"><strong>AF attribute preview error</strong> — Data Reference tidak benar. Masuk PSE → attribute → pastikan PI Tag name valid dan server-nya benar.</span>
+      </div>
+      <div class="error-item">
+        <span class="error-label">ERR-03</span>
+        <span class="error-cause"><strong>Tidak bisa drag simbol ke display</strong> — Belum masuk Design Mode. Klik icon pensil/edit di toolbar PI Vision terlebih dahulu.</span>
+      </div>
+      <div class="error-item">
+        <span class="error-label">ERR-04</span>
+        <span class="error-cause"><strong>AF Database tidak muncul di Assets pane</strong> — Pilih AF Server yang benar dulu dari dropdown. Kalau server tidak muncul, cek koneksi PI AF ke PI Vision.</span>
+      </div>
+      <div class="error-item">
+        <span class="error-label">ERR-05</span>
+        <span class="error-cause"><strong>Data muncul tapi nilai "No Data" / "Shutdown"</strong> — Kemungkinan time range display terlalu jauh ke masa lalu atau future. Set time range ke "Last 8 Hours" dan klik "Now".</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  <div>
+    <span class="footer-brand">PT. CISTECH ALPHA INDONESIA</span> // PI SYSTEM LAB
+  </div>
+  <div>README v1.0 · PI VISION 2024 · AVEVA OSISFT</div>
+</footer>
+
+<script>
+function toggleCheck(item) {
+  const box = item.querySelector('.check-box');
+  const text = item.querySelector('.check-text');
+  box.classList.toggle('checked');
+  text.classList.toggle('done');
+}
+</script>
+
+</body>
+</html>
