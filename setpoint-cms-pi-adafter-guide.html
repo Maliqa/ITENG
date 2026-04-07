@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SETPOINT CMS + PI Adapter — User Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f5f2ed;
+    --bg2:      #edeae3;
+    --bg3:      #e4e0d7;
+    --ink:      #1a1714;
+    --ink2:     #3d3830;
+    --ink3:     #6b6358;
+    --red:      #c0392b;
+    --red2:     #e74c3c;
+    --gold:     #c97d1a;
+    --gold2:    #f0a500;
+    --teal:     #1a6b6b;
+    --teal2:    #2a9d8f;
+    --green:    #2d6a4f;
+    --border:   rgba(26,23,20,0.12);
+    --border2:  rgba(26,23,20,0.25);
+    --shadow:   0 2px 20px rgba(26,23,20,0.08);
+    --shadow2:  0 8px 40px rgba(26,23,20,0.14);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--ink);
+    padding: 32px 0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-brand {
+    padding: 0 28px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 20px;
+  }
+  .sidebar-brand .brand-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold2);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .sidebar-brand h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .sidebar-brand h2 span { color: var(--gold2); }
+
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.3);
+    padding: 0 28px;
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 28px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+    border-left-color: var(--gold2);
+  }
+  .nav-item.active {
+    color: var(--gold2);
+    border-left-color: var(--gold2);
+    background: rgba(240,165,0,0.08);
+  }
+  .nav-item .nav-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    min-width: 20px;
+  }
+  .nav-item:hover .nav-num { color: var(--gold2); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 28px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--ink);
+    padding: 64px 64px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: 'SETPOINT';
+    position: absolute;
+    right: -20px;
+    top: -10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 140px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.03);
+    letter-spacing: -5px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .hero-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold2);
+    border: 1px solid rgba(240,165,0,0.3);
+    padding: 4px 14px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    color: var(--gold2);
+    font-style: normal;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.45);
+    max-width: 520px;
+    line-height: 1.6;
+  }
+  .hero-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    border-radius: 2px;
+  }
+  .chip-gold { background: rgba(240,165,0,0.12); color: var(--gold2); border: 1px solid rgba(240,165,0,0.2); }
+  .chip-teal { background: rgba(42,157,143,0.12); color: var(--teal2); border: 1px solid rgba(42,157,143,0.2); }
+  .chip-red  { background: rgba(192,57,43,0.12);  color: var(--red2);  border: 1px solid rgba(192,57,43,0.2); }
+
+  /* CONTENT AREA */
+  .content {
+    padding: 0 64px 80px;
+  }
+
+  /* ARCH DIAGRAM */
+  .arch-section {
+    background: var(--ink);
+    margin: 0 -64px;
+    padding: 40px 64px;
+    margin-bottom: 0;
+  }
+  .arch-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .arch-node {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 110px;
+    transition: all 0.25s;
+  }
+  .arch-node:hover {
+    background: rgba(240,165,0,0.1);
+    border-color: rgba(240,165,0,0.3);
+    transform: translateY(-2px);
+  }
+  .arch-node .an-ico { font-size: 22px; margin-bottom: 6px; }
+  .arch-node .an-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--gold2);
+    display: block;
+  }
+  .arch-node .an-desc { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .arch-arrow { color: rgba(255,255,255,0.2); font-size: 18px; padding: 0 8px; }
+
+  /* SECTIONS */
+  .section {
+    padding: 52px 0 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--border2);
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: -8px;
+  }
+  .section-meta {}
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .section-meta h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+  .section-meta p { font-size: 13px; color: var(--ink3); margin-top: 4px; }
+
+  /* STEP CARDS */
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+
+  .step-card {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.25s;
+  }
+  .step-card:hover {
+    box-shadow: var(--shadow2);
+    transform: translateX(4px);
+  }
+  .step-num-col {
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink3);
+    border-right: 1px solid var(--border);
+    writing-mode: vertical-rl;
+    letter-spacing: 2px;
+  }
+  .step-body { padding: 18px 22px; }
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .step-desc { font-size: 13px; color: var(--ink3); line-height: 1.7; }
+
+  /* CODE BLOCKS */
+  .code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    background: var(--ink);
+    color: #c8c0b8;
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin-top: 12px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    word-break: break-all;
+    position: relative;
+    border-left: 3px solid var(--gold);
+  }
+  .code .c-gold  { color: var(--gold2); }
+  .code .c-teal  { color: #5ecfcf; }
+  .code .c-green { color: #82c99a; }
+  .code .c-red   { color: #e07070; }
+  .code .c-dim   { color: rgba(200,192,184,0.4); }
+  .code .c-white { color: #ffffff; }
+
+  /* ALERT BOXES */
+  .alert {
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert-warn { background: #fff8ec; border: 1px solid #f0c060; border-left: 3px solid var(--gold); color: #5a4010; }
+  .alert-info { background: #ecf8f8; border: 1px solid #80cccc; border-left: 3px solid var(--teal2); color: #0a3030; }
+  .alert-ok   { background: #ecf8f0; border: 1px solid #80c880; border-left: 3px solid var(--green); color: #0a3020; }
+  .alert-err  { background: #fdf0ee; border: 1px solid #e09090; border-left: 3px solid var(--red); color: #400a0a; }
+
+  /* TABLES */
+  .tbl-wrap { overflow-x: auto; margin-top: 14px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border-bottom: 2px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink2);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--ink); font-weight: 500; }
+  tr:hover td { background: var(--bg); }
+  .td-ok  { color: var(--green)  !important; font-weight: 500; }
+  .td-warn{ color: var(--gold)   !important; font-weight: 500; }
+  .td-err { color: var(--red)    !important; font-weight: 500; }
+
+  /* STATUS GRID */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .status-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+  .status-card .sc-icon { font-size: 20px; margin-bottom: 8px; }
+  .status-card .sc-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink3);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .status-card .sc-val { font-size: 13px; font-weight: 500; }
+  .sc-ok  { border-left: 3px solid var(--green); }
+  .sc-ok .sc-val  { color: var(--green); }
+  .sc-err { border-left: 3px solid var(--red); }
+  .sc-err .sc-val { color: var(--red); }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .chk-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .chk-item:hover { border-color: var(--teal2); background: #f5fffe; }
+  .chk-item.done { border-color: var(--green); background: #f0faf4; color: var(--green); }
+  .chk-box {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border2);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+  .chk-item.done .chk-box { background: var(--green); border-color: var(--green); color: #fff; }
+
+  /* TAG NAME FORMAT */
+  .tag-format {
+    background: var(--ink);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-top: 14px;
+  }
+  .tag-format .tf-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .tag-parts {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .tag-part {
+    padding: 8px 14px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .tp-rack  { background: rgba(240,165,0,0.2);  color: var(--gold2); }
+  .tp-sep   { color: rgba(255,255,255,0.2); font-size: 18px; padding: 0 2px; }
+  .tp-slot  { background: rgba(94,207,207,0.15); color: #5ecfcf; }
+  .tp-ch    { background: rgba(130,201,154,0.15); color: #82c99a; }
+  .tp-meas  { background: rgba(224,112,112,0.15); color: #e07070; }
+  .tp-type  { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+  .tag-example {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+    padding: 10px 16px;
+    border-radius: 3px;
+    border-left: 3px solid var(--gold);
+  }
+
+  /* PLOT TYPES GRID */
+  .plot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .plot-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+  }
+  .plot-card:hover { box-shadow: var(--shadow2); transform: translateY(-2px); }
+  .plot-card .pc-ico { font-size: 28px; margin-bottom: 10px; }
+  .plot-card .pc-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .plot-card .pc-desc { font-size: 11.5px; color: var(--ink3); line-height: 1.5; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0 0;
+  }
+
+  /* RATE TABLE HIGHLIGHT */
+  .rate-best td { background: #f0faf4; }
+  .rate-best td:first-child { color: var(--green); font-weight: 600; }
+
+  /* TROUBLESHOOT */
+  .trouble-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .trouble-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 12.5px;
+    box-shadow: var(--shadow);
+  }
+  .ti-problem { padding: 12px 16px; border-right: 1px solid var(--border); color: var(--red); font-weight: 500; }
+  .ti-cause   { padding: 12px 16px; border-right: 1px solid var(--border); color: var(--ink3); }
+  .ti-fix     { padding: 12px 16px; color: var(--green); font-weight: 500; }
+
+  /* TOP BAR */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: var(--shadow);
+  }
+  .topbar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 1px;
+  }
+  .topbar-title span { color: var(--ink); font-weight: 500; }
+  .progress-bar {
+    height: 2px;
+    background: var(--bg3);
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .section { animation: fadeInLeft 0.5s ease both; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media(max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 24px; padding-right: 24px; }
+    .arch-section { margin: 0; padding: 32px 24px; }
+    .topbar { padding: 12px 24px; }
+    .trouble-item { grid-template-columns: 1fr; }
+    .ti-problem, .ti-cause { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-label">User Guide</span>
+    <h2>SETPOINT <span>CMS</span><br>+ PI Adapter</h2>
+  </div>
+
+  <div class="nav-section-label">Prerequisites</div>
+  <a href="#prereq"  class="nav-item active"><span class="nav-num">00</span>Komponen & Requirements</a>
+
+  <div class="nav-section-label">Setup</div>
+  <a href="#s1" class="nav-item"><span class="nav-num">01</span>Setup PI Adapter</a>
+  <a href="#s2" class="nav-item"><span class="nav-num">02</span>Konfigurasi VC-8000 MPS</a>
+  <a href="#s3" class="nav-item"><span class="nav-num">03</span>Start Data Collection</a>
+
+  <div class="nav-section-label">Penggunaan</div>
+  <a href="#s4" class="nav-item"><span class="nav-num">04</span>Data Collection Rates</a>
+  <a href="#s5" class="nav-item"><span class="nav-num">05</span>SETPOINT CMS Display</a>
+  <a href="#s6" class="nav-item"><span class="nav-num">06</span>PI Vision (Static Data)</a>
+  <a href="#s7" class="nav-item"><span class="nav-num">07</span>Upload Offline / Backfill</a>
+  <a href="#s8" class="nav-item"><span class="nav-num">08</span>Rename PI Tags</a>
+
+  <div class="nav-section-label">Referensi</div>
+  <a href="#s9" class="nav-item"><span class="nav-num">09</span>Troubleshooting</a>
+  <a href="#s10" class="nav-item"><span class="nav-num">10</span>Checklist Final</a>
+
+  <div class="sidebar-footer">
+    Brüel & Kjær Vibro<br>
+    MPI-6108-EN-02<br>
+    OSIsoft PI System®
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">SETPOINT CMS + PI Adapter — <span>Panduan Penggunaan</span></div>
+    <div class="topbar-title" id="section-indicator">Prerequisites</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">// BRÜEL & KJÆR VIBRO · OSISOFT PARTNER</div>
+    <h1>SETPOINT CMS<br>+ PI <em>Adapter</em></h1>
+    <p class="hero-sub">Panduan lengkap penggunaan SETPOINT Condition Monitoring System terintegrasi dengan OSIsoft PI System — dari setup awal hingga visualisasi data vibration.</p>
+    <div class="hero-chips">
+      <span class="chip chip-gold">VC-8000 MPS</span>
+      <span class="chip chip-teal">PI Data Archive</span>
+      <span class="chip chip-teal">PI AF Server</span>
+      <span class="chip chip-gold">PI Vision</span>
+      <span class="chip chip-red">PI Adapter (π)</span>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="arch-section">
+    <div class="arch-label">// Arsitektur Sistem</div>
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="an-ico">🔧</div>
+        <span class="an-name">VIBRATION</span>
+        <div class="an-desc">Sensor + VC-8000</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-ico">⚙️</div>
+        <span class="an-name">MPS RACK</span>
+        <div class="an-desc">CMS DAC Enable</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-ico">π</div>
+        <span class="an-name">PI ADAPTER</span>
+        <div class="an-desc">Auto tag create</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-ico">🗄️</div>
+        <span class="an-name">PI ARCHIVE</span>
+        <div class="an-desc">+ AF Database</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-ico">📊</div>
+        <span class="an-name">CMS DISPLAY</span>
+        <div class="an-desc">Orbit / FFT / Trend</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="an-ico">🌐</div>
+        <span class="an-name">PI VISION</span>
+        <div class="an-desc">Static data web</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- PREREQ -->
+    <div class="section" id="prereq">
+      <div class="section-header">
+        <div class="section-num">00</div>
+        <div class="section-meta">
+          <span class="section-tag">Prerequisites</span>
+          <h2>Komponen yang Harus Ada</h2>
+          <p>Pastikan semua ini sudah terinstall dan running sebelum mulai</p>
+        </div>
+      </div>
+      <div class="checklist">
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>VC-8000 MPS Rack — hardware vibration monitor, sudah terpasang dan powered on</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Setpoint PI Adapter (π) — software interface, gratis, download dari BKV website</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Setpoint CMS Software — client display app, gratis, terinstall di komputer CMS</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>PI Server (Data Archive + AF) — sudah running, semua services aktif</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>PI AF Client — terinstall di komputer yang sama dengan CMS Display</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>SQL Server Express (min 2012) — untuk AF database (PIFD), gratis</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Network: koneksi antara VC-8000, PI Adapter node, dan PI Server</div>
+      </div>
+      <div class="alert alert-info" style="margin-top:16px">
+        <span class="alert-icon">ℹ️</span>
+        <div><strong>Lisensi:</strong> CMS Display dan PI Adapter gratis dari Brüel & Kjær Vibro. Yang berbayar hanya OSIsoft PI System license (per-server/per-tag) dan Setpoint-to-PI Adapter license (per PI Server instance).</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 1 -->
+    <div class="section" id="s1">
+      <div class="section-header">
+        <div class="section-num">01</div>
+        <div class="section-meta">
+          <span class="section-tag">Setup</span>
+          <h2>Setup PI Adapter</h2>
+          <p>Konfigurasi koneksi antara MPS rack dan PI Server</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">STEP 01</div>
+          <div class="step-body">
+            <div class="step-title">Buka PI Adapter</div>
+            <div class="step-desc">Jalankan sebagai Administrator untuk akses penuh.</div>
+            <div class="code"><span class="c-dim"># Start Menu → Setpoint - PI Adapter Setup</span>
+<span class="c-dim"># Atau klik kanan → Run as Administrator</span>
+
+<span class="c-gold">Tampilan awal:</span>
+┌──────────────────────────────────────────┐
+│ Action │ Status  │ Rack IP    │ CMS-DB   │
+│ Record │ Stopped │ 192.168.0.1│ TRC1_45  │
+└──────────────────────────────────────────┘
+Tombol: <span class="c-teal">Add</span> | Edit | Delete | Check Connections</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">STEP 02</div>
+          <div class="step-body">
+            <div class="step-title">Tambah Rack Baru</div>
+            <div class="step-desc">Klik Add untuk mendaftarkan VC-8000 rack baru ke PI Adapter.</div>
+            <div class="code"><span class="c-gold">Klik: Add</span>
+→ Isi field berikut:
+
+<span class="c-teal">Rack IP Address :</span> <span class="c-white">192.168.0.1</span>      <span class="c-dim">← IP VC-8000 rack</span>
+<span class="c-teal">CMS-XC Database :</span> <span class="c-white">TRC1_45</span>         <span class="c-dim">← nama CMS database</span>
+<span class="c-teal">PI Server       :</span> <span class="c-white">PISRVCISDEMO</span>     <span class="c-dim">← hostname PI Server</span>
+<span class="c-teal">AF Root Path    :</span> <span class="c-white">Setpoint\SiteA\Turbine</span>
+<span class="c-teal">AF Rack Alias   :</span> <span class="c-white">STG1_11</span>          <span class="c-dim">← nama rack di AF tree</span>
+
+→ OK</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">STEP 03</div>
+          <div class="step-body">
+            <div class="step-title">Aktifkan PI Backfilling (Tab Advanced)</div>
+            <div class="step-desc">Fitur ini memastikan data yang hilang saat network putus akan otomatis di-recover saat reconnect.</div>
+            <div class="code"><span class="c-gold">Klik Edit → Tab: Advanced</span>
+
+<span class="c-teal">☑ PI Backfilling</span>          <span class="c-dim">← centang ini</span>
+<span class="c-teal">PI Server    :</span> <span class="c-white">PISRVCISDEMO</span>
+<span class="c-teal">AF Root Path :</span> <span class="c-white">Setpoint\SiteA\Turbine</span>
+<span class="c-teal">AF Rack Alias:</span> <span class="c-white">STG1_11</span>
+
+→ OK
+
+<span class="c-dim">Note: jika gap &gt; 3 hari, perlu prosedur manual khusus</span></div>
+            <div class="alert alert-warn">
+              <span class="alert-icon">⚠️</span>
+              <div>Backfilling hanya bekerja untuk PI System — <strong>tidak berfungsi</strong> untuk mode CMS-XC (offline mode).</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">STEP 04</div>
+          <div class="step-body">
+            <div class="step-title">Check Connections — Verifikasi Semua Terhubung</div>
+            <div class="step-desc">Gunakan ini sebelum start, saat commissioning, atau saat ada masalah koneksi.</div>
+            <div class="code"><span class="c-gold">Klik: Tools → Check Connections</span>
+
+<span class="c-dim"># Hasil yang diharapkan (semua ✅):</span>
+<span class="c-green">✅ All Connections Passed</span>
+  <span class="c-green">✅ CMS-XC</span>
+  <span class="c-green">✅ Service</span>
+  <span class="c-green">✅ AF [PISRVCISDEMO]</span>
+  <span class="c-green">✅ PI [PISRVCISDEMO]</span>
+  <span class="c-green">✅ VC-8000 Rack [192.168.0.1]</span>
+
+<span class="c-dim"># Jika ada yang ❌:</span>
+<span class="c-red">❌ Rack [192.168.0.1]</span>
+   <span class="c-dim">→ Connected to 192.168.0.1:8001. Name: (kosong)</span>
+   <span class="c-dim">→ Cek IP rack & pastikan VC-8000 menyala</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2 -->
+    <div class="section" id="s2">
+      <div class="section-header">
+        <div class="section-num">02</div>
+        <div class="section-meta">
+          <span class="section-tag">Setup</span>
+          <h2>Konfigurasi VC-8000 MPS</h2>
+          <p>Enable CMS mode di hardware rack sebelum PI Adapter bisa collect data</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">STEP 01</div>
+          <div class="step-body">
+            <div class="step-title">Enable CMS di VC-8000</div>
+            <div class="step-desc">Buka MPS Setup Software dari komputer yang terhubung ke rack.</div>
+            <div class="code"><span class="c-gold">MPS Setup Software → Rack Settings</span>
+
+<span class="c-teal">CMS (SD) Enabled  :</span> <span class="c-green">✅</span>  <span class="c-dim">← simpan ke SD card (max 32 GB)</span>
+<span class="c-teal">CMS (HD) Enabled  :</span> <span class="c-green">✅</span>  <span class="c-dim">← simpan ke internal SSD (max 256 GB)</span>
+<span class="c-teal">CMS (DAC) Enabled :</span> <span class="c-green">✅</span>  <span class="c-dim">← stream ke PI via network</span>
+
+<span class="c-teal">CMS (DAC) Rack Name  :</span> <span class="c-white">STG1_11</span>
+<span class="c-teal">CMS (DAC) IP Address :</span> <span class="c-white">192.168.0.1</span></div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">STEP 02</div>
+          <div class="step-body">
+            <div class="step-title">Pastikan Module UMM/SAM Sudah CM-Enabled</div>
+            <div class="step-desc">Setiap modul di rack harus diaktifkan secara individual untuk bisa streaming CMS data.</div>
+            <div class="code"><span class="c-gold">MPS Setup → Module Settings → per Slot</span>
+
+Slot 2 - SAM:
+  <span class="c-green">☑ CMS</span>   <span class="c-teal">☑ HD32</span>  <span class="c-dim">☐ Standard Display</span>
+
+Slot 3 - UMM:
+  <span class="c-green">☑ CMS</span>
+
+Slot 4 - UMM:
+  <span class="c-green">☑ CMS</span>
+
+<span class="c-dim"># Jika module belum CM-enabled → Enable Hardware</span>
+<span class="c-dim"># PI license based on IP — gunakan static IP untuk DAC port!</span></div>
+            <div class="alert alert-warn">
+              <span class="alert-icon">⚠️</span>
+              <div>PI license berbasis IP address. Pastikan VC-8000 menggunakan <strong>static IP</strong> untuk port DAC/CMS — jangan DHCP!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="s3">
+      <div class="section-header">
+        <div class="section-num">03</div>
+        <div class="section-meta">
+          <span class="section-tag">Setup</span>
+          <h2>Start Data Collection</h2>
+          <p>Mulai recording dan verifikasi data masuk ke PI Archive</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">STEP 01</div>
+          <div class="step-body">
+            <div class="step-title">Start Recording di PI Adapter</div>
+            <div class="code"><span class="c-gold">PI Adapter → pilih rack → Klik: Record (▶)</span>
+
+<span class="c-dim"># Status berubah:</span>
+Stopped → Starting → <span class="c-green">Recording ✅</span>
+
+<span class="c-dim"># Indikator di header:</span>
+<span class="c-green">🟢 TRC_1 (5.0.1227) ✅ XC</span>   <span class="c-dim">← connected & recording</span>
+<span class="c-red">🔴 setpoint2 (5.1.2001) ✅ XC</span>  <span class="c-dim">← stopped</span></div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">STEP 02</div>
+          <div class="step-body">
+            <div class="step-title">Yang Terjadi Otomatis Saat Pertama Connect</div>
+            <div class="step-desc">PI Adapter akan otomatis melakukan seluruh proses ini tanpa perlu input manual:</div>
+            <div class="code"><span class="c-gold">Proses Otomatis PI Adapter:</span>
+
+<span class="c-teal">1.</span> Baca konfigurasi MPS dari VC-8000 rack
+<span class="c-teal">2.</span> Auto-create PI Tags di Data Archive
+<span class="c-teal">3.</span> Auto-create AF Database structure di PI AF
+<span class="c-teal">4.</span> Mulai collect data → kirim ke PI Archive
+
+<span class="c-dim"># Struktur AF yang terbentuk otomatis:</span>
+<span class="c-gold">Setpoint Instrument (rack)</span>
+  └─ <span class="c-teal">Customer Site A</span>
+      └─ <span class="c-teal">Unit 501</span>
+          ├─ <span class="c-green">A1</span>
+          ├─ <span class="c-green">B10</span>
+          └─ <span class="c-green">B11</span>
+              ├─ Bearing Radial Vibration 1
+              └─ Radial Vibration 2</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">STEP 03</div>
+          <div class="step-body">
+            <div class="step-title">Format Nama PI Tag yang Dibuat Otomatis</div>
+            <div class="step-desc">Setiap channel menghasilkan multiple PI tags. Radial Vibration = 17 tags per channel.</div>
+            <div class="tag-format">
+              <div class="tf-label">// Tag Name Format</div>
+              <div class="tag-parts">
+                <span class="tag-part tp-rack">RackName</span>
+                <span class="tag-part tp-sep">•</span>
+                <span class="tag-part tp-slot">Slot</span>
+                <span class="tag-part tp-sep">•</span>
+                <span class="tag-part tp-ch">Channel</span>
+                <span class="tag-part tp-sep">•</span>
+                <span class="tag-part tp-meas">Measurement</span>
+                <span class="tag-part tp-sep">•</span>
+                <span class="tag-part tp-type">Type</span>
+              </div>
+              <div class="tag-example">STG1_11 . 4 . 1 . nXAmplitude . 1</div>
+              <div style="margin-top:14px; color:rgba(255,255,255,0.4); font-size:11px; font-family:'JetBrains Mono',monospace; line-height:2">
+                STG1_11.4.1.Direct.0          ← Direct vibration (Float32, mil/µm)<br>
+                STG1_11.4.1.Gap.0             ← Gap voltage (Float32, mil/µm)<br>
+                STG1_11.4.1.nXAmplitude.1     ← 1X Amplitude<br>
+                STG1_11.4.1.nXAmplitude.2     ← 2X Amplitude<br>
+                STG1_11.4.1.nXPhase.1         ← 1X Phase (deg)<br>
+                STG1_11.4.1.SyncWaveform.99   ← Waveform data (Float32)<br>
+                STG1_11.4.1.Direct.0.Quality  ← Quality/alarm status (Int32)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="s4">
+      <div class="section-header">
+        <div class="section-num">04</div>
+        <div class="section-meta">
+          <span class="section-tag">Konfigurasi</span>
+          <h2>Data Collection Rates</h2>
+          <p>Setting interval pengambilan data — berpengaruh langsung ke storage usage</p>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Dynamic Rate</th><th>Storage 1 Channel / Tahun</th><th>Storage 300 Channel / Tahun</th><th>Recommended For</th></tr>
+          <tr><td>1 menit</td><td class="td-err">25.8 GB</td><td class="td-err">7.7 TB</td><td>Transient monitoring intensif</td></tr>
+          <tr class="rate-best"><td>20 menit ⭐</td><td class="td-warn">1.3 GB</td><td class="td-warn">390 GB</td><td>Lab / development / learning</td></tr>
+          <tr class="rate-best"><td>2 jam ⭐</td><td class="td-ok">216 MB</td><td class="td-ok">65 GB</td><td>Steady-state monitoring</td></tr>
+          <tr><td>1 hari</td><td class="td-ok">18 MB</td><td class="td-ok">5.4 GB</td><td>Long-term trending only</td></tr>
+        </table>
+      </div>
+      <div class="alert alert-info" style="margin-top:16px">
+        <span class="alert-icon">💡</span>
+        <div>Untuk lab bro, set ke <strong>20 menit atau 2 jam</strong> — cukup belajar tanpa makan storage terlalu besar. Setting ada di <strong>PI Adapter → Asset Framework View</strong>.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 5 -->
+    <div class="section" id="s5">
+      <div class="section-header">
+        <div class="section-num">05</div>
+        <div class="section-meta">
+          <span class="section-tag">Penggunaan</span>
+          <h2>SETPOINT CMS Display</h2>
+          <p>Aplikasi utama untuk analisis vibration — orbit, FFT, waveform, Bode</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">BUKA</div>
+          <div class="step-body">
+            <div class="step-title">Buka CMS Software & Navigasi</div>
+            <div class="code"><span class="c-dim"># Start Menu → Setpoint CMS</span>
+<span class="c-dim"># Login dengan Windows credential</span>
+
+<span class="c-gold">Panel Kiri (Navigation Tree):</span>
+Assets
+  └─ Setpoint Instrument (rack)
+      └─ Customer Site A
+          └─ Unit → Bearing → Channel
+
+<span class="c-gold">Cara buka plot:</span>
+<span class="c-teal">1.</span> Klik bearing/channel di navigation tree
+<span class="c-teal">2.</span> Pilih measurement (1X Amplitude, Direct, dll)
+<span class="c-teal">3.</span> Pilih plot type dari toolbar
+<span class="c-teal">4.</span> Set time range: <span class="c-white">* - 8h</span> sampai <span class="c-white">*</span>
+<span class="c-teal">5.</span> Klik: Refresh / Update</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plot-grid" style="margin-top:16px">
+        <div class="plot-card">
+          <div class="pc-ico">〰️</div>
+          <div class="pc-name">Time Waveform</div>
+          <div class="pc-desc">Raw sinyal vibration vs waktu. Untuk deteksi impak dan bentuk gelombang.</div>
+        </div>
+        <div class="plot-card">
+          <div class="pc-ico">📈</div>
+          <div class="pc-name">Spectrum (FFT)</div>
+          <div class="pc-desc">Frequency domain. Identifikasi komponen 1X, 2X, harmonic, bearing defect freq.</div>
+        </div>
+        <div class="plot-card">
+          <div class="pc-ico">🔄</div>
+          <div class="pc-name">Orbit Plot</div>
+          <div class="pc-desc">Gerakan shaft X vs Y. Deteksi misalignment, rub, dan shaft instability.</div>
+        </div>
+        <div class="plot-card">
+          <div class="pc-ico">📉</div>
+          <div class="pc-name">Bode Plot</div>
+          <div class="pc-desc">Amplitude & phase vs RPM. Identifikasi critical speed saat startup/shutdown.</div>
+        </div>
+        <div class="plot-card">
+          <div class="pc-ico">🧭</div>
+          <div class="pc-name">Polar Plot</div>
+          <div class="pc-desc">Phase vector diagram. Monitor perubahan phase selama operasi.</div>
+        </div>
+        <div class="plot-card">
+          <div class="pc-ico">🌊</div>
+          <div class="pc-name">Waterfall / Cascade</div>
+          <div class="pc-desc">Spectrum vs waktu 3D. Lihat evolusi frekuensi dari waktu ke waktu.</div>
+        </div>
+        <div class="plot-card">
+          <div class="pc-ico">📊</div>
+          <div class="pc-name">Trend</div>
+          <div class="pc-desc">Nilai measurement over time. Monitoring kondisi jangka panjang.</div>
+        </div>
+      </div>
+
+      <div class="alert alert-warn" style="margin-top:16px">
+        <span class="alert-icon">⚠️</span>
+        <div><strong>Waveform data TIDAK bisa dilihat di PI Vision!</strong> Untuk orbit plot, spectrum, FFT — wajib pakai Setpoint CMS Display. PI Vision hanya untuk static data (amplitude, direct, phase).</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 6 -->
+    <div class="section" id="s6">
+      <div class="section-header">
+        <div class="section-num">06</div>
+        <div class="section-meta">
+          <span class="section-tag">Penggunaan</span>
+          <h2>PI Vision untuk Static Data</h2>
+          <p>Tampilkan data amplitude, direct, dan status di web dashboard</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">AKSES</div>
+          <div class="step-body">
+            <div class="step-title">Buka PI Vision & Buat Display</div>
+            <div class="code"><span class="c-dim"># URL akses PI Vision:</span>
+<span class="c-gold">http://PISRVCISDEMO/PIVision/#/</span>
+
+<span class="c-dim"># Buat display baru:</span>
+New Display → Blank → Open
+
+<span class="c-dim"># Tambah symbols dari SETPOINT tags:</span>
+<span class="c-teal">Trend:</span>
+  Tag: <span class="c-white">STG1_11.4.1.Direct.0</span>
+  Tag: <span class="c-white">STG1_11.4.1.nXAmplitude.1</span>
+
+<span class="c-teal">Value (Current):</span>
+  Tag: <span class="c-white">STG1_11.4.1.nXAmplitude.2</span>
+  Format: Numeric, 2 decimal places
+
+<span class="c-teal">Multi-state (Alarm Status):</span>
+  Tag: <span class="c-white">STG1_11.4.1.Direct.0.Quality</span>
+  Value 2   : "VALID"   → Hijau
+  Value 8   : "ALERT"   → Kuning
+  Value 32  : "DANGER"  → Merah
+  Value 64  : "NOT OK"  → Merah tua</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--ink3); margin-bottom:12px; text-transform:uppercase;">Quality Tag Status Values</div>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Value</th><th>Status</th><th>Deskripsi</th></tr>
+            <tr><td>0, 1</td><td class="td-warn">No Data</td><td>Tidak ada data dari channel</td></tr>
+            <tr><td>2</td><td class="td-ok">Valid</td><td>Data valid, kondisi normal</td></tr>
+            <tr><td>8</td><td class="td-warn">Alert</td><td>Melebihi setpoint Alert</td></tr>
+            <tr><td>32</td><td class="td-err">Danger</td><td>Melebihi setpoint Danger</td></tr>
+            <tr><td>64</td><td class="td-err">Not OK</td><td>Channel failure / sensor fault</td></tr>
+            <tr><td>256</td><td class="td-warn">Bypass</td><td>Channel di-bypass oleh operator</td></tr>
+            <tr><td>512</td><td class="td-warn">Trip Multiply</td><td>Setpoint multiply aktif</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 7 -->
+    <div class="section" id="s7">
+      <div class="section-header">
+        <div class="section-num">07</div>
+        <div class="section-meta">
+          <span class="section-tag">Penggunaan</span>
+          <h2>Upload Offline Data / Backfilling</h2>
+          <p>Recovery data CMS yang collected offline atau saat jaringan putus</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">UPLOAD</div>
+          <div class="step-body">
+            <div class="step-title">Upload CMS Database Offline ke PI</div>
+            <div class="step-desc">Digunakan ketika data dikumpulkan tanpa koneksi PI (mode XC/offline).</div>
+            <div class="code"><span class="c-gold">PI Adapter → Options → PI System Options</span>
+→ Klik: <span class="c-teal">Upload</span> (Import CMS Data into PI System)
+
+<span class="c-dim"># Dialog Upload CMS Database:</span>
+<span class="c-teal">CMS Database File :</span> <span class="c-white">C:\...\data-file.cms</span>
+<span class="c-teal">PI Server         :</span> <span class="c-white">PISRVCISDEMO</span>
+<span class="c-teal">AF Rack Alias     :</span> <span class="c-white">STG1_11</span>
+→ OK
+
+<span class="c-dim"># Response sistem:</span>
+<span class="c-green">"PI System is ready to archive the upload range" ✅</span>
+<span class="c-dim">→ Data akan di-upload</span>
+
+<span class="c-red">"PI System was not running during this period" ⚠️</span>
+<span class="c-dim">→ Admin perlu buat archive baru dulu</span></div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num-col">BACKFILL</div>
+          <div class="step-body">
+            <div class="step-title">Auto Backfilling via PI Buffer Subsystem</div>
+            <div class="step-desc">Jika jaringan putus sementara, PI Adapter otomatis backfill data dari CMS-HD SAM.</div>
+            <div class="code"><span class="c-dim"># Cara kerja auto backfilling:</span>
+<span class="c-teal">1.</span> Network putus → data tersimpan di CMS-HD (SSD internal)
+<span class="c-teal">2.</span> Network reconnect → PI Adapter deteksi gap
+<span class="c-teal">3.</span> Data otomatis di-push ke PI Archive (backfill)
+<span class="c-teal">4.</span> Gap terisi → data kontinu di PI Vision ✅
+
+<span class="c-dim"># Jika gap lebih dari 3 hari:</span>
+<span class="c-red">⚠️ Perlu prosedur manual</span>
+<span class="c-dim">   → Refer ke CMS manual untuk instruksi lengkap</span>
+<span class="c-dim">   → Hubungi Brüel & Kjær Vibro support</span></div>
+            <div class="alert alert-ok">
+              <span class="alert-icon">✅</span>
+              <div>Backfilling hanya bekerja jika <strong>PI Backfilling diaktifkan</strong> di tab Advanced PI Adapter (lihat Section 01 Step 03).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 8 -->
+    <div class="section" id="s8">
+      <div class="section-header">
+        <div class="section-num">08</div>
+        <div class="section-meta">
+          <span class="section-tag">Administrasi</span>
+          <h2>Rename PI Tags</h2>
+          <p>Kustomisasi nama tag sesuai konvensi naming perusahaan tanpa reconfig rack</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num-col">PI BUILDER</div>
+          <div class="step-body">
+            <div class="step-title">Rename via PI Builder (Excel Add-in)</div>
+            <div class="step-desc">PI Adapter menggunakan kolom instrumenttag (bukan name) untuk mapping — jadi nama bisa diubah bebas.</div>
+            <div class="code"><span class="c-gold">Buka Excel → Tab: PI Builder</span>
+→ PI Points → Load tags dengan prefix <span class="c-white">STG1_11*</span>
+
+<span class="c-dim"># Kolom yang boleh diubah:</span>
+<span class="c-teal">Name</span>          → ganti sesuai naming convention
+<span class="c-teal">Description</span>   → update deskripsi yang lebih jelas
+
+<span class="c-dim"># Kolom yang JANGAN diubah:</span>
+<span class="c-red">instrumenttag</span>  → ini yang dipakai PI Adapter untuk mapping rack!
+
+<span class="c-dim"># Contoh rename:</span>
+<span class="c-dim">Before:</span> STG1_11.4.1.Direct.0
+<span class="c-dim">After :</span> <span class="c-white">Plant.VibMotor01.BrgDE.Direct</span>
+
+→ Publish ke PI Server ✅
+
+<span class="c-dim"># PI Adapter akan tetap bisa collect data karena</span>
+<span class="c-dim"># mapping berdasarkan instrumenttag, bukan tag name</span></div>
+            <div class="alert alert-info">
+              <span class="alert-icon">ℹ️</span>
+              <div>AF Elements juga bisa dipindah-pindah di tree tanpa perlu reconfig rack. Extended properties menyimpan Setpoint rack identifier secara terpisah.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 9 -->
+    <div class="section" id="s9">
+      <div class="section-header">
+        <div class="section-num">09</div>
+        <div class="section-meta">
+          <span class="section-tag">Referensi</span>
+          <h2>Troubleshooting</h2>
+          <p>Masalah umum dan cara mengatasinya</p>
+        </div>
+      </div>
+
+      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--ink3); margin-bottom:10px; display:grid; grid-template-columns:1fr 1fr 1fr; padding:0 0 6px; border-bottom:1px solid var(--border); text-transform:uppercase;">
+        <span>Problem</span><span>Kemungkinan Penyebab</span><span>Solusi</span>
+      </div>
+      <div class="trouble-grid">
+        <div class="trouble-item">
+          <div class="ti-problem">Rack ❌ di Check Connections</div>
+          <div class="ti-cause">IP rack salah atau VC-8000 tidak menyala</div>
+          <div class="ti-fix">Cek IP address & power rack</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">PI ❌ di Check Connections</div>
+          <div class="ti-cause">PI Server services tidak running</div>
+          <div class="ti-fix">Start PI services di server</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">AF ❌ di Check Connections</div>
+          <div class="ti-cause">piaflink service down</div>
+          <div class="ti-fix">Restart piaflink service</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">Status stuck di "Starting"</div>
+          <div class="ti-cause">PI Adapter tidak bisa auth ke PI</div>
+          <div class="ti-fix">Cek PI Trust/Mapping di PI SMT</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">PI Tags tidak terbuat otomatis</div>
+          <div class="ti-cause">PI Adapter tidak punya Write access</div>
+          <div class="ti-fix">Cek PI Identity mapping — perlu R/W</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">Data tidak muncul di PI Vision</div>
+          <div class="ti-cause">PI Trust untuk Vision belum dibuat</div>
+          <div class="ti-fix">Buat Trust di PI SMT → Trusts</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">Backfill tidak berjalan</div>
+          <div class="ti-cause">PI Backfilling belum diaktifkan</div>
+          <div class="ti-fix">Centang PI Backfilling di tab Advanced</div>
+        </div>
+        <div class="trouble-item">
+          <div class="ti-problem">CMS plot tidak tampil waveform</div>
+          <div class="ti-cause">CMS HD/SD belum di-enable di MPS</div>
+          <div class="ti-fix">Enable CMS (HD) & CMS (SD) di MPS Setup</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 10 -->
+    <div class="section" id="s10">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div class="section-meta">
+          <span class="section-tag">Referensi</span>
+          <h2>Checklist Final — End-to-End</h2>
+          <p>Klik setiap item untuk tandai sudah selesai dikonfigurasi</p>
+        </div>
+      </div>
+      <div class="checklist">
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>VC-8000 rack powered on, static IP dikonfigurasi</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>CMS (SD), CMS (HD), CMS (DAC) enabled di MPS Setup</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>PI Adapter terinstall, rack ditambahkan (Add)</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Check Connections: semua ✅ passed</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>PI Backfilling diaktifkan di tab Advanced</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Recording dimulai, status: Recording ✅</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>PI Tags terbuat otomatis di PI SMT → Current Values</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>AF Database terbentuk otomatis di PI System Explorer</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Data muncul di SETPOINT CMS Display (waveform, trend)</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Static data (amplitude, direct) tampil di PI Vision</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Quality tag dikonfigurasi sebagai Multi-state di PI Vision</div>
+        <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Data Collection Rate sudah diset sesuai kebutuhan</div>
+      </div>
+
+      <div class="alert alert-ok" style="margin-top:20px">
+        <span class="alert-icon">🎯</span>
+        <div>Semua checklist ✅ = sistem SETPOINT CMS + PI Adapter sudah berjalan penuh. Data vibration dari VC-8000 masuk ke PI Archive dan bisa dianalisis via CMS Display maupun dimonitor via PI Vision.</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  function toggleChk(el) {
+    el.classList.toggle('done');
+    const box = el.querySelector('.chk-box');
+    box.textContent = el.classList.contains('done') ? '✓' : '';
+  }
+
+  // Scroll progress
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop;
+    const total = doc.scrollHeight - doc.clientHeight;
+    const pct = (scrolled / total) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('.section, #prereq');
+  const navItems = document.querySelectorAll('.nav-item');
+  const indicator = document.getElementById('section-indicator');
+
+  const sectionNames = {
+    'prereq': 'Prerequisites',
+    's1': '01 Setup PI Adapter',
+    's2': '02 Konfigurasi VC-8000',
+    's3': '03 Start Collection',
+    's4': '04 Collection Rates',
+    's5': '05 CMS Display',
+    's6': '06 PI Vision',
+    's7': '07 Upload / Backfill',
+    's8': '08 Rename Tags',
+    's9': '09 Troubleshooting',
+    's10': '10 Final Checklist',
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(n => {
+          n.classList.toggle('active', n.getAttribute('href') === '#' + id);
+        });
+        if (sectionNames[id]) indicator.textContent = sectionNames[id];
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('[id]').forEach(el => {
+    if (el.id) observer.observe(el);
+  });
+</script>
+</body>
+</html>
