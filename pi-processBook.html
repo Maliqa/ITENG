@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI ProcessBook — Dead Software Walking</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2430;
+    --accent: #f97316;
+    --accent2: #ef4444;
+    --accent3: #22d3ee;
+    --muted: #4b5563;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* SCAN LINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    padding: 4px 12px;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  header h1 .dead {
+    color: var(--accent2);
+    position: relative;
+    display: inline-block;
+  }
+
+  header h1 .dead::after {
+    content: '';
+    position: absolute;
+    bottom: 6px; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent2);
+    animation: strikeIn 0.6s 0.4s ease forwards;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  @keyframes strikeIn {
+    to { transform: scaleX(1); }
+  }
+
+  header p.subtitle {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 16px;
+    max-width: 580px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .meta-item span {
+    color: var(--accent3);
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  p {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 14px;
+    max-width: 720px;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin-top: 16px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent2), var(--border));
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+  }
+
+  .tl-date {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent2);
+    text-transform: uppercase;
+  }
+
+  .tl-desc {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  .tl-item.done .tl-desc {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  /* ── RISK CARDS ── */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .risk-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .risk-card:hover {
+    border-color: var(--accent2);
+  }
+
+  .risk-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .risk-card.critical::before { background: var(--accent2); }
+  .risk-card.high::before { background: #f59e0b; }
+  .risk-card.medium::before { background: #84cc16; }
+
+  .risk-level {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .critical .risk-level { color: var(--accent2); }
+  .high .risk-level { color: #f59e0b; }
+  .medium .risk-level { color: #84cc16; }
+
+  .risk-title {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .risk-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .risk-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* ── TECH COMPARE TABLE ── */
+  .tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 12px;
+  }
+
+  .tech-table th {
+    background: var(--surface2);
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tech-table th:last-child { color: var(--accent3); }
+
+  .tech-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,36,48,0.7);
+    color: var(--text2);
+    vertical-align: top;
+  }
+
+  .tech-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .tech-table td:first-child {
+    color: var(--text);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .tag-bad {
+    display: inline-block;
+    background: rgba(239,68,68,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(239,68,68,0.2);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+
+  .tag-good {
+    display: inline-block;
+    background: rgba(34,211,238,0.08);
+    color: var(--accent3);
+    border: 1px solid rgba(34,211,238,0.2);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+
+  /* ── ANALOGY BLOCK ── */
+  .analogy-box {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 28px 28px 28px 32px;
+    margin-top: 20px;
+    position: relative;
+  }
+
+  .analogy-box::before {
+    content: '"';
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 3rem;
+    color: var(--accent);
+    font-family: serif;
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .analogy-title {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .analogy-text {
+    font-size: 13px;
+    color: var(--text2);
+    font-style: italic;
+    line-height: 1.8;
+  }
+
+  .analogy-breakdown {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .analogy-map {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 12px;
+    font-size: 11px;
+  }
+
+  .analogy-map .am-label {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .analogy-map .am-val {
+    color: var(--text);
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 16px;
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+
+  .code-block .c-comment { color: #374151; }
+  .code-block .c-key { color: var(--accent2); }
+  .code-block .c-val { color: var(--accent3); }
+  .code-block .c-ok { color: #4ade80; }
+  .code-block .c-warn { color: #f59e0b; }
+
+  /* ── VERDICT ── */
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(249,115,22,0.05), rgba(239,68,68,0.05));
+    border: 1px solid rgba(249,115,22,0.2);
+    padding: 32px;
+    margin-top: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .verdict-box::before {
+    content: '⚠';
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.03;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .verdict-box h3 {
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .verdict-box p {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 32px 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  footer a {
+    color: var(--accent3);
+    text-decoration: none;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  section {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  section:nth-child(1) { animation-delay: 0.1s; }
+  section:nth-child(2) { animation-delay: 0.2s; }
+  section:nth-child(3) { animation-delay: 0.3s; }
+  section:nth-child(4) { animation-delay: 0.4s; }
+  section:nth-child(5) { animation-delay: 0.5s; }
+
+  @media (max-width: 600px) {
+    .analogy-breakdown { grid-template-columns: 1fr; }
+    .risk-grid { grid-template-columns: 1fr; }
+    .tech-table { font-size: 11px; }
+    .tech-table td, .tech-table th { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge">⚠ AVEVA Official Notice · End of Life</div>
+    <h1>PI ProcessBook<br>— <span class="dead">Dead Software</span> Walking</h1>
+    <p class="subtitle">
+      Panduan teknis mengapa PI ProcessBook <strong>tidak boleh diinstall</strong> di environment baru,
+      risiko jika tetap digunakan, dan penjelasan sederhana untuk semua stakeholder.
+    </p>
+    <div class="meta-row">
+      <div class="meta-item">STATUS: <span>EOL Dec 31, 2024</span></div>
+      <div class="meta-item">SECURITY PATCH: <span>Stopped Dec 2022</span></div>
+      <div class="meta-item">PENGGANTI: <span>PI Vision (Web-based)</span></div>
+      <div class="meta-item">SOURCE: <span>AVEVA Official Blog</span></div>
+    </div>
+  </header>
+
+  <!-- SECTION 1: KENAPA TIDAK DIREKOMENDASIKAN -->
+  <section>
+    <div class="section-label">// 01 · Mengapa Tidak Direkomendasikan</div>
+    <h2>Rekomendasi Resmi AVEVA: Jangan Install PI ProcessBook</h2>
+
+    <p>
+      AVEVA secara resmi menyatakan bahwa PI ProcessBook telah "officially retired" dan
+      merekomendasikan semua pengguna beralih ke <strong>PI Vision</strong> sebagai satu-satunya
+      jalur migrasi yang didukung. Bukan sekadar deprecated — ini <em>full retirement</em>.
+    </p>
+
+    <p>
+      Berikut adalah <strong>timeline resmi akhir hidup PI ProcessBook</strong>:
+    </p>
+
+    <div class="timeline">
+      <div class="tl-item done">
+        <div class="tl-date">31 Desember 2020</div>
+        <div class="tl-desc">AVEVA mengumumkan rencana penghentian PI ProcessBook secara resmi.</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-date">31 Desember 2022</div>
+        <div class="tl-desc">✗ Security updates & patches dihentikan sepenuhnya. Setiap CVE baru tidak akan ditambal.</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-date">31 Desember 2024</div>
+        <div class="tl-desc">✗ Technical support resmi berakhir. Download & akses installer tidak tersedia lagi dari portal AVEVA.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Sekarang → Seterusnya</div>
+        <div class="tl-desc">⚠ Software masih bisa berjalan jika sudah terinstall, tapi tanpa patch, tanpa support, tanpa update.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: RISIKO TEKNIS -->
+  <section>
+    <div class="section-label">// 02 · Risiko Jika Tetap Install</div>
+    <h2>Risk Assessment: PI ProcessBook di Environment Baru</h2>
+
+    <p>
+      Jika tetap memilih untuk menginstall PI ProcessBook (misalnya dari installer lama),
+      berikut adalah risiko-risiko yang harus dipahami secara teknis:
+    </p>
+
+    <div class="risk-grid">
+      <div class="risk-card critical">
+        <span class="risk-icon">🔓</span>
+        <div class="risk-level">● Critical</div>
+        <div class="risk-title">Unpatched Security Vulnerabilities</div>
+        <div class="risk-desc">
+          Sejak Des 2022, tidak ada security patch. CVE yang ditemukan setelah tanggal tersebut pada
+          komponen ActiveX, VBA runtime, dan COM objects yang digunakan ProcessBook
+          tidak akan pernah ditambal. Attack surface terbuka permanen.
+        </div>
+      </div>
+
+      <div class="risk-card critical">
+        <span class="risk-icon">🧩</span>
+        <div class="risk-level">● Critical</div>
+        <div class="risk-title">Dependency Hell: ActiveX & COM</div>
+        <div class="risk-desc">
+          ProcessBook bergantung pada teknologi <strong>ActiveX</strong> dan <strong>COM/OLE</strong>
+          yang dijalankan lewat Internet Explorer engine. IE sudah resmi retired Juni 2022.
+          Windows 11 / Windows Server 2022+ tidak lagi support fully IE-based COM rendering.
+        </div>
+      </div>
+
+      <div class="risk-card high">
+        <span class="risk-icon">🧱</span>
+        <div class="risk-level">◆ High</div>
+        <div class="risk-title">Incompatibility dengan OS Terbaru</div>
+        <div class="risk-desc">
+          ProcessBook dirancang untuk Windows XP–Windows 10 era lama.
+          Instalasi di Windows Server 2019/2022 atau Windows 11 dapat mengalami
+          kegagalan rendering, crash, atau fitur yang silent-fail tanpa error message.
+        </div>
+      </div>
+
+      <div class="risk-card high">
+        <span class="risk-icon">🚫</span>
+        <div class="risk-level">◆ High</div>
+        <div class="risk-title">No Support & No Download</div>
+        <div class="risk-desc">
+          AVEVA Customer Portal sudah menutup akses download resmi.
+          Menggunakan installer dari sumber tidak resmi melanggar lisensi dan meningkatkan
+          risiko supply chain attack (installer yang telah dimodifikasi).
+        </div>
+      </div>
+
+      <div class="risk-card high">
+        <span class="risk-icon">⚡</span>
+        <div class="risk-level">◆ High</div>
+        <div class="risk-title">Konflik dengan PI Vision di Server yang Sama</div>
+        <div class="risk-desc">
+          ProcessBook menggunakan port dan registry key yang bisa conflict dengan
+          PI Vision (IIS-based). Menginstall keduanya di server yang sama
+          berisiko menyebabkan PI Vision gagal berfungsi normal.
+        </div>
+      </div>
+
+      <div class="risk-card medium">
+        <span class="risk-icon">🔧</span>
+        <div class="risk-level">▸ Medium</div>
+        <div class="risk-title">Dead-End Migration Path</div>
+        <div class="risk-desc">
+          Semakin lama menggunakan ProcessBook, semakin besar technical debt yang menumpuk
+          terutama jika ada custom VBA scripting. Migrasi ke PI Vision belakangan akan
+          lebih kompleks dan costly.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: TECH COMPARISON -->
+  <section>
+    <div class="section-label">// 03 · Penjelasan Teknis</div>
+    <h2>PI ProcessBook vs PI Vision: Under The Hood</h2>
+
+    <p>
+      Ini bukan sekadar "tampilan baru". Kedua produk ini berbeda secara fundamental
+      di level arsitektur:
+    </p>
+
+    <table class="tech-table">
+      <thead>
+        <tr>
+          <th>Aspek</th>
+          <th>PI ProcessBook ❌</th>
+          <th>PI Vision ✓</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Arsitektur</td>
+          <td>Desktop client app (Windows only)<br><span class="tag-bad">Fat client</span></td>
+          <td>Web app via IIS/ASP.NET<br><span class="tag-good">Thin client</span></td>
+        </tr>
+        <tr>
+          <td>Rendering Engine</td>
+          <td>COM/ActiveX + IE (deprecated)<br><span class="tag-bad">Legacy IE engine</span></td>
+          <td>HTML5 + JavaScript + REST API<br><span class="tag-good">Modern browser</span></td>
+        </tr>
+        <tr>
+          <td>Scripting</td>
+          <td>Visual Basic for Applications (VBA)<br><span class="tag-bad">Maintenance nightmare</span></td>
+          <td>Custom symbols via HTML/JS<br><span class="tag-good">Modern web stack</span></td>
+        </tr>
+        <tr>
+          <td>Access Method</td>
+          <td>Harus install di tiap PC<br><span class="tag-bad">Per-machine install</span></td>
+          <td>Browser URL, bisa dari HP/tablet<br><span class="tag-good">URL sharing</span></td>
+        </tr>
+        <tr>
+          <td>Security Model</td>
+          <td>NT Authentication, no MFA<br><span class="tag-bad">Outdated auth</span></td>
+          <td>Windows Auth + HTTPS + LDAP/AD<br><span class="tag-good">Modern security</span></td>
+        </tr>
+        <tr>
+          <td>PI AF Integration</td>
+          <td>Terbatas, manual linking<br><span class="tag-bad">Partial</span></td>
+          <td>Native AF Asset Framework<br><span class="tag-good">Full integration</span></td>
+        </tr>
+        <tr>
+          <td>Data Volume</td>
+          <td>Throttle di high-frequency data<br><span class="tag-bad">Performance cap</span></td>
+          <td>Scalable, multi-user concurrent<br><span class="tag-good">Enterprise scale</span></td>
+        </tr>
+        <tr>
+          <td>Update & Patch</td>
+          <td>Berhenti Des 2022<br><span class="tag-bad">Dead</span></td>
+          <td>Aktif dikembangkan AVEVA<br><span class="tag-good">Actively maintained</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-block">
+<span class="c-comment">// Ilustrasi dependency tree PI ProcessBook</span>
+PI ProcessBook.exe
+├── <span class="c-key">PISDKDll.dll</span>         <span class="c-comment">← PI SDK (legacy, 32-bit)</span>
+├── <span class="c-key">ActiveX Controls</span>     <span class="c-comment">← COM-based, requires MSHTML.dll</span>
+│   └── <span class="c-warn">MSHTML.dll</span>       <span class="c-comment">← Internet Explorer engine [RETIRED]</span>
+├── <span class="c-key">VBA Runtime</span>          <span class="c-comment">← Microsoft VBA7 (Office dependency)</span>
+└── <span class="c-key">OLE Automation</span>       <span class="c-comment">← 32-bit COM server, tidak support Win11 fully</span>
+
+<span class="c-comment">// Ilustrasi dependency tree PI Vision</span>
+PI Vision (IIS)
+├── <span class="c-ok">ASP.NET Core</span>          <span class="c-comment">← Modern .NET, cross-platform ready</span>
+├── <span class="c-ok">PI Web API</span>            <span class="c-comment">← REST/JSON, fire dari browser apapun</span>
+├── <span class="c-ok">HTML5 + JavaScript</span>   <span class="c-comment">← Berjalan di Chrome, Edge, Firefox</span>
+└── <span class="c-ok">PI AF SDK</span>            <span class="c-comment">← Native Asset Framework integration</span>
+    </div>
+  </section>
+
+  <!-- SECTION 4: ANALOGI -->
+  <section>
+    <div class="section-label">// 04 · Analogi Sederhana</div>
+    <h2>Kalau Bingung, Baca Ini</h2>
+
+    <div class="analogy-box">
+      <div class="analogy-title">Analogi 1 — Warung vs Restoran Online</div>
+      <div class="analogy-text">
+        PI ProcessBook itu seperti <strong>warung makan jadul yang sudah tutup</strong>. Dulu enak,
+        dulu bisa makan di sana, tapi sekarang sudah tutup permanen, kuncinya sudah diserahkan,
+        dan pemiliknya sudah pindah buka restoran baru (PI Vision).
+        <br><br>
+        Kamu masih bisa masuk lewat jendela yang rusak (installer bajakan/lama) dan masak sendiri di dapur yang ditinggal,
+        tapi <strong>tidak ada yang jaga, tidak ada yang bersihkan, tidak ada yang tahu kalau ada tikus masuk.</strong>
+      </div>
+
+      <div class="analogy-breakdown">
+        <div class="analogy-map">
+          <div class="am-label">ProcessBook =</div>
+          <div class="am-val">Warung tutup yang kamu paksa buka sendiri</div>
+        </div>
+        <div class="analogy-map">
+          <div class="am-label">No Security Patch =</div>
+          <div class="am-val">Pintu rusak yang tidak ada yang mau betulkan</div>
+        </div>
+        <div class="analogy-map">
+          <div class="am-label">PI Vision =</div>
+          <div class="am-val">Restoran baru, bisa order lewat HP dari mana saja</div>
+        </div>
+        <div class="analogy-map">
+          <div class="am-label">Migrasi =</div>
+          <div class="am-val">Pindah ke restoran baru, menu sama, tampilan lebih bagus</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analogy-box" style="margin-top: 16px; border-left-color: var(--accent2);">
+      <div class="analogy-title" style="color: var(--accent2);">Analogi 2 — Windows XP di 2025</div>
+      <div class="analogy-text">
+        Menginstall PI ProcessBook di server baru itu seperti <strong>menginstall Windows XP
+        di laptop gaming terbaru</strong>. Bisa jalan? Mungkin. Tapi:
+        <br><br>
+        — Driver tidak support penuh<br>
+        — Tidak ada update keamanan sejak 2014<br>
+        — Hacker sudah hafal semua lubangnya<br>
+        — Tidak ada yang mau bantu kalau rusak<br><br>
+        Bedanya, Windows XP setidaknya bisa kamu download legal. PI ProcessBook bahkan sudah
+        <strong>dihapus dari portal resmi AVEVA.</strong>
+      </div>
+    </div>
+
+    <div class="analogy-box" style="margin-top: 16px; border-left-color: var(--accent3);">
+      <div class="analogy-title" style="color: var(--accent3);">Analogi 3 — Untuk Tim Petronas</div>
+      <div class="analogy-text">
+        Bayangkan kamu pasang <strong>sensor transmitter lama yang sudah discontinued</strong> di fasilitas produksi baru.
+        Transmitter bisa baca tekanan dan suhu, tapi spare part tidak tersedia,
+        kalibrasi tidak bisa dilakukan karena vendor sudah tutup, dan kalau bocor
+        tidak ada warranty coverage.
+        <br><br>
+        Regulator (audit ISA-99/IEC 62443) akan langsung flag ini sebagai <em>non-compliant component</em>.
+        Itulah posisi PI ProcessBook di stack PI System modern — bukan sekadar "kurang bagus",
+        tapi <strong>actively non-compliant dari sisi security baseline.</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERDICT -->
+  <section style="border-bottom: none;">
+    <div class="section-label">// 05 · Kesimpulan</div>
+    <h2>Verdict</h2>
+
+    <div class="verdict-box">
+      <h3>Jangan Install. Gunakan PI Vision.</h3>
+      <p>
+        AVEVA telah resmi menutup PI ProcessBook per 31 Desember 2024. Tidak ada security patch,
+        tidak ada support, tidak ada download resmi. Menginstall di environment baru (terutama
+        production atau lab yang mensimulasikan production) adalah technical debt yang tidak
+        worth it — terutama di lingkungan regulated seperti Oil & Gas Petronas yang
+        memerlukan kepatuhan terhadap ISA-99 / IEC 62443.
+        <br><br>
+        <strong>PI Vision adalah satu-satunya jalur forward yang didukung AVEVA.</strong>
+      </p>
+    </div>
+
+    <table class="tech-table" style="margin-top: 24px;">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Rekomendasi</th>
+          <th>Alasan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lab / Simulasi baru</td>
+          <td><span class="tag-good">✓ Pakai PI Vision</span></td>
+          <td>Simulasi harusnya cerminkan production stack yang valid</td>
+        </tr>
+        <tr>
+          <td>Server production baru</td>
+          <td><span class="tag-good">✓ PI Vision only</span></td>
+          <td>EOL software tidak boleh ada di environment regulated</td>
+        </tr>
+        <tr>
+          <td>Existing ProcessBook display</td>
+          <td><span class="tag-good">✓ Migrate via utility</span></td>
+          <td>AVEVA punya tool migrasi display ke PI Vision</td>
+        </tr>
+        <tr>
+          <td>Tetap install ProcessBook</td>
+          <td><span class="tag-bad">✗ Tidak disarankan</span></td>
+          <td>Security risk, compliance issue, no support path</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <div style="margin-bottom: 8px;">
+      Referensi: <a href="https://www.aveva.com/en/perspectives/blog/why-we-are-retiring-aveva-pi-systems-pi-processbook/" target="_blank">AVEVA Official Blog</a> ·
+      <a href="https://www.processinnovations.io/processbook-end-of-life-5-things-to-know-in-2022/" target="_blank">Process Innovations</a> ·
+      <a href="https://www.cse-icon.com/notice-about-discontinued-pi-products/" target="_blank">CSE ICON</a>
+    </div>
+    <div>PI SYSTEM LAB · PT. CISTECH ALPHA INDONESIA · PISRVCISDEMO / PISYSTEM VM</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
