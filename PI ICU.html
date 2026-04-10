@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan PI ICU — PI System Administrator 2018 SP2</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0B1016;
+    --surface:  #111820;
+    --surface2: #162030;
+    --border:   #1E3040;
+    --teal:     #00C9A7;
+    --blue:     #3B9EDB;
+    --yellow:   #F5C842;
+    --red:      #E05C5C;
+    --green:    #4CAF7D;
+    --white:    #E8F0F5;
+    --gray:     #7A96A8;
+    --dimgray:  #3D5060;
+    --text:     #C8DCE8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 15px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0; width: 248px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow-y: auto; z-index: 100;
+  }
+  .sb-header {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sb-source {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 2.5px;
+    color: var(--teal); text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .sb-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--white); line-height: 1.3;
+  }
+  .sb-sub { font-size: 11px; color: var(--gray); margin-top: 4px; }
+
+  .sb-nav { padding: 10px 0; flex: 1; }
+  .sb-section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 2px;
+    color: var(--dimgray); text-transform: uppercase;
+    padding: 14px 20px 5px;
+  }
+  .sb-nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px;
+    font-size: 12.5px; color: var(--gray);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .sb-nav a:hover  { color: var(--white); background: rgba(0,201,167,0.05); }
+  .sb-nav a.active { color: var(--teal); border-left-color: var(--teal); background: rgba(0,201,167,0.07); }
+  .sb-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--border); flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .sb-nav a:hover .sb-dot, .sb-nav a.active .sb-dot { background: var(--teal); }
+
+  /* ── MAIN ── */
+  .main { margin-left: 248px; }
+
+  /* ── TOP HERO ── */
+  .hero {
+    background: linear-gradient(160deg, #0B1016 0%, #0E1E2C 60%, #0B1016 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 60px 48px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; right: -80px; top: -80px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,201,167,0.055) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-tag::before {
+    content: ''; display: block;
+    width: 24px; height: 1px; background: var(--teal);
+  }
+  .hero h1 {
+    font-size: clamp(26px, 3.5vw, 42px);
+    font-weight: 700; color: var(--white);
+    line-height: 1.1; margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero-desc { font-size: 15px; color: var(--gray); font-weight: 300; max-width: 600px; margin-bottom: 24px; }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; padding: 4px 10px;
+    border-radius: 2px; border: 1px solid var(--border); color: var(--gray);
+  }
+  .badge.t { border-color: var(--teal); color: var(--teal); }
+  .badge.y { border-color: var(--yellow); color: var(--yellow); }
+
+  /* ── CONTENT ── */
+  .content { padding: 0 60px 80px; }
+
+  /* ── SECTION HEADER ── */
+  .sec {
+    padding-top: 52px;
+    margin-bottom: 32px;
+  }
+  .sec-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--blue); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: var(--blue); }
+  .sec h2 {
+    font-size: 22px; font-weight: 700; color: var(--white);
+    line-height: 1.2; margin-bottom: 10px;
+  }
+  .sec-divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--teal) 0%, var(--border) 40%, transparent 100%);
+    margin-bottom: 28px;
+  }
+  .sec p { font-size: 14px; color: var(--text); margin-bottom: 14px; }
+
+  /* ── METHODOLOGY STEPS ── */
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .method-step {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px 16px;
+    transition: border-color 0.15s;
+  }
+  .method-step:hover { border-color: var(--teal); }
+  .method-step.highlight { border-color: var(--teal); background: rgba(0,201,167,0.04); }
+  .ms-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    background: var(--teal); color: var(--bg);
+    width: 26px; height: 26px; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .method-step.extra .ms-num { background: var(--blue); }
+  .ms-body h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .ms-body p  { font-size: 12px; color: var(--gray); line-height: 1.55; }
+
+  /* ── DIRECTED ACTIVITY ── */
+  .activity {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--teal);
+    border-radius: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .activity-header {
+    padding: 14px 20px;
+    background: rgba(0,201,167,0.05);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .activity-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    background: var(--teal); color: var(--bg);
+    padding: 3px 8px; border-radius: 2px;
+    font-weight: 600; flex-shrink: 0;
+  }
+  .activity-badge.solo { background: var(--blue); }
+  .activity-title { font-size: 14px; font-weight: 600; color: var(--white); }
+  .activity-ref { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--gray); margin-left: auto; }
+  .activity-body { padding: 20px 24px; }
+  .activity-obj {
+    font-size: 13px; color: var(--gray);
+    font-style: italic; margin-bottom: 20px;
+    padding-left: 12px; border-left: 2px solid var(--dimgray);
+  }
+
+  /* ── STEPS ── */
+  .steps { list-style: none; }
+  .step-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .step-item:first-child { padding-top: 0; }
+  .step-item:last-child  { border-bottom: none; padding-bottom: 0; }
+  .step-n {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    color: var(--bg); background: var(--teal);
+    min-width: 28px; height: 28px; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-n.part { background: var(--blue); font-size: 10px; }
+  .step-content h4 {
+    font-size: 14px; font-weight: 600; color: var(--white);
+    margin-bottom: 5px;
+  }
+  .step-content p  { font-size: 13px; color: var(--text); line-height: 1.65; }
+  .step-content p + p { margin-top: 6px; }
+
+  /* ── SUB STEPS ── */
+  .sub-steps {
+    margin-top: 10px; list-style: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px 16px;
+  }
+  .sub-step {
+    display: flex; gap: 10px;
+    font-size: 13px; color: var(--text);
+    padding: 5px 0; border-bottom: 1px solid var(--border);
+  }
+  .sub-step:last-child { border-bottom: none; }
+  .sub-step-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--teal); font-weight: 600;
+    min-width: 20px; flex-shrink: 0; padding-top: 1px;
+  }
+
+  /* ── CODE / COMMAND ── */
+  .cmd-block {
+    background: #060E14;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+  .cmd-block .prompt { color: var(--dimgray); user-select: none; }
+  .cmd-block .cmd    { color: var(--teal); }
+  .cmd-block .arg    { color: var(--yellow); }
+  .cmd-block .cmt    { color: var(--dimgray); font-style: italic; }
+  .cmd-block .out    { color: var(--green); }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--teal);
+    background: rgba(0,201,167,0.1);
+    padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    display: flex; gap: 14px;
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 14px 0; font-size: 13px;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout p { color: var(--text); line-height: 1.65; }
+  .callout.note  { background: rgba(59,158,219,0.08); border: 1px solid rgba(59,158,219,0.25); }
+  .callout.tip   { background: rgba(76,175,125,0.08); border: 1px solid rgba(76,175,125,0.25); }
+  .callout.warn  { background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.25); }
+  .callout strong { color: var(--white); font-weight: 600; }
+
+  /* ── TABLES ── */
+  .tbl { width: 100%; border-collapse: collapse; margin: 14px 0 22px; font-size: 13px; }
+  .tbl th {
+    background: var(--surface2); color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 10px 14px; text-align: left;
+    border-bottom: 2px solid var(--teal);
+  }
+  .tbl td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  .tbl tr:nth-child(even) td { background: rgba(0,0,0,0.15); }
+  .tbl .val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--teal); }
+
+  /* ── MESSAGE LOG ── */
+  .msglog {
+    background: #030A0F;
+    border: 1px solid var(--border);
+    border-radius: 4px; padding: 16px 20px;
+    margin: 12px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; line-height: 2;
+  }
+  .msg-good    { color: var(--green); }
+  .msg-info    { color: var(--blue); }
+  .msg-warn    { color: var(--yellow); }
+  .msg-label   { color: var(--dimgray); font-size: 10px; display: block; margin-bottom: 4px; letter-spacing: 1px; }
+
+  /* ── HEALTH POINTS TABLE ── */
+  .hp-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin: 14px 0 22px;
+  }
+  .hp-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 16px 18px;
+    border-top: 2px solid var(--blue);
+  }
+  .hp-card.priority { border-top-color: var(--teal); }
+  .hp-name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--teal); margin-bottom: 6px; font-weight: 600; }
+  .hp-card.priority .hp-name { color: var(--teal); }
+  .hp-card:not(.priority) .hp-name { color: var(--blue); }
+  .hp-desc { font-size: 12.5px; color: var(--gray); line-height: 1.6; }
+
+  /* ── ARCHITECTURE DIAGRAM ── */
+  .arch-wrap {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 24px;
+    display: flex; align-items: center;
+    justify-content: center; flex-wrap: wrap;
+    gap: 0; margin: 14px 0 22px;
+  }
+  .arch-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px 16px;
+    text-align: center; font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    min-width: 110px;
+  }
+  .arch-box.hl  { border-color: var(--teal); color: var(--teal); background: rgba(0,201,167,0.06); }
+  .arch-box .sub { display: block; font-size: 9.5px; color: var(--gray); margin-top: 3px; font-weight: 400; }
+  .arch-arrow { color: var(--teal); font-size: 20px; padding: 0 10px; }
+
+  /* ── SECTION DIVIDER ── */
+  hr.full { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* ── PROGRESS TRACKER ── */
+  .progress-bar {
+    height: 3px; background: var(--border);
+    position: fixed; top: 0; left: 248px; right: 0; z-index: 200;
+  }
+  .progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width 0.1s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 24px; padding-right: 24px; }
+    .method-grid { grid-template-columns: 1fr; }
+    .hp-grid { grid-template-columns: 1fr; }
+    .arch-wrap { flex-direction: column; }
+    .arch-arrow { transform: rotate(90deg); }
+  }
+
+  /* fade-in */
+  .fade { opacity: 0; transform: translateY(14px); transition: opacity 0.45s ease, transform 0.45s ease; }
+  .fade.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-header">
+    <div class="sb-source">PI System Admin 2018 SP2</div>
+    <div class="sb-title">Panduan PI ICU</div>
+    <div class="sb-sub">PI Interface Configuration Utility</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section-label">Konsep</div>
+    <a href="#icu-overview"><span class="sb-dot"></span>Apa itu PI ICU?</a>
+    <a href="#methodology"><span class="sb-dot"></span>Metodologi Instalasi</a>
+    <a href="#architecture"><span class="sb-dot"></span>Arsitektur Interface</a>
+    <div class="sb-section-label">Instalasi</div>
+    <a href="#install"><span class="sb-dot"></span>Install PI ICU & OPCInt</a>
+    <a href="#validate-network"><span class="sb-dot"></span>Validasi Jaringan</a>
+    <a href="#validate-opc"><span class="sb-dot"></span>Validasi OPC Server</a>
+    <div class="sb-section-label">Konfigurasi</div>
+    <a href="#configure-instance"><span class="sb-dot"></span>Buat Instance Interface</a>
+    <a href="#pi-points"><span class="sb-dot"></span>Tipe PI Point OPC DA</a>
+    <a href="#create-points"><span class="sb-dot"></span>Buat PI Points</a>
+    <div class="sb-section-label">Produksi</div>
+    <a href="#buffering"><span class="sb-dot"></span>Konfigurasi Buffering</a>
+    <a href="#health-points"><span class="sb-dot"></span>Health Points</a>
+    <a href="#manage-existing"><span class="sb-dot"></span>Manage Interface Existing</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Panduan Lengkap</div>
+    <h1>PI Interface Configuration<br><span>Utility (PI ICU)</span></h1>
+    <p class="hero-desc">Panduan langkah demi langkah penggunaan PI ICU untuk instalasi, konfigurasi, dan manajemen PI Interface for OPC DA — berdasarkan PI System Administrator 2018 SP2.</p>
+    <div class="hero-badges">
+      <span class="badge t">PI System 2018 SP2</span>
+      <span class="badge t">OPC DA</span>
+      <span class="badge y">Directed Activity</span>
+      <span class="badge">Bab 2 — PI Interface Management</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════ -->
+    <!-- APA ITU PI ICU -->
+    <!-- ══════════════════════════════ -->
+    <section id="icu-overview" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.7</div>
+        <h2>Apa itu PI Interface Configuration Utility (PI ICU)?</h2>
+        <div class="sec-divider"></div>
+        <p>PI Interface Configuration Utility (ICU) adalah <strong style="color:var(--white)">Graphical User Interface (GUI)</strong> yang digunakan oleh PI System Administrator untuk membuat dan mengkonfigurasi batch file serta service dari PI Interface.</p>
+        <p>PI ICU hanya bisa mengkonfigurasi batch file dan service yang terinstal di komputer yang sama (tidak bisa remote ke komputer lain).</p>
+
+        <div class="callout note">
+          <span class="callout-icon">📝</span>
+          <p><strong>Module Database (MDB):</strong> Setelah PI ICU digunakan untuk mengkonfigurasi batch file, isi file tersebut ditulis ke database di Data Archive yang disebut "Module Database" (MDB). Ini memungkinkan recovery konfigurasi PI Interface. Namun jika batch file diedit secara manual, PI ICU akan menampilkan warning.</p>
+        </div>
+
+        <div class="callout tip">
+          <span class="callout-icon">💡</span>
+          <p>Konfigurasi PI Interface melalui PI ICU (bukan edit manual) adalah <strong>best practice</strong> agar konfigurasi tersimpan di MDB dan bisa di-recover kapan saja.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- METODOLOGI INSTALASI -->
+    <!-- ══════════════════════════════ -->
+    <section id="methodology" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.10</div>
+        <h2>Metodologi Instalasi PI Interface</h2>
+        <div class="sec-divider"></div>
+        <p>Setiap kali PI Interface baru dipasang untuk pengumpulan data, ikuti metodologi berikut secara berurutan:</p>
+
+        <div class="method-grid">
+          <div class="method-step highlight">
+            <div class="ms-num">1</div>
+            <div class="ms-body">
+              <h4>Pilih PI Interface</h4>
+              <p>Tentukan jenis PI Interface sesuai data source (OPC DA, OPC UA, Modbus, dll.)</p>
+            </div>
+          </div>
+          <div class="method-step">
+            <div class="ms-num">2</div>
+            <div class="ms-body">
+              <h4>Pilih Lokasi Instalasi</h4>
+              <p>Tentukan arsitektur: apakah interface di-install di server terpisah atau di PI Server.</p>
+            </div>
+          </div>
+          <div class="method-step highlight">
+            <div class="ms-num">3</div>
+            <div class="ms-body">
+              <h4>Install PI Interface, PI ICU & PI API</h4>
+              <p>Install <code>PIICU_x.x.xx.xx_.exe</code>, <code>OPCInt_ReadOnly.exe</code>, dan PI API for Windows Integrated Security.</p>
+            </div>
+          </div>
+          <div class="method-step highlight">
+            <div class="ms-num">4</div>
+            <div class="ms-body">
+              <h4>Validasi Koneksi ke Data Archive</h4>
+              <p>Verifikasi konektivitas jaringan (ping, port TCP 5450) dan test PI SDK + PI API dari interface node.</p>
+            </div>
+          </div>
+          <div class="method-step highlight">
+            <div class="ms-num">5</div>
+            <div class="ms-body">
+              <h4>Validasi Data di OPC Server</h4>
+              <p>Gunakan PI OPC Client Tool untuk memastikan data tersedia di OPC Server sebelum konfigurasi interface.</p>
+            </div>
+          </div>
+          <div class="method-step">
+            <div class="ms-num">6</div>
+            <div class="ms-body">
+              <h4>Konfigurasi Security</h4>
+              <p>Buat PI Mapping untuk service account PI Interface di Data Archive.</p>
+            </div>
+          </div>
+          <div class="method-step highlight">
+            <div class="ms-num">7</div>
+            <div class="ms-body">
+              <h4>Buat & Konfigurasi Instance Interface</h4>
+              <p>Di PI ICU: buat instance baru, set PointSource, Interface ID, Scan Class, dan OPC Server target.</p>
+            </div>
+          </div>
+          <div class="method-step highlight">
+            <div class="ms-num">8</div>
+            <div class="ms-body">
+              <h4>Buat PI Points</h4>
+              <p>Buat PI Tag untuk setiap OPC Item yang akan dikumpulkan datanya, via SMT atau PI Builder.</p>
+            </div>
+          </div>
+          <div class="method-step extra">
+            <div class="ms-num extra">9</div>
+            <div class="ms-body">
+              <h4>Konfigurasi Buffering</h4>
+              <p>Aktifkan PI Buffer Subsystem agar data tidak hilang saat jaringan atau Data Archive down.</p>
+            </div>
+          </div>
+          <div class="method-step extra">
+            <div class="ms-num extra">10</div>
+            <div class="ms-body">
+              <h4>Buat Health Points</h4>
+              <p>Buat UniInt Health Points (Heartbeat, Device Status, IO Rate) untuk monitoring kesehatan interface.</p>
+            </div>
+          </div>
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">✅</span>
+          <p>Step 1–8 adalah langkah dasar untuk mulai mengumpulkan data. Step 9–10 diperlukan untuk memastikan pengumpulan data yang <strong>reliable di environment produksi</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- ARSITEKTUR -->
+    <!-- ══════════════════════════════ -->
+    <section id="architecture" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.11</div>
+        <h2>Arsitektur PI Interface</h2>
+        <div class="sec-divider"></div>
+        <p>Ada tiga kemungkinan arsitektur deployment PI Interface. Pilihan arsitektur memengaruhi performa, keamanan, dan kemudahan maintenance.</p>
+
+        <table class="tbl">
+          <thead>
+            <tr><th>Arsitektur</th><th>Deskripsi</th><th>Kelebihan</th><th>Kekurangan</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--white)">A</strong></td>
+              <td>Data Source, PI Interface, dan Data Archive di mesin terpisah</td>
+              <td>Isolasi penuh, lebih aman, tidak membebani PI Server</td>
+              <td>Butuh lebih banyak hardware</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--white)">B</strong></td>
+              <td>Data Source dan PI Interface di mesin yang sama</td>
+              <td>Latensi rendah, tidak perlu DCOM remote untuk OPC DA</td>
+              <td>OPC Server dan interface bersaing resource</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--white)">C</strong></td>
+              <td>PI Interface di-install di PI Server (Data Archive)</td>
+              <td>Simple, tidak perlu server tambahan</td>
+              <td>Tidak disarankan untuk produksi — membebani PI Server</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="arch-wrap">
+          <div class="arch-box"><strong style="color:var(--white)">OPC Server</strong><span class="sub">Data Source (DCS/SCADA)</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-box hl"><strong>PI Interface</strong><span class="sub">OPCInt_ReadOnly.exe</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-box"><strong style="color:var(--white)">PI Data Archive</strong><span class="sub">TCP Port 5450</span></div>
+        </div>
+        <p style="font-size:12px;color:var(--gray);margin-top:-14px">Arsitektur B (class ini): OPC Server dan PI Interface di PIINT01, Data Archive di PISRV01.</p>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- INSTALL -->
+    <!-- ══════════════════════════════ -->
+    <section id="install" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.12.2 — Directed Activity</div>
+        <h2>Install PI ICU dan PI Interface for OPC DA</h2>
+        <div class="sec-divider"></div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Install PI ICU & OPCInt — Step 3 Metodologi</span>
+            <span class="activity-ref">§ 2.12.2</span>
+          </div>
+          <div class="activity-body">
+            <p class="activity-obj">Menyelesaikan Step 3 dan 4 dari metodologi instalasi: install PI Interface + PI ICU, lalu validasi koneksi ke Data Archive.</p>
+
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Part 1 — Install PI ICU dan PI Interface for OPC DA</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content">
+                  <h4>Navigasi ke Folder Install Kits</h4>
+                  <p>Di PIINT01, buka Windows Explorer, navigasi ke <code>C:\Course Folder\Install Kits</code></p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content">
+                  <h4>Install PI ICU</h4>
+                  <p>Klik kanan pada <code>PIICU_x.x.xx.xx_.exe</code> → pilih <strong style="color:var(--white)">Run as administrator</strong> → selesaikan wizard instalasi.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content">
+                  <h4>Install PI Interface for OPC DA dan PI API</h4>
+                  <p>Ulangi langkah yang sama untuk dua kit berikut:</p>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span><code>OPCInt_ReadOnly_x.x.x.xx_.exe</code> — versi Read-Only (disarankan, tidak bisa write ke OPC Server)</span></li>
+                    <li class="sub-step"><span class="sub-step-key">b.</span><span><code>PIAPI-xxxx-for-Windows-Integrated-Security_x.x.x.xx_.exe</code> — PI API dengan Windows Integrated Security</span></li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+
+            <div class="callout note" style="margin-top:16px">
+              <span class="callout-icon">📝</span>
+              <p>Versi Read-Only <strong>(OPCInt_ReadOnly)</strong> direkomendasikan karena secara inheren lebih aman — tidak memiliki kemampuan menulis data kembali ke OPC Server. Ini juga menyederhanakan kepatuhan terhadap kebijakan keamanan.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- VALIDASI JARINGAN -->
+    <!-- ══════════════════════════════ -->
+    <section id="validate-network" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.12.2 — Part 2 & 3</div>
+        <h2>Validasi Koneksi ke Data Archive</h2>
+        <div class="sec-divider"></div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Validasi Jaringan — Step 4 Metodologi</span>
+          </div>
+          <div class="activity-body">
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Part 2 — Test Konektivitas Jaringan</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content">
+                  <h4>Ping dari Interface Node ke Data Archive</h4>
+                  <p>Di PIINT01, buka Command Prompt:</p>
+                  <div class="cmd-block">
+                    <span class="prompt">C:\> </span><span class="cmd">ping</span> <span class="arg">PISRV01</span>
+                  </div>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content">
+                  <h4>Ping dari Data Archive ke Interface Node</h4>
+                  <p>Di PISRV01, buka Command Prompt:</p>
+                  <div class="cmd-block">
+                    <span class="prompt">C:\> </span><span class="cmd">ping</span> <span class="arg">PIINT01</span>
+                  </div>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content">
+                  <h4>Test Port TCP 5450 (PI Data Archive Port)</h4>
+                  <p>Di PIINT01, buka <strong style="color:var(--white)">Windows PowerShell</strong> dan jalankan:</p>
+                  <div class="cmd-block">
+                    <span class="prompt">PS C:\> </span><span class="cmd">(new-object net.sockets.tcpclient PISRV01, 5450).connected</span>
+                    <br><br>
+                    <span class="cmt"># Jika port terbuka:</span><br>
+                    <span class="out">True</span><br>
+                    <span class="cmt"># Jika port terblokir: akan muncul pesan error</span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin:20px 0 12px">Part 3 — Test Protokol Koneksi PI System (PI SDK & PI API)</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n part">3a</span>
+                <div class="step-content">
+                  <h4>Test PI SDK (Protokol Baru)</h4>
+                  <p>Jalankan <code>AboutPI-SDK</code> (PI SDK Utility). Di panel kiri pilih "Connections", klik checkbox di sebelah nama Data Archive <code>PISRV01</code>. Jika berhasil, akan muncul username dan status "connected as" di field "Connected User".</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n part">3b</span>
+                <div class="step-content">
+                  <h4>Test PI API (Protokol Lama)</h4>
+                  <p>Buka Command Prompt, navigasi ke direktori bin PI:</p>
+                  <div class="cmd-block">
+                    <span class="prompt">C:\> </span><span class="cmd">cd</span> <span class="arg">%pihome%\bin</span><br>
+                    <span class="prompt">C:\...bin> </span><span class="cmd">apisnap</span> <span class="arg">PISRV01</span><br>
+                    <br>
+                    <span class="cmt"># Kalau berhasil, ketik tagname untuk test:</span><br>
+                    <span class="prompt">> </span><span class="arg">sinusoid</span><br>
+                    <span class="out">sinusoid    [timestamp]    [value]</span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- VALIDASI OPC -->
+    <!-- ══════════════════════════════ -->
+    <section id="validate-opc" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.12.3 & 2.12.4</div>
+        <h2>Validasi Data di OPC Server</h2>
+        <div class="sec-divider"></div>
+        <p>Sebelum konfigurasi interface, pastikan data tersedia di OPC Server menggunakan <strong style="color:var(--white)">PI OPC Client Tool</strong>. Ini adalah salah satu penyebab paling umum PI Interface baru tidak mendapat data.</p>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge solo">Solo Exercise</span>
+            <span class="activity-title">Menggunakan PI OPC Client Tool — Step 5 Metodologi</span>
+            <span class="activity-ref">§ 2.12.4</span>
+          </div>
+          <div class="activity-body">
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content">
+                  <h4>Buka PI OPC Client Tool</h4>
+                  <p>Di PIINT01, jalankan program <strong style="color:var(--white)">"PI OPC Client Tool"</strong> dari Start Menu.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content">
+                  <h4>Connect ke OPC Node</h4>
+                  <p>Di field kiri atas, biarkan <code>Localhost</code> (karena OPC Server ada di komputer yang sama), lalu klik tombol <strong style="color:var(--white)">"Connect to node"</strong>.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content">
+                  <h4>Pilih OPC Server</h4>
+                  <p>Dari daftar "OPC Servers", pilih <code>OPCSample.OpcDa20Server.1</code> lalu klik <strong style="color:var(--white)">"Connect to OPC Server"</strong>.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">4</span>
+                <div class="step-content">
+                  <h4>Verifikasi Status OPC Server</h4>
+                  <p>Cek field <strong style="color:var(--white)">"Server Status"</strong> — nilainya harus <code>RUNNING</code>. Jika tidak RUNNING, selesaikan masalah OPC Server terlebih dahulu sebelum lanjut ke konfigurasi PI Interface.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- CONFIGURE INSTANCE -->
+    <!-- ══════════════════════════════ -->
+    <section id="configure-instance" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.12.7 — Directed Activity</div>
+        <h2>Konfigurasi Instance PI Interface for OPC DA di PI ICU</h2>
+        <div class="sec-divider"></div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Buat Instance PI Interface Baru — Step 7 Metodologi</span>
+            <span class="activity-ref">§ 2.12.7</span>
+          </div>
+          <div class="activity-body">
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content">
+                  <h4>Jalankan PI ICU</h4>
+                  <p>Di PIINT01, buka program <strong style="color:var(--white)">"PI Interface Configuration Utility"</strong> dari Start Menu.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content">
+                  <h4>Buat Instance Baru dari .EXE</h4>
+                  <p>Klik tombol <strong style="color:var(--white)">"Create new Interface Instance from .EXE"</strong> di pojok kiri atas jendela PI ICU.</p>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span>Browse ke executable PI Interface: <code>C:\Program Files (x86)\PIPC\Interfaces\OPCInt_ReadOnly\OPCInt_ReadOnly.exe</code></span></li>
+                    <li class="sub-step"><span class="sub-step-key">b.</span><span>Pilih host PI Data Archive: <code>PISRV01</code></span></li>
+                    <li class="sub-step"><span class="sub-step-key">c.</span><span>Di "Optional Settings", set <strong style="color:var(--white)">Point Source</strong> ke <code>OPC-PIINT01</code> — kombinasi PointSource + Interface ID harus unik di setiap instance</span></li>
+                    <li class="sub-step"><span class="sub-step-key">d.</span><span>Klik <strong style="color:var(--white)">"Add"</strong> lalu <strong style="color:var(--white)">"OK"</strong></span></li>
+                  </ul>
+                  <div class="callout note" style="margin-top:10px">
+                    <span class="callout-icon">📝</span>
+                    <p>Instance juga bisa dibuat dari file <code>XXX.bat_new</code> menggunakan tombol "Create new Interface Instance from .BAT file". Metode ini lebih cepat karena ada konfigurasi default yang sudah terisi.</p>
+                  </div>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content">
+                  <h4>Tab General — Set Interface ID dan Scan Class</h4>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span>Set <strong style="color:var(--white)">Interface ID</strong> ke <code>1</code></span></li>
+                    <li class="sub-step"><span class="sub-step-key">b.</span><span>Klik tombol <strong style="color:var(--white)">"Add a scan class"</strong>, buat scan class dengan frekuensi <code>00:00:05</code> (5 detik)</span></li>
+                  </ul>
+                  <p style="margin-top:10px;font-size:13px;">Format scan class: <code>hh:mm:ss.##,hh:mm:ss.##</code></p>
+                  <table class="tbl" style="margin-top:10px">
+                    <thead><tr><th>Scan Class</th><th>Hasil</th></tr></thead>
+                    <tbody>
+                      <tr><td class="val">00:00:05</td><td>Kumpulkan data setiap 5 detik, mulai segera setelah start</td></tr>
+                      <tr><td class="val">00:00:05,00:00:00</td><td>Setiap 5 detik, sinkronisasi ke midnight (12:24:05, 12:24:10, ...)</td></tr>
+                      <tr><td class="val">5,0</td><td>Sama dengan contoh di atas (format singkat)</td></tr>
+                      <tr><td class="val">01:00:00,00:30:00</td><td>Setiap jam, offset 30 menit dari midnight (12:30, 13:30, ...)</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">4</span>
+                <div class="step-content">
+                  <h4>Tab OPCInt — Set OPC Server Target</h4>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span>Saat pindah ke tab ini akan muncul prompt — klik <strong style="color:var(--white)">"No"</strong> karena konfigurasi belum selesai</span></li>
+                    <li class="sub-step"><span class="sub-step-key">i.</span><span>"OPC Server Node Name": isi <code>localhost</code> (karena OPC Server di mesin yang sama)</span></li>
+                    <li class="sub-step"><span class="sub-step-key">ii.</span><span>Klik tombol <strong style="color:var(--white)">"List Available Servers"</strong></span></li>
+                    <li class="sub-step"><span class="sub-step-key">iii.</span><span>Di "OPC Server Name", pilih <code>OPCSample.OpcDa20Server.1</code></span></li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">5</span>
+                <div class="step-content">
+                  <h4>Tab Service — Set Service Account dan Create Service</h4>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span>Di "Log on as:", pilih <code>[Domain\]UserName</code></span></li>
+                    <li class="sub-step"><span class="sub-step-key">b.</span><span>UserName: <code>PISCHOOL\svc-PIInterface</code> | Password: <code>student</code></span></li>
+                    <li class="sub-step"><span class="sub-step-key">c.</span><span>Klik <strong style="color:var(--white)">"Create"</strong> untuk membuat Windows Service</span></li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">6</span>
+                <div class="step-content">
+                  <h4>Save Konfigurasi</h4>
+                  <p>Klik tombol <strong style="color:var(--white)">Save</strong> (ikon floppy disk) di toolbar.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">7</span>
+                <div class="step-content">
+                  <h4>Start Service dan Monitor PI Message Log</h4>
+                  <p>Setelah service di-create, tombol Start/Stop/Restart akan muncul di bagian atas jendela PI ICU.</p>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span>Klik tombol <strong style="color:var(--white)">"View Current PI Message Log continuously"</strong> terlebih dahulu</span></li>
+                    <li class="sub-step"><span class="sub-step-key">b.</span><span>Klik tombol <strong style="color:var(--white)">Start</strong> untuk menjalankan Windows Service</span></li>
+                  </ul>
+                  <p style="margin-top:10px;font-size:13px">Pesan-pesan yang diharapkan muncul di PI Message Log:</p>
+                  <div class="msglog">
+                    <span class="msg-label">PI MESSAGE LOG</span>
+                    <span class="msg-good">Connected to OPC Server PIINT01:: OPCSample.OpcDa20Server.1 in thread ID XXXX</span><br>
+                    <span class="msg-good">OPC Server current state = RUNNING</span><br>
+                    <span class="msg-info">Total Number of points matching pointsource 'OPC-PIINT01' is 0</span>
+                  </div>
+                  <div class="callout note" style="margin-top:10px">
+                    <span class="callout-icon">📝</span>
+                    <p>Pesan <code>Total Number of points matching pointsource is 0</code> adalah <strong>normal</strong> — artinya interface berjalan tapi belum ada PI Points yang dibuat. Ini akan berubah setelah PI Points dibuat di langkah berikutnya.</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- TIPE PI POINT -->
+    <!-- ══════════════════════════════ -->
+    <section id="pi-points" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.12.8</div>
+        <h2>Tipe PI Point untuk PI Interface for OPC DA</h2>
+        <div class="sec-divider"></div>
+        <p>Ada empat cara berbeda untuk mendefinisikan PI Points untuk PI Interface for OPC DA, tergantung kebutuhan pengambilan data:</p>
+
+        <table class="tbl">
+          <thead>
+            <tr><th>Tipe</th><th>Location3</th><th>Cara Kerja</th><th>Use Case</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--white)">Polled</strong></td>
+              <td class="val">0</td>
+              <td>Interface polling OPC Server secara periodik sesuai frekuensi scan class</td>
+              <td>Data yang butuh interval konsisten</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--white)">Advise</strong></td>
+              <td class="val">1</td>
+              <td>OPC Server mengirim nilai baru ke interface ketika ada perubahan (read on change)</td>
+              <td>Paling efisien — kurangi traffic jaringan, tidak ada duplikat nilai</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--white)">Event (Trigger)</strong></td>
+              <td class="val">0</td>
+              <td>Interface minta nilai baru ke OPC Server ketika nilai trigger PI Point berubah</td>
+              <td>Data yang harus diambil berdasarkan event tertentu</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--white)">Output</strong></td>
+              <td class="val">2</td>
+              <td>Interface menulis nilai dari PI Point ke data source (bukan untuk pengumpulan data)</td>
+              <td>Write-back ke sistem kontrol (tidak tersedia di versi Read-Only)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout tip">
+          <span class="callout-icon">⭐</span>
+          <p>Metode <strong>Advise</strong> sering kali paling efisien dan performan. Gunakan ini sebagai default untuk sebagian besar PI Points.</p>
+        </div>
+
+        <p style="font-weight:600;color:var(--white);margin-bottom:10px">Aturan Atribut PI Point untuk OPC DA:</p>
+        <table class="tbl">
+          <thead>
+            <tr><th>Atribut</th><th>Fungsi</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong style="color:var(--white)">Location1</strong></td><td>Interface ID — menghubungkan PI Point ke instance interface tertentu</td></tr>
+            <tr><td><strong style="color:var(--white)">Location3</strong></td><td>Tipe PI Point: <code>0</code> = Polled/Event, <code>1</code> = Advise, <code>2</code> = Output</td></tr>
+            <tr><td><strong style="color:var(--white)">Location4</strong></td><td>Nomor scan class yang digunakan</td></tr>
+            <tr><td><strong style="color:var(--white)">PointSource</strong></td><td>Harus match dengan Point Source dari instance interface</td></tr>
+            <tr><td><strong style="color:var(--white)">InstrumentTag</strong></td><td>OPC Item ID di OPC Server — harus persis sama, case-sensitive!</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <p><strong>Aturan penting:</strong> Hanya Advise points yang boleh masuk ke scan class 1. PI Points dengan tipe berbeda tidak boleh berada di scan class yang sama.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- BUAT PI POINTS -->
+    <!-- ══════════════════════════════ -->
+    <section id="create-points" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.12.9 & 2.12.10</div>
+        <h2>Buat PI Points untuk PI Interface OPC DA</h2>
+        <div class="sec-divider"></div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Buat PI Points via PI Builder — Step 8 Metodologi</span>
+            <span class="activity-ref">§ 2.12.10</span>
+          </div>
+          <div class="activity-body">
+            <p class="activity-obj">Membuat PI Points dalam jumlah banyak menggunakan ekspor CSV dari PI OPC Client Tool lalu import via PI Builder (Excel Add-in).</p>
+
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Part 1 — Generate CSV dari PI OPC Client Tool</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content"><h4>Buka PI OPC Client Tool di PIINT01</h4><p>Jalankan program dari Start Menu.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content"><h4>Connect ke OPC Server</h4><p>Connect ke <code>OPCSample.OpcDa20Server.1</code> menggunakan prosedur yang sama seperti di langkah validasi.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content"><h4>Buat Group Baru</h4><p>Klik tombol "Add Group", di dialog "Add Group" klik <strong style="color:var(--white)">"Create"</strong>.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">4</span>
+                <div class="step-content"><h4>Browse dan Tambah OPC Tags</h4><p>Klik "Browse OPC Server, Add Tags" → di window Add Item, pilih opsi <code>Flat</code> → klik <strong style="color:var(--white)">"List"</strong> → klik "Select All" → "Add Selected" → "OK".</p><div class="callout note" style="margin-top:8px"><span class="callout-icon">📝</span><p>Maksimal 500 OPC Items dapat ditambahkan sekaligus dengan metode ini.</p></div></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">5</span>
+                <div class="step-content">
+                  <h4>Simpan sebagai CSV</h4>
+                  <p>Di toolbar: <code>File → Save As</code>. Di window Save Configuration, klik ellipsis untuk pilih lokasi (Desktop), ubah <strong style="color:var(--white)">Point Source</strong> ke <code>OPC-PIINT01</code>, lalu klik <strong style="color:var(--white)">"Save"</strong>.</p>
+                </div>
+              </li>
+            </ul>
+
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin:20px 0 12px">Part 2 — Import PI Points dari PI Builder (Excel)</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">6</span>
+                <div class="step-content">
+                  <h4>Copy CSV ke PISRV01 dan Buka di Excel</h4>
+                  <p>Kolom yang akan ada di file CSV:</p>
+                  <div class="cmd-block" style="font-size:11.5px">
+                    <span class="arg">Select(x)</span> · <span class="arg">Tag</span> · <span class="arg">instrumenttag</span> · <span class="arg">pointtype</span> · <span class="arg">location1</span> · <span class="arg">location2</span> · <span class="arg">location3</span> · <span class="arg">location4</span> · <span class="arg">location5</span> · <span class="arg">pointsource</span>
+                  </div>
+                  <p style="margin-top:8px">Atribut <code>instrumenttag</code>, <code>pointtype</code>, <code>location2</code>, <code>location5</code>, dan <code>pointsource</code> sudah terisi otomatis oleh PI OPC Client Tool.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">7</span>
+                <div class="step-content">
+                  <h4>Set location3 dan location4 ke Advise di Scan Class 1</h4>
+                  <p>Ubah kolom <code>location3 = 1</code> (Advise) dan <code>location4 = 1</code> (scan class 1) untuk semua PI Points.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">8</span>
+                <div class="step-content">
+                  <h4>Beri Nama Tag yang Bermakna</h4>
+                  <p>Di kolom <code>Tag</code>: copy-paste dari kolom <code>instrumenttag</code>, lalu gunakan Find & Replace (<code>Ctrl+H</code>) untuk ubah <code>/</code> menjadi <code>.</code> dan hapus prefix <code>Sample Process.</code>. Hasil akhir: format <code>PumpX.DataName</code>.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">9</span>
+                <div class="step-content">
+                  <h4>Publish PI Points via PI Builder</h4>
+                  <p>Di Excel, klik tab <strong style="color:var(--white)">PI Builder</strong> di ribbon → klik tombol <strong style="color:var(--white)">"Publish"</strong> → pilih edit mode <code>Create Only</code> → OK. Verifikasi: pesan sukses "The requested action is complete."</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">10</span>
+                <div class="step-content">
+                  <h4>Verifikasi Data di SMT</h4>
+                  <p>Di PISRV01 buka SMT → <code>Data → Current Values</code>. Search berdasarkan Point Source <code>OPC-PIINT01</code>. PI Points baru harus mulai mendapat data dalam 2 menit.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- BUFFERING -->
+    <!-- ══════════════════════════════ -->
+    <section id="buffering" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.15 — Directed Activity</div>
+        <h2>Konfigurasi PI Buffer Subsystem</h2>
+        <div class="sec-divider"></div>
+        <p>PI Buffer Subsystem adalah aplikasi OSIsoft yang menyimpan data sementara di interface node saat koneksi ke Data Archive terputus. Analoginya seperti <strong style="color:var(--white)">reservoir</strong> — data terakumulasi saat "valve" ke Data Archive tertutup, lalu otomatis dikirim saat koneksi pulih.</p>
+
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <p>PI Buffer Subsystem <strong>wajib dikonfigurasi</strong> di environment produksi. Tanpanya, data akan hilang setiap kali Data Archive atau jaringan down.</p>
+        </div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Konfigurasi Buffering — Step 9 Metodologi</span>
+            <span class="activity-ref">§ 2.15.3</span>
+          </div>
+          <div class="activity-body">
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Part 1 — Konfigurasi PI Buffer Subsystem</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content"><h4>Buka Buffering Manager via PI ICU</h4><p>Di PIINT01, jalankan PI ICU → di menu bar pilih <code>Tools → Buffering</code>.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content"><h4>Lanjutkan Wizard Konfigurasi</h4><p>Pilih <strong style="color:var(--white)">"Yes"</strong> → <strong style="color:var(--white)">"Continue with configuration"</strong>.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content"><h4>Pilih Data Archive dan Interface</h4><p>Akan terlihat nama Data Archive <code>PISRV01</code> dan nama PI Interface yang sudah dikonfigurasi. Centang checkbox dan klik <strong style="color:var(--white)">"Next"</strong>.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">4</span>
+                <div class="step-content">
+                  <h4>Ganti Service Account dari LocalSystem</h4>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">i.</span><span>Klik <strong style="color:var(--white)">"Change"</strong> di sebelah LocalSystem</span></li>
+                    <li class="sub-step"><span class="sub-step-key">ii.</span><span>Pilih "Use Windows account", masukkan <code>PISCHOOL\svc-PIBuffer</code> / <code>student</code></span></li>
+                    <li class="sub-step"><span class="sub-step-key">iii.</span><span>Klik "Browse..." di field PI Identity, pilih identity <code>PI Interface & PI Buffers</code>, klik OK</span></li>
+                    <li class="sub-step"><span class="sub-step-key">iv.</span><span>Klik <strong style="color:var(--white)">"Create"</strong> → pastikan ada green checkmark → klik "Next"</span></li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">5</span>
+                <div class="step-content">
+                  <h4>Set Lokasi Buffer Queue</h4>
+                  <p>Set lokasi ke <code>E:\OSIsoft\Buffering</code>. Sangat direkomendasikan untuk <strong style="color:var(--white)">memisahkan buffer queue dari drive OS</strong> agar drive sistem tidak penuh jika terjadi buffering dalam waktu lama.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">6</span>
+                <div class="step-content"><h4>Selesaikan Wizard</h4><p>Verifikasi tidak ada error di halaman terakhir wizard, lalu klik Exit.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">7</span>
+                <div class="step-content">
+                  <h4>Aktifkan Buffering per Interface</h4>
+                  <p>Kembali ke tab <strong style="color:var(--white)">General</strong> di PI ICU untuk masing-masing interface, aktifkan opsi buffering. PI ICU akan otomatis mendeteksi dan menambahkan dependency ke PIBufss di Windows Service.</p>
+                </div>
+              </li>
+            </ul>
+
+            <p style="font-size:13px;font-weight:600;color:var(--white);margin:20px 0 12px">Part 2 — Verifikasi Buffering (2 Metode)</p>
+            <p style="font-size:13px;font-weight:600;color:var(--gray);margin-bottom:10px">Metode 1: Buffering Manager GUI</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n part">M1</span>
+                <div class="step-content">
+                  <p>Buka PI ICU → <code>Tools → Buffering</code>. Monitor statistik real-time: <strong style="color:var(--white)">Global Buffering Status</strong>, estimated buffer capacity, events in queue, dan <strong style="color:var(--white)">total events sent</strong>. Pastikan "total events sent" terus bertambah.</p>
+                </div>
+              </li>
+            </ul>
+            <p style="font-size:13px;font-weight:600;color:var(--gray);margin:14px 0 10px">Metode 2: Command Line pibufss</p>
+            <div class="cmd-block">
+              <span class="prompt">C:\> </span><span class="cmd">cd</span> <span class="arg">%pihome%\bin</span><br><br>
+              <span class="cmt"># Cek status buffering secara keseluruhan</span><br>
+              <span class="prompt">C:\...bin> </span><span class="cmd">pibufss</span> <span class="arg">-cfg</span><br><br>
+              <span class="cmt"># Lihat statistik buffer queue file</span><br>
+              <span class="prompt">C:\...bin> </span><span class="cmd">pibufss</span> <span class="arg">-qs</span><br><br>
+              <span class="cmt"># Simulasi gangguan jaringan (stop kirim data)</span><br>
+              <span class="prompt">C:\...bin> </span><span class="cmd">pibufss</span> <span class="arg">-bc stop</span><br><br>
+              <span class="cmt"># Pulihkan koneksi (resume kirim data)</span><br>
+              <span class="prompt">C:\...bin> </span><span class="cmd">pibufss</span> <span class="arg">-bc start</span><br><br>
+              <span class="cmt"># Stop monitoring statistik</span><br>
+              <span class="prompt">C:\...bin> </span><span class="cmd">Ctrl+C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- HEALTH POINTS -->
+    <!-- ══════════════════════════════ -->
+    <section id="health-points" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.16 — Directed Activity</div>
+        <h2>UniInt Health Points — Monitor Kesehatan Interface</h2>
+        <div class="sec-divider"></div>
+        <p>UniInt Health Points adalah PI Points khusus yang mengumpulkan informasi tentang kesehatan PI Interface. Dibuat dari PI ICU di menu <code>UniInt → Health Points</code>. OSIsoft merekomendasikan minimal 4 Health Points berikut:</p>
+
+        <div class="hp-grid">
+          <div class="hp-card priority">
+            <div class="hp-name">Heartbeat</div>
+            <div class="hp-desc">Menunjukkan apakah interface sedang berjalan. Nilai berputar dari 1–15 selama interface aktif. Berhenti update jika interface mati atau deadlock. <em>Tidak</em> menunjukkan apakah interface terhubung ke data source.</div>
+          </div>
+          <div class="hp-card priority">
+            <div class="hp-name">Device Status</div>
+            <div class="hp-desc">Informasi komunikasi antara interface dan data source. Normal = <code>GOOD</code>. Jika ada masalah, berisi kode status: contoh <code>95 | Device(s) in error</code> berarti tidak bisa komunikasi ke OPC Server.</div>
+          </div>
+          <div class="hp-card">
+            <div class="hp-name">IO Rate</div>
+            <div class="hp-desc">Menghitung semua nilai PI Point yang dikirim ke Data Archive. Jika nilai berhenti update, berarti interface berhenti mengumpulkan data.</div>
+          </div>
+          <div class="hp-card">
+            <div class="hp-name">Scan Class Scans Skipped</div>
+            <div class="hp-desc">Menghitung "skipped scans" — scan yang tidak dilakukan sebelum jadwal scan berikutnya tiba. Periode pelaporan default: 8 jam. Nilai tinggi mengindikasikan beban berlebihan.</div>
+          </div>
+        </div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Buat UniInt Health Points — Step 10 Metodologi</span>
+            <span class="activity-ref">§ 2.16.1</span>
+          </div>
+          <div class="activity-body">
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content"><h4>Buka PI ICU, Navigasi ke Health Points</h4><p>Di PIINT01, jalankan PI ICU → di panel kiri navigasi ke <code>UniInt → Health Points</code>.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content">
+                  <h4>Create 4 Health Points</h4>
+                  <p>Klik kanan pada masing-masing item berikut, pilih <strong style="color:var(--white)">"Create"</strong>:</p>
+                  <ul class="sub-steps">
+                    <li class="sub-step"><span class="sub-step-key">a.</span><span>Heartbeat</span></li>
+                    <li class="sub-step"><span class="sub-step-key">b.</span><span>Device Status</span></li>
+                    <li class="sub-step"><span class="sub-step-key">c.</span><span>IORate</span></li>
+                    <li class="sub-step"><span class="sub-step-key">d.</span><span>Scan Class Scans Skipped.sc1</span></li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content"><h4>Verifikasi di SMT</h4><p>Di PISRV01, buka SMT dan cari PI Points yang baru dibuat. Verifikasi bahwa Health Points sudah menerima data.</p></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="full">
+
+    <!-- ══════════════════════════════ -->
+    <!-- MANAGE EXISTING -->
+    <!-- ══════════════════════════════ -->
+    <section id="manage-existing" class="fade">
+      <div class="sec">
+        <div class="sec-eyebrow">Section 2.8 — Directed Activity</div>
+        <h2>Manage Interface yang Sudah Ada dengan PI ICU</h2>
+        <div class="sec-divider"></div>
+
+        <div class="activity">
+          <div class="activity-header">
+            <span class="activity-badge">Directed Activity</span>
+            <span class="activity-title">Familiar dengan PI ICU — Edit Konfigurasi Interface Existing</span>
+            <span class="activity-ref">§ 2.8</span>
+          </div>
+          <div class="activity-body">
+            <p class="activity-obj">Membiasakan diri dengan PI ICU dengan memuat instance yang sudah ada dan mengedit konfigurasinya untuk memahami dampak perubahan.</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-n">1</span>
+                <div class="step-content"><h4>Login dan Jalankan PI ICU</h4><p>Login ke PIINT02. Jalankan program "PI Interface Configuration Utility".</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">2</span>
+                <div class="step-content"><h4>Pilih Interface Instance</h4><p>Dari dropdown "Interface", pilih <code>opcint_ReadOnly1</code>. Catat nilai <strong style="color:var(--white)">Point Source</strong> yang ada di tab General.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">3</span>
+                <div class="step-content"><h4>Verifikasi Data di SMT</h4><p>Di PISRV01, buka SMT → <code>Data → Current Values</code>, load semua PI Points dengan Point Source tersebut. Klik "Start Updating" dan perhatikan kecepatan update data.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">4</span>
+                <div class="step-content"><h4>Edit Scan Class</h4><p>Di PI ICU, klik kanan pada scan class #1 → ubah ke <code>00:00:01</code> (1 detik) → klik <strong style="color:var(--white)">"Apply"</strong> → restart interface dengan tombol Restart di pojok kiri atas.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">5</span>
+                <div class="step-content"><h4>Amati Perubahan di SMT</h4><p>Kembali ke SMT — data seharusnya update lebih cepat sekarang (setiap 1 detik vs sebelumnya).</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">6</span>
+                <div class="step-content"><h4>Ubah Point Source (Eksperimen)</h4><p>Kembali ke PI ICU, ubah nilai Point Source ke nilai yang berbeda → klik "Apply" → restart interface.</p></div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">7</span>
+                <div class="step-content">
+                  <h4>Amati Dampak Perubahan Point Source</h4>
+                  <p>Kembali ke SMT. PI Points yang sudah ada menggunakan Point Source lama — karena Point Source tidak match lagi dengan interface, data akan <strong style="color:var(--red)">berhenti masuk</strong>. Ini menunjukkan betapa kritisnya kecocokan Point Source.</p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-n">8</span>
+                <div class="step-content"><h4>Undo Perubahan</h4><p>Kembali ke PI ICU, kembalikan Point Source ke nilai semula → Apply → restart interface. Data seharusnya kembali normal.</p></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('prog').style.width = (window.scrollY / total * 100) + '%';
+  });
+
+  // Fade-in on scroll
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+
+  // Active nav
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks  = document.querySelectorAll('.sb-nav a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 140) cur = s.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + cur) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
