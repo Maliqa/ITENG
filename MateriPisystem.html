@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI System Training — Materi & Skrip Presenter</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0D1B2A;
+    --blue:    #1B4F72;
+    --teal:    #0A7EA4;
+    --accent:  #00C9A7;
+    --yellow:  #F4C430;
+    --light:   #E8F4F8;
+    --gray:    #8FA8B8;
+    --white:   #FFFFFF;
+    --card:    #111E2B;
+    --card2:   #0F1D2C;
+    --border:  #1E3A50;
+    --script-bg: #0A1520;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--card2);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .sidebar-logo h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .nav-list { padding: 12px 0; flex: 1; }
+  .nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 12.5px;
+    color: var(--gray);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item a:hover { color: var(--white); background: rgba(0,201,167,0.06); }
+  .nav-item a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,201,167,0.08); }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .nav-item a:hover .nav-dot, .nav-item a.active .nav-dot { background: var(--accent); }
+  .nav-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--teal); padding: 16px 20px 4px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 220px; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #091624 0%, #0D1B2A 50%, #0a1e2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 64px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,201,167,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero-desc {
+    font-size: 16px;
+    color: var(--gray);
+    font-weight: 300;
+    max-width: 560px;
+    margin-bottom: 28px;
+  }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    padding: 5px 12px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--gray);
+    letter-spacing: 0.5px;
+  }
+  .badge.a { border-color: var(--accent); color: var(--accent); }
+  .badge.y { border-color: var(--yellow); color: var(--yellow); }
+
+  /* ── CONTENT WRAP ── */
+  .content { padding: 0 64px 80px; }
+
+  /* ── SECTION HEADER ── */
+  .sesi-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 48px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .sesi-header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 60px; height: 2px;
+    background: var(--accent);
+  }
+  .sesi-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .sesi-info h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .sesi-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    margin-top: 4px;
+  }
+
+  /* ── MATERI CONTENT ── */
+  .materi-block { margin-bottom: 28px; }
+
+  .block-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* ── CONTENT CARDS (konsep) ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .ccard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 18px 20px;
+    border-left: 3px solid var(--teal);
+  }
+  .ccard.accent { border-left-color: var(--accent); }
+  .ccard h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 7px;
+  }
+  .ccard p { font-size: 13px; color: var(--gray); line-height: 1.65; }
+  .ccard code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(0,201,167,0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ── INFO TABLE ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+  .info-table th {
+    background: var(--blue);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: left;
+    padding: 10px 14px;
+  }
+  .info-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--light);
+    vertical-align: top;
+  }
+  .info-table tr:nth-child(even) td { background: rgba(0,0,0,0.15); }
+  .info-table .mono { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 20px 24px;
+  }
+  .flow-item {
+    background: var(--blue);
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: var(--white);
+    text-align: center;
+    line-height: 1.3;
+    min-width: 100px;
+  }
+  .flow-item.hl { background: var(--teal); }
+  .flow-item.acc { background: rgba(0,201,167,0.2); border: 1px solid var(--accent); color: var(--accent); }
+  .flow-arrow {
+    color: var(--accent);
+    font-size: 18px;
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── TREE ── */
+  .tree {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 20px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 2;
+  }
+  .tree .l0 { color: var(--white); font-weight: 500; }
+  .tree .l1 { color: var(--light); padding-left: 20px; }
+  .tree .l2 { color: var(--gray); padding-left: 40px; }
+  .tree .l3 { color: var(--accent); padding-left: 60px; }
+
+  /* ── LAB STEPS ── */
+  .lab-steps { margin-bottom: 24px; }
+  .lab-step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .lab-step:first-child { border-top: 1px solid var(--border); }
+  .step-num {
+    background: var(--accent);
+    color: var(--navy);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    width: 36px; height: 36px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-body h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 5px;
+  }
+  .step-body p { font-size: 13px; color: var(--gray); }
+  .step-body code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(0,201,167,0.08);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  /* ── SCRIPT BOX ── */
+  .script-box {
+    background: var(--script-bg);
+    border: 1px solid var(--teal);
+    border-left: 4px solid var(--yellow);
+    border-radius: 5px;
+    padding: 22px 26px;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .script-label {
+    position: absolute;
+    top: -11px; left: 18px;
+    background: var(--script-bg);
+    padding: 0 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    border: 1px solid var(--yellow);
+    border-radius: 2px;
+  }
+  .script-box p {
+    font-size: 14px;
+    color: #C8DDE8;
+    font-style: italic;
+    line-height: 1.8;
+  }
+  .script-box p + p { margin-top: 12px; }
+  .script-box strong { color: var(--yellow); font-style: normal; font-weight: 600; }
+  .script-box em { color: var(--accent); font-style: normal; }
+
+  /* ── DIVIDER ── */
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ── TAKEAWAYS ── */
+  .takeaway-list { list-style: none; margin-bottom: 24px; }
+  .takeaway-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--light);
+  }
+  .takeaway-list li:first-child { border-top: 1px solid var(--border); }
+  .tk-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    min-width: 28px;
+    margin-top: 2px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 24px; padding-right: 24px; }
+    .flow { flex-direction: column; align-items: flex-start; }
+    .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+  }
+
+  /* SCROLL ANIMATION */
+  .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="tag">PI System</div>
+    <h2>Training<br>1 Day</h2>
+  </div>
+  <div class="nav-list">
+    <div class="nav-label">Sesi</div>
+    <div class="nav-item"><a href="#sesi1" class="active"><span class="nav-dot"></span>Sesi 1 — Pengenalan</a></div>
+    <div class="nav-item"><a href="#sesi2"><span class="nav-dot"></span>Sesi 2 — PI DA & Tag</a></div>
+    <div class="nav-item"><a href="#sesi3"><span class="nav-dot"></span>Sesi 3 — OPC & Interface</a></div>
+    <div class="nav-item"><a href="#sesi4"><span class="nav-dot"></span>Sesi 4 — PI AF</a></div>
+    <div class="nav-item"><a href="#sesi5"><span class="nav-dot"></span>Sesi 5 — PI Vision</a></div>
+    <div class="nav-item"><a href="#sesi6"><span class="nav-dot"></span>Sesi 6 — Lab</a></div>
+    <div class="nav-label">Penutup</div>
+    <div class="nav-item"><a href="#takeaway"><span class="nav-dot"></span>Key Takeaways</a></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">📋 Materi & Skrip Presenter</div>
+    <h1>PI System <em>Training</em><br>— 1 Hari Intensif</h1>
+    <p class="hero-desc">Panduan lengkap materi tiap sesi beserta teks kalimat yang bisa langsung dibacakan saat presentasi. Cocok untuk trainer maupun peserta sebagai referensi belajar mandiri.</p>
+    <div class="hero-badges">
+      <span class="badge a">6 Sesi</span>
+      <span class="badge a">08:00 – 17:00</span>
+      <span class="badge y">🎤 Skrip Presenter Tiap Sesi</span>
+      <span class="badge">AVEVA OSIsoft PI System</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- SESI 1 -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="sesi1" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Sesi 1</div>
+        <div class="sesi-info">
+          <h2>Pengenalan PI System & Arsitektur</h2>
+          <div class="sesi-time">08:00 – 09:00 &nbsp;·&nbsp; 60 menit</div>
+        </div>
+      </div>
+
+      <div class="materi-block">
+        <div class="block-title">Materi</div>
+        <div class="card-grid">
+          <div class="ccard">
+            <h4>📦 Apa itu Industrial Historian?</h4>
+            <p>Software yang merekam data proses industri (suhu, tekanan, flow rate, level) secara real-time dan menyimpannya dalam <strong style="color:var(--white)">time-series database</strong> yang dioptimalkan untuk data sensor — bukan database relasional biasa.</p>
+          </div>
+          <div class="ccard">
+            <h4>🏢 Sejarah Singkat</h4>
+            <p>OSIsoft PI System berdiri sejak 1980 dan menjadi standar de-facto industri O&G. Diakuisisi AVEVA tahun 2021, lalu menjadi bagian Schneider Electric. Digunakan di lebih dari 1.000 perusahaan energi dan manufaktur global.</p>
+          </div>
+          <div class="ccard">
+            <h4>🔷 5 Komponen Utama</h4>
+            <p>
+              <strong style="color:var(--white)">PI Data Archive</strong> — database time-series<br>
+              <strong style="color:var(--white)">PI AF</strong> — asset framework & konteks<br>
+              <strong style="color:var(--white)">PI Vision</strong> — visualisasi real-time<br>
+              <strong style="color:var(--white)">PI Web API</strong> — REST interface<br>
+              <strong style="color:var(--white)">PI Interface / Connector</strong> — koneksi data
+            </p>
+          </div>
+          <div class="ccard">
+            <h4>🏭 Kenapa PI System?</h4>
+            <p>Kompresi data efisien (hingga 10x lebih kecil), integrasi mudah ke DCS/SCADA/OPC, analytics historis, dan menjadi standar di industri O&G, Petrokimia, Power, dan Manufaktur.</p>
+          </div>
+        </div>
+
+        <div class="block-title">Alur Arsitektur</div>
+        <div class="flow">
+          <div class="flow-item">Field Devices<br><span style="font-size:10px;font-weight:400;color:var(--gray)">DCS / OPC / Sensor</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-item hl">PI Interface /<br>PI Connector</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-item hl">PI Data<br>Archive</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-item">PI Asset<br>Framework</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-item acc">PI Vision /<br>Dashboard</div>
+        </div>
+        <p style="font-size:12.5px;color:var(--gray);margin-bottom:24px">⚡ PI Web API bisa diakses di layer manapun setelah PI Data Archive — cocok untuk integrasi Python, Node.js, atau aplikasi web custom.</p>
+      </div>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Presenter</span>
+        <p>"Selamat pagi semua, dan selamat datang di training PI System hari ini. Sebelum kita mulai, perkenalkan dulu — saya <strong>[nama trainer]</strong> dari PT. Cistech Alpha Indonesia."</p>
+        <p>"Hari ini kita akan belajar PI System dari nol, mulai dari konsep dasar sampai praktik langsung. Bayangkan PI System sebagai <em>'otak data'</em> pabrik — semua data sensor dari lapangan masuk ke sini, tersimpan rapi, dan bisa divisualisasikan kapan saja oleh siapa saja yang berwenang."</p>
+        <p>"Kalau pabrik kalian punya ratusan bahkan ribuan sensor — suhu, tekanan, flow, vibrasi — nah PI System-lah yang merekam semua itu secara real-time, 24 jam sehari, 365 hari setahun. Tanpa PI System, data sensor itu hilang begitu saja setiap detiknya."</p>
+        <p>"Lihat diagram arsitektur ini — alurnya sederhana: data dari lapangan masuk lewat PI Interface, disimpan di PI Data Archive, PI AF menambahkan konteks asetnya, lalu PI Vision menampilkannya ke operator. Kita akan bahas satu per satu hari ini."</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- SESI 2 -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="sesi2" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Sesi 2</div>
+        <div class="sesi-info">
+          <h2>PI Data Archive & PI Tag (PI Point)</h2>
+          <div class="sesi-time">09:00 – 10:30 &nbsp;·&nbsp; 90 menit &nbsp;·&nbsp; Coffee break 10:15</div>
+        </div>
+      </div>
+
+      <div class="materi-block">
+        <div class="block-title">Anatomy PI Tag</div>
+        <div class="card-grid">
+          <div class="ccard">
+            <h4>Apa itu PI Tag / PI Point?</h4>
+            <p>PI Tag adalah representasi satu sinyal atau sensor dalam PI System. Setiap tag adalah satu "kolom" dalam time-series database. Kalau pabrik punya 20.000 sensor, berarti ada 20.000 PI Tags.</p>
+          </div>
+          <div class="ccard">
+            <h4>Contoh Nama Tag</h4>
+            <p>
+              <code>PUMP-01.VIBRATION.MOTOR_RMS</code><br>
+              <code>HX-02.TEMPERATURE.INLET</code><br>
+              <code>COMP-01.PRESSURE.DISCHARGE</code><br><br>
+              Konvensi: <em style="color:var(--white)">Equipment.Parameter.Location</em>
+            </p>
+          </div>
+        </div>
+
+        <div class="block-title">Atribut Utama PI Tag</div>
+        <table class="info-table">
+          <thead>
+            <tr><th>Atribut</th><th>Fungsi</th><th>Contoh</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="mono">TagName</span></td><td>Nama unik tag di dalam PI Server</td><td class="mono">PUMP01.VIB.RMS</td></tr>
+            <tr><td><span class="mono">PointType</span></td><td>Tipe data nilai yang disimpan</td><td class="mono">Float32, Int32, String, Digital</td></tr>
+            <tr><td><span class="mono">PointSource</span></td><td>Identifier interface yang menulis data ke tag ini</td><td class="mono">O (OPC), M (Manual), C (Connector)</td></tr>
+            <tr><td><span class="mono">InstrumentTag</span></td><td>Nama tag di OPC server / DCS sumber</td><td class="mono">AI1001, FIC_101.PV</td></tr>
+            <tr><td><span class="mono">EngUnit</span></td><td>Satuan engineering</td><td class="mono">mm/s, °C, bar, m³/h</td></tr>
+            <tr><td><span class="mono">Descriptor</span></td><td>Deskripsi singkat tag</td><td class="mono">Motor 01 Vibration RMS</td></tr>
+            <tr><td><span class="mono">Zero / Span</span></td><td>Batas bawah dan atas nilai sensor</td><td class="mono">0 / 100</td></tr>
+          </tbody>
+        </table>
+
+        <div class="block-title">Compression & Exception</div>
+        <div class="card-grid">
+          <div class="ccard accent">
+            <h4>Exception Deviation</h4>
+            <p>Data hanya dikirim dari interface ke PI Data Archive kalau nilainya berubah melebihi threshold yang ditentukan. Tujuannya: <strong style="color:var(--white)">menghemat bandwidth</strong> jaringan antara interface node dan PI Server.</p>
+          </div>
+          <div class="ccard accent">
+            <h4>Compression Deviation</h4>
+            <p>Data hanya disimpan permanen ke archive kalau berubah secara signifikan (di luar deadband). Tujuannya: <strong style="color:var(--white)">menghemat storage</strong> di PI Data Archive, bisa hingga 10x lebih efisien vs menyimpan setiap sample.</p>
+          </div>
+          <div class="ccard">
+            <h4>Compression On/Off</h4>
+            <p>Default: <strong style="color:var(--white)">Compression = On</strong>. Nonaktifkan hanya untuk data kritis yang wajib tersimpan setiap detik tanpa ada nilai yang dilewati, misalnya data safety atau billing meter.</p>
+          </div>
+          <div class="ccard">
+            <h4>Snapshot vs Archive</h4>
+            <p><strong style="color:var(--white)">Snapshot</strong> = nilai terkini (real-time) dari tag, disimpan di memory. <strong style="color:var(--white)">Archive</strong> = data historis yang sudah lolos compression, disimpan permanen ke disk.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Presenter</span>
+        <p>"Oke sekarang kita masuk ke inti PI System — yaitu PI Tag atau PI Point. <em>PI Tag itu ibarat satu kolom di spreadsheet, tapi khusus time-series.</em> Satu tag sama dengan satu sinyal sensor."</p>
+        <p>"Perhatikan contoh nama tagnya: <strong>PUMP-01.VIBRATION.MOTOR_RMS</strong>. Ini artinya tag untuk data vibrasi RMS motor pada Pump nomor 01. Naming convention yang konsisten itu sangat penting — kalau tagnya ribuan, naming yang buruk akan menyulitkan semua orang."</p>
+        <p>"Sekarang soal compression. Bayangin sensor suhu yang nilainya stabil di 65°C sepanjang hari — apakah kita perlu simpan nilai yang sama itu setiap detik? Tentu tidak. Nah, di sinilah fungsi Compression — PI hanya menyimpan data kalau ada perubahan yang signifikan. Hasilnya: storage kita bisa hemat sampai 10 kali lipat."</p>
+        <p>"Exception Deviation itu 'filter' pertama sebelum data masuk ke PI Server lewat jaringan. Compression Deviation itu 'filter' kedua sebelum data ditulis permanen ke disk. Keduanya bekerja bersama untuk membuat PI System sangat efisien."</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- SESI 3 -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="sesi3" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Sesi 3</div>
+        <div class="sesi-info">
+          <h2>Koneksi Data: OPC & PI Interface</h2>
+          <div class="sesi-time">10:30 – 12:00 &nbsp;·&nbsp; 90 menit</div>
+        </div>
+      </div>
+
+      <div class="materi-block">
+        <div class="block-title">OPC DA vs OPC UA</div>
+        <table class="info-table">
+          <thead>
+            <tr><th>Aspek</th><th>OPC DA (Classic)</th><th>OPC UA</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kepanjangan</td><td>OLE for Process Control — Data Access</td><td>Unified Architecture</td></tr>
+            <tr><td>Teknologi</td><td>DCOM/COM — Windows only</td><td>TCP/IP — platform independent</td></tr>
+            <tr><td>Keamanan</td><td>Terbatas, port dinamis (sulit firewall)</td><td>Enkripsi & autentikasi built-in</td></tr>
+            <tr><td>Penggunaan</td><td>Legacy DCS — masih sangat banyak digunakan</td><td>Modern, IIoT, cloud-ready</td></tr>
+            <tr><td>PI Interface</td><td class="mono">PI Interface for OPC DA (OPCInt.exe)</td><td class="mono">PI Connector for OPC UA</td></tr>
+            <tr><td>Cocok untuk</td><td>Sistem DCS lama (ABB, Yokogawa, Emerson)</td><td>Sistem baru, SCADA modern</td></tr>
+          </tbody>
+        </table>
+
+        <div class="block-title">Alur Konfigurasi PI Interface for OPC DA</div>
+        <div class="flow" style="flex-direction:column; align-items:flex-start; gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;width:100%">
+            <div class="flow-item" style="min-width:180px">1. Buka PI ICU</div>
+            <span style="color:var(--gray);font-size:13px">PI Interface Configuration Utility — tool untuk manage semua PI Interface</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;width:100%">
+            <div class="flow-item hl" style="min-width:180px">2. Pilih OPCInt.exe</div>
+            <span style="color:var(--gray);font-size:13px">Locate executable di folder PI installation, register sebagai Windows Service</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;width:100%">
+            <div class="flow-item hl" style="min-width:180px">3. Set OPC Server</div>
+            <span style="color:var(--gray);font-size:13px">Isi nama host & OPC Server ProgID, misal: <code style="font-family:'DM Mono',monospace;color:var(--accent)">Matrikon.OPC.Simulation.1</code></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;width:100%">
+            <div class="flow-item" style="min-width:180px">4. Set PointSource</div>
+            <span style="color:var(--gray);font-size:13px">Tentukan PointSource identifier, misal: <code style="font-family:'DM Mono',monospace;color:var(--accent)">O</code> untuk OPC. PI tag yang ber-PointSource=O akan dibaca oleh interface ini</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;width:100%">
+            <div class="flow-item acc" style="min-width:180px">5. Start Service</div>
+            <span style="color:var(--gray);font-size:13px">Jalankan interface sebagai Windows Service. Cek PI SMT — data seharusnya mulai mengalir ke PI Tags</span>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="ccard">
+            <h4>InstrumentTag vs Location</h4>
+            <p>Untuk PI Interface for OPC DA, field <code>InstrumentTag</code> diisi dengan Item ID dari OPC Server (misal: <code>Random.Int1</code>). Atribut Location1–4 digunakan untuk konfigurasi interface lama.</p>
+          </div>
+          <div class="ccard">
+            <h4>Matrikon OPC Simulation Server</h4>
+            <p>OPC server gratis untuk keperluan lab dan testing. Mensimulasikan berbagai tipe sinyal: random, ramp, sawtooth. Sangat cocok untuk belajar tanpa perlu DCS fisik.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Presenter</span>
+        <p>"Sekarang pertanyaannya: bagaimana data dari DCS atau sensor di lapangan bisa sampai ke PI Data Archive? Jawabannya adalah lewat <em>PI Interface</em> atau <em>PI Connector</em>."</p>
+        <p>"<strong>OPC</strong> itu analoginya seperti USB — satu standar konektor universal untuk semua device industri. Tanpa OPC, setiap vendor DCS punya protokol yang berbeda-beda dan kita harus buat driver custom untuk masing-masing. Dengan OPC, PI Interface cukup 'bicara OPC' dan bisa connect ke hampir semua sistem DCS."</p>
+        <p>"Sekarang ada dua versi: <strong>OPC DA</strong> yang sudah lama dan masih banyak dipakai di sistem DCS legacy, dan <strong>OPC UA</strong> yang lebih modern dan aman. Di proyek-proyek existing seperti yang berbasis ABB atau Yokogawa lama, kemungkinan besar kalian akan ketemu OPC DA."</p>
+        <p>"Untuk lab kita hari ini, kita pakai <em>Matrikon OPC Simulation Server</em> sebagai pengganti DCS. Ini tools yang sering banget dipakai engineer PI untuk testing dan belajar tanpa perlu hardware fisik."</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- SESI 4 -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="sesi4" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Sesi 4</div>
+        <div class="sesi-info">
+          <h2>PI Asset Framework (PI AF)</h2>
+          <div class="sesi-time">13:00 – 14:30 &nbsp;·&nbsp; 90 menit</div>
+        </div>
+      </div>
+
+      <div class="materi-block">
+        <div class="block-title">PI DA vs PI AF</div>
+        <div class="card-grid">
+          <div class="ccard">
+            <h4>PI Data Archive — "Gudang Data"</h4>
+            <p>Menyimpan data time-series. Tidak tahu konteks: tidak tahu tag itu milik equipment mana, di unit mana, di plant mana. Hanya tahu: nama tag, waktu, dan nilai.</p>
+          </div>
+          <div class="ccard accent">
+            <h4>PI Asset Framework — "Peta Aset"</h4>
+            <p>Menambahkan struktur dan konteks: Plant › Unit › Equipment. Setiap Equipment adalah sebuah <em>Element</em>, dan tag PI-nya menjadi <em>Attribute</em> dari element tersebut.</p>
+          </div>
+        </div>
+
+        <div class="block-title">Konsep Kunci PI AF</div>
+        <table class="info-table">
+          <thead>
+            <tr><th>Konsep</th><th>Penjelasan</th><th>Analogi</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong style="color:var(--white)">Database</strong></td><td>Wadah utama semua aset dalam satu PI AF Server</td><td>Satu perusahaan / satu plant</td></tr>
+            <tr><td><strong style="color:var(--white)">Element</strong></td><td>Representasi satu aset fisik (pump, compressor, vessel)</td><td>Satu baris di daftar equipment</td></tr>
+            <tr><td><strong style="color:var(--white)">Attribute</strong></td><td>Properti dari element — bisa link ke PI Tag, atau nilai statis</td><td>Kolom di tabel equipment</td></tr>
+            <tr><td><strong style="color:var(--white)">Template</strong></td><td>Blueprint element — buat satu template, apply ke semua equipment sejenis</td><td>Class / blueprint di OOP</td></tr>
+            <tr><td><strong style="color:var(--white)">Analysis</strong></td><td>Kalkulasi berbasis attribute: rata-rata, alarm, prediksi</td><td>Rumus di Excel, tapi real-time</td></tr>
+          </tbody>
+        </table>
+
+        <div class="block-title">Contoh Hierarchy PI AF</div>
+        <div class="tree">
+          <div class="l0">🏭  FSO Platform  <span style="color:var(--gray);font-size:11px">(Database)</span></div>
+          <div class="l1">├── ⚙️  Compression Train A  <span style="color:var(--gray);font-size:11px">(Element — Unit)</span></div>
+          <div class="l2">│   ├── 🔩  Pump-01  <span style="color:var(--gray);font-size:11px">(Element — Equipment)</span></div>
+          <div class="l3">│   │   ├── Vibration.RMS  → <span style="color:var(--accent)">PUMP-01.VIB.RMS</span></div>
+          <div class="l3">│   │   ├── Temperature.Motor  → <span style="color:var(--accent)">PUMP-01.TEMP.MOTOR</span></div>
+          <div class="l3">│   │   └── Speed.RPM  → <span style="color:var(--accent)">PUMP-01.SPEED</span></div>
+          <div class="l2">│   └── 🔩  Pump-02  <span style="color:var(--gray);font-size:11px">(Element — Equipment)</span></div>
+          <div class="l3">│       ├── Vibration.RMS  → <span style="color:var(--accent)">PUMP-02.VIB.RMS</span></div>
+          <div class="l3">│       └── Temperature.Motor  → <span style="color:var(--accent)">PUMP-02.TEMP.MOTOR</span></div>
+          <div class="l1">└── ⚙️  Compression Train B  <span style="color:var(--gray);font-size:11px">(Element — Unit)</span></div>
+        </div>
+      </div>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Presenter</span>
+        <p>"Kalau PI Data Archive itu 'gudang data'-nya — dia menyimpan semua nilai sensor — maka PI AF itu adalah <em>'peta'-nya</em>. Tanpa PI AF, kita hanya punya ribuan nama tag yang membingungkan, tanpa tahu tag itu milik equipment apa, di unit mana, dan di plant mana."</p>
+        <p>"Bayangkan kalian dapat daftar 20.000 nama tag tanpa konteks apapun — pusing kan? PI AF menyelesaikan itu dengan membuat hierarchy: <strong>Plant → Unit → Equipment → Parameter</strong>. Sekarang operator bisa langsung klik 'Pump-01' dan langsung lihat semua datanya: vibrasi, suhu, RPM — semuanya."</p>
+        <p>"Fitur paling powerful di PI AF adalah <strong>Template</strong>. Kalau kalian punya 50 pompa yang sejenis, cukup buat satu template Pump, lalu apply ke 50 equipment sekaligus. Efisiensinya luar biasa."</p>
+        <p>"Di proyek nyata seperti di platform offshore, PI AF ini yang jadi 'backbone' — semua 20.000 tag diorganisir dalam hierarchy yang mencerminkan struktur fisik plant. Operator bisa navigasi dari platform level sampai ke sensor individual dalam beberapa klik."</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- SESI 5 -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="sesi5" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Sesi 5</div>
+        <div class="sesi-info">
+          <h2>PI Vision — Visualisasi Data Real-Time</h2>
+          <div class="sesi-time">14:30 – 15:30 &nbsp;·&nbsp; 60 menit &nbsp;·&nbsp; Coffee break 15:15</div>
+        </div>
+      </div>
+
+      <div class="materi-block">
+        <div class="block-title">Fitur Utama PI Vision</div>
+        <div class="card-grid">
+          <div class="ccard">
+            <h4>📈 Trend Chart</h4>
+            <p>Tampilkan data historis dan real-time dalam grafik garis. Bisa overlay beberapa tag sekaligus untuk perbandingan, dengan zoom dan pan timeline yang mudah.</p>
+          </div>
+          <div class="ccard">
+            <h4>🔢 Value Display</h4>
+            <p>Angka live dari PI Tag yang ter-update otomatis. Bisa dikonfigurasi warna berdasarkan threshold: hijau = normal, kuning = warning, merah = alarm.</p>
+          </div>
+          <div class="ccard">
+            <h4>⏱️ Gauge / Dial</h4>
+            <p>Representasi analog untuk nilai seperti RPM, tekanan, dan suhu. Lebih intuitif bagi operator yang terbiasa dengan panel kontrol fisik.</p>
+          </div>
+          <div class="ccard">
+            <h4>🔗 Koneksi ke PI AF</h4>
+            <p>Display bisa di-link ke Element di PI AF. Operator cukup pilih equipment mana yang ingin dilihat, dan display otomatis menampilkan semua attribute-nya.</p>
+          </div>
+          <div class="ccard">
+            <h4>📋 Event Frame</h4>
+            <p>Tampilkan event tertentu seperti startup, shutdown, atau anomaly berdasarkan kondisi yang sudah didefinisikan di PI AF Analysis.</p>
+          </div>
+          <div class="ccard">
+            <h4>🔐 User Management</h4>
+            <p>Role-based access: <strong style="color:var(--white)">Read-only</strong> untuk operator, <strong style="color:var(--white)">Edit</strong> untuk engineer, <strong style="color:var(--white)">Admin</strong> untuk PI administrator. Integrasi dengan Windows AD.</p>
+          </div>
+        </div>
+
+        <div class="block-title">Cara Buat Display Pertama</div>
+        <div class="lab-steps">
+          <div class="lab-step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>Buka PI Vision di Browser</h4>
+              <p>Akses <code>http://[server-name]/PIVision</code> — tidak perlu install software di client, cukup browser modern.</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>Klik "New Display"</h4>
+              <p>Pilih layout kosong. Klik tombol Add Symbol di toolbar, pilih tipe symbol: Trend, Value, Gauge, dll.</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>Assign PI Tag atau AF Attribute</h4>
+              <p>Drag & drop tag dari PI Tag Search, atau navigasi ke AF Element lalu pilih attribute yang ingin ditampilkan.</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h4>Konfigurasi Threshold & Warna</h4>
+              <p>Double-click symbol → Format panel → atur color zones sesuai batas normal/warning/alarm dari ISO 10816 atau SIL requirement.</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <h4>Save & Share</h4>
+              <p>Save display, atur permission siapa saja yang bisa akses. Display bisa dibuka di PC, tablet, bahkan smartphone.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Presenter</span>
+        <p>"PI Vision ini adalah 'wajah' dari seluruh infrastruktur PI yang sudah kita bangun. Inilah yang dilihat oleh operator, supervisor, dan manajemen setiap harinya."</p>
+        <p>"Keunggulan PI Vision: <em>web-based</em>, artinya tidak perlu install apapun di komputer operator. Cukup buka browser, masukkan alamat server, langsung tampil dashboard real-time. Bisa diakses dari mana saja — termasuk dari kantor pusat atau saat sedang perjalanan dinas."</p>
+        <p>"Yang paling powerful adalah koneksinya ke PI AF. Kalau display kalian di-link ke AF Element, operator bisa ganti konteks hanya dengan pilih equipment yang berbeda — display langsung update otomatis menampilkan data equipment yang baru. Tidak perlu buat display baru untuk setiap equipment yang sama jenisnya."</p>
+        <p>"Kita sudah cover semua teorinya. <strong>Setelah coffee break, kita langsung hands-on</strong> — build semuanya dari awal di VM kalian masing-masing."</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- SESI 6 -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="sesi6" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Sesi 6</div>
+        <div class="sesi-info">
+          <h2>Hands-On Lab</h2>
+          <div class="sesi-time">15:30 – 17:00 &nbsp;·&nbsp; 90 menit + Q&A</div>
+        </div>
+      </div>
+
+      <div class="materi-block">
+        <div class="block-title">Langkah Lab</div>
+        <div class="lab-steps">
+          <div class="lab-step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <h4>Verifikasi Stack PI System</h4>
+              <p>Buka PI SMT → cek semua service UP: <code>PI Data Archive</code>, <code>PI AF Server</code>, <code>PI Vision</code>. Test koneksi PI Web API via browser: <code>https://[server]/piwebapi/</code></p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <h4>Buat PI Tags Manual via PI SMT</h4>
+              <p>PI SMT → Tag Search → New Tag. Buat 4 tag:<br>
+              <code>Motor01.Vibration.RMS</code> · <code>Motor01.Temperature</code><br>
+              <code>Motor02.Vibration.RMS</code> · <code>Motor02.Temperature</code><br>
+              PointType: Float32 | EngUnit: mm/s atau °C</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <h4>Jalankan Python RMS Simulator</h4>
+              <p>Jalankan <code>pi_rms_simulator.py</code> di terminal. Script ini mensimulasikan data vibrasi Motor01–04 sesuai threshold ISO 10816 (OK / Warning / Alarm) dan mengirim data via PI Web API setiap 2 detik. Verifikasi di PI SMT: Tag Search → lihat Current Value.</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">04</div>
+            <div class="step-body">
+              <h4>Buat Hierarchy PI AF</h4>
+              <p>Buka PI System Explorer → New Database → Buat Element <code>CompressorTrain</code> → child element <code>Motor01</code> → tambah Attribute: <code>Vibration.RMS</code> (link ke PI Tag <code>Motor01.Vibration.RMS</code>), <code>Temperature</code>.</p>
+            </div>
+          </div>
+          <div class="lab-step">
+            <div class="step-num">05</div>
+            <div class="step-body">
+              <h4>Build Display di PI Vision</h4>
+              <p>Buka <code>http://[server]/PIVision</code> → New Display → Tambah Trend dengan tag <code>Motor01.Vibration.RMS</code> → Tambah Value display untuk <code>Motor01.Temperature</code> → Set threshold warna → Save display.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Presenter</span>
+        <p>"Oke, ini waktunya praktek! Ikuti langkah-langkahnya satu per satu. Jangan terburu-buru — yang penting kalian paham setiap langkahnya, bukan cepat selesai."</p>
+        <p>"Kalau ada error, jangan panik. <strong>Screenshot errornya dulu, baru tanya.</strong> Di dunia nyata, troubleshooting adalah skill yang sama pentingnya dengan instalasi. Setiap error itu peluang belajar."</p>
+        <p>"Perhatikan step 03 — kita pakai Python untuk simulasi data. Di proyek real, data datang dari DCS atau OPC. Tapi prinsipnya sama: PI Web API adalah pintu masuknya. Python, .NET, Java — semua bisa write data ke PI lewat Web API."</p>
+        <p>"Waktu tersisa setelah lab untuk <em>Q&A bebas</em> — tanyakan apapun yang masih belum jelas dari semua materi hari ini."</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- KEY TAKEAWAYS -->
+    <!-- ══════════════════════════════════════════ -->
+    <section id="takeaway" class="fade-in">
+      <div class="sesi-header">
+        <div class="sesi-num">Penutup</div>
+        <div class="sesi-info">
+          <h2>Key Takeaways</h2>
+          <div class="sesi-time">Ringkasan akhir training</div>
+        </div>
+      </div>
+
+      <ul class="takeaway-list">
+        <li>
+          <span class="tk-num">01</span>
+          <span>PI System adalah platform historian industri standar de-facto di O&G dan Petrokimia. Bukan sekadar database — ini adalah <strong style="color:var(--white)">infrastruktur data operasional</strong> yang menghubungkan sensor lapangan ke decision maker.</span>
+        </li>
+        <li>
+          <span class="tk-num">02</span>
+          <span><strong style="color:var(--white)">PI Data Archive</strong> menyimpan time-series data dengan kompresi efisien. <strong style="color:var(--white)">PI AF</strong> menambahkan konteks aset dan hierarchy. Keduanya bekerja bersama — Archive adalah gudang datanya, AF adalah peta-nya.</span>
+        </li>
+        <li>
+          <span class="tk-num">03</span>
+          <span><strong style="color:var(--white)">OPC DA dan OPC UA</strong> adalah protokol standar yang menjembatani DCS/sensor ke PI Data Archive lewat PI Interface atau PI Connector. Pahami perbedaannya karena di lapangan kalian akan ketemu keduanya.</span>
+        </li>
+        <li>
+          <span class="tk-num">04</span>
+          <span><strong style="color:var(--white)">PI Vision</strong> adalah web-based dashboard yang mengubah data menjadi insight visual real-time. Tidak perlu install apapun di sisi client — bisa diakses dari mana saja.</span>
+        </li>
+        <li>
+          <span class="tk-num">05</span>
+          <span><strong style="color:var(--white)">PI Web API</strong> membuka PI System ke ekosistem modern: Python, Node.js, web dashboard, hingga AI/ML pipeline. Ini yang membuat PI System relevan di era Industry 4.0.</span>
+        </li>
+      </ul>
+
+      <div class="script-box">
+        <span class="script-label">🎤 Kalimat Penutup</span>
+        <p>"Kita sudah selesai semua materi hari ini — dari konsep dasar sampai hands-on lab. Selamat, kalian sekarang sudah punya fondasi yang kuat untuk bekerja dengan PI System."</p>
+        <p>"Yang paling penting dari semua yang kita pelajari: PI System itu <em>ekosistem</em>. PI Data Archive, PI AF, PI Vision, dan PI Web API — semuanya saling melengkapi. Kuasai satu per satu, dan kalian akan bisa handle implementasi skala enterprise."</p>
+        <p>"Langkah selanjutnya yang bisa kalian explore secara mandiri: <strong>PI Notifications</strong> untuk alerting, <strong>PI Datalink</strong> untuk analisis di Excel, dan integrasi <strong>Python + PI Web API</strong> untuk use-case AI/ML. Semua fondasinya sudah kalian punya setelah hari ini."</p>
+        <p>"Terima kasih atas partisipasi kalian hari ini. Kalau ada pertanyaan lanjutan setelah training, jangan ragu untuk hubungi kami. <em>Selamat berkarir di dunia industrial data!</em>"</p>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  // Scroll-triggered fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-item a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
