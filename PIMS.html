@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIMS Architecture — Wayang Windu</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #F0F4F8;
+    --surface:   #FFFFFF;
+    --surface2:  #F7FAFC;
+    --border:    #E2E8F0;
+    --text:      #1A202C;
+    --muted:     #718096;
+    --subtle:    #A0AEC0;
+    --blue:      #2563EB;
+    --blue-lt:   #EFF6FF;
+    --blue-mid:  #BFDBFE;
+    --teal:      #0D9488;
+    --teal-lt:   #F0FDFA;
+    --teal-mid:  #99F6E4;
+    --orange:    #EA580C;
+    --orange-lt: #FFF7ED;
+    --orange-mid:#FED7AA;
+    --green:     #16A34A;
+    --green-lt:  #F0FDF4;
+    --purple:    #7C3AED;
+    --purple-lt: #F5F3FF;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 14px; }
+  body {
+    background: var(--bg);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 24px 60px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    max-width: 1100px;
+    margin: 0 auto 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-eyebrow {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--blue); margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .header-eyebrow::before {
+    content: ''; display: block;
+    width: 20px; height: 2px;
+    background: var(--blue); border-radius: 2px;
+  }
+  .header h1 { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1.2; }
+  .header h1 span { color: var(--blue); }
+  .header-sub { font-size: 13px; color: var(--muted); margin-top: 5px; }
+  .header-badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; padding-top: 4px; }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px; border: 1.5px solid;
+  }
+  .badge.blue   { background: var(--blue-lt);   color: var(--blue);   border-color: var(--blue-mid); }
+  .badge.teal   { background: var(--teal-lt);   color: var(--teal);   border-color: var(--teal-mid); }
+  .badge.orange { background: var(--orange-lt); color: var(--orange); border-color: var(--orange-mid); }
+  .badge.green  { background: var(--green-lt);  color: var(--green);  border-color: #BBF7D0; }
+
+  /* ── TABS ── */
+  .tabs-wrap { max-width: 1100px; margin: 0 auto 28px; }
+  .tabs-bar {
+    display: flex; gap: 6px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 6px;
+    width: fit-content;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .tab-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 22px;
+    border: none; border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--muted);
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--text); }
+  .tab-btn.active {
+    background: var(--blue);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+  }
+  .tab-btn .tab-num {
+    width: 20px; height: 20px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    background: rgba(255,255,255,0.25);
+    flex-shrink: 0;
+  }
+  .tab-btn:not(.active) .tab-num {
+    background: var(--border);
+    color: var(--muted);
+  }
+
+  /* ── TAB PANELS ── */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── DIAGRAM STYLES ── */
+  .diagram { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; }
+  .row { display: flex; align-items: stretch; gap: 20px; }
+  .section-label {
+    font-size: 9.5px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--subtle); text-align: center;
+    margin: 10px 0 16px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px; overflow: hidden; flex: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.2s;
+    animation: fadeUp 0.45s ease both;
+  }
+  .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-2px); }
+  .card-top { padding: 18px 20px 14px; border-bottom: 1.5px solid var(--border); }
+  .card-type {
+    font-size: 9.5px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .dot-status { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .dot-status.online { background: var(--green); box-shadow: 0 0 0 3px #DCFCE7; }
+  .card-title { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  .card-hostname { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; margin-top: 3px; }
+
+  .card.blue  .card-top { background: var(--blue-lt); }
+  .card.blue  .card-type, .card.blue  .card-hostname { color: var(--blue); }
+  .card.teal  .card-top { background: var(--teal-lt); }
+  .card.teal  .card-type, .card.teal  .card-hostname { color: var(--teal); }
+  .card.orange .card-top { background: var(--orange-lt); }
+  .card.orange .card-type, .card.orange .card-hostname { color: var(--orange); }
+
+  .card-body { padding: 16px 20px; }
+  .info-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 7px 0; border-bottom: 1px solid var(--border); gap: 12px;
+  }
+  .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-label { font-size: 11px; color: var(--muted); font-weight: 500; flex-shrink: 0; padding-top: 1px; }
+  .info-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text); text-align: right; }
+  .info-val.blue   { color: var(--blue); }
+  .info-val.teal   { color: var(--teal); }
+  .info-val.orange { color: var(--orange); }
+  .info-val.green  { color: var(--green); }
+  .info-val.muted  { color: var(--muted); }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+  .tag-pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; border: 1px solid; }
+
+  /* ── PIPES ── */
+  .pipe-zone { max-width: 1100px; margin: 0 auto; display: flex; gap: 20px; padding: 8px 0; }
+  .pipe-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .pipe-line { width: 2px; height: 36px; }
+  .pipe-line.blue { background: linear-gradient(180deg,#BFDBFE,#2563EB); animation: flowPulse 2s ease-in-out infinite; }
+  .pipe-line.teal { background: linear-gradient(180deg,#99F6E4,#0D9488); animation: flowPulse 2s ease-in-out infinite 0.5s; }
+  .pipe-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; }
+  .pipe-arrow.blue { border-top: 8px solid var(--blue); }
+  .pipe-arrow.teal { border-top: 8px solid var(--teal); }
+  .pipe-badge { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; padding: 2px 9px; border-radius: 10px; }
+  .pipe-badge.blue { background: var(--blue-lt); color: var(--blue); border: 1px solid var(--blue-mid); }
+  .pipe-badge.teal { background: var(--teal-lt); color: var(--teal); border: 1px solid var(--teal-mid); }
+
+  /* ── QUERY ZONE ── */
+  .query-zone { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 0; padding: 16px 0; }
+  .qline { flex: 1; height: 2px; background: var(--border); }
+  .qlabel {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 5px 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    color: var(--muted); display: flex; align-items: center; gap: 6px;
+    white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  /* ── DOWN ZONE ── */
+  .down-zone { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 0; }
+  .down-line { width: 2px; animation: flowPulse 2s ease-in-out infinite; }
+
+  /* ── USER SECTION ── */
+  .user-section { max-width: 1100px; margin: 20px auto 0; }
+  .user-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 20px 24px;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .user-url {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600;
+    background: var(--blue-lt); color: var(--blue);
+    border: 1.5px solid var(--blue-mid); padding: 8px 16px; border-radius: 8px; flex-shrink: 0;
+  }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 12px; margin-top: 16px; }
+  .info-mini { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+  .info-mini-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+  /* ── LEGEND ── */
+  .legend { max-width: 1100px; margin: 20px auto 0; display: flex; gap: 20px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── SCRIPT / TAB 2 ── */
+  .script-wrap { max-width: 1100px; margin: 0 auto; }
+  .script-block {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 16px; overflow: hidden; margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    animation: fadeUp 0.45s ease both;
+  }
+  .script-block:nth-child(1) { animation-delay: 0.05s; }
+  .script-block:nth-child(2) { animation-delay: 0.10s; }
+  .script-block:nth-child(3) { animation-delay: 0.15s; }
+  .script-block:nth-child(4) { animation-delay: 0.20s; }
+  .script-block:nth-child(5) { animation-delay: 0.25s; }
+  .script-header {
+    padding: 14px 22px; display: flex; align-items: center; gap: 12px;
+  }
+  .script-tag {
+    background: rgba(255,255,255,0.22); color: #fff;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px;
+    padding: 3px 10px; border-radius: 10px; white-space: nowrap;
+  }
+  .script-sub { color: rgba(255,255,255,0.75); font-size: 12px; }
+  .script-body { padding: 22px 24px; }
+  .script-body p { font-size: 14.5px; line-height: 1.9; color: var(--text); }
+  .script-body p + p { margin-top: 12px; }
+  .sub-block { border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; border: 1.5px solid; }
+  .sub-block:last-child { margin-bottom: 0; }
+  .sub-title { font-size: 10.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .sub-block p { font-size: 13.5px; line-height: 1.85; color: var(--text); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes flowPulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    .row { flex-direction: column; }
+    .pipe-zone { flex-direction: column; align-items: center; }
+    .query-zone { flex-direction: column; gap: 8px; }
+    .qline { width: 2px; height: 20px; }
+    .tab-btn { padding: 9px 14px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<div class="header">
+  <div>
+    <div class="header-eyebrow">Arsitektur Sistem</div>
+    <h1>PIMS <span>Wayang Windu</span></h1>
+    <p class="header-sub">Plant Information Management System · Star Energy Geothermal · PT Cistech Alpha Indonesia</p>
+  </div>
+  <div class="header-badges">
+    <span class="badge blue">PI Server 3.4.460.29</span>
+    <span class="badge teal">PI Vision 3.11.0.0</span>
+    <span class="badge orange">6,000 Tags Licensed</span>
+    <span class="badge green">● System Online</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TABS BAR ═══════════════════════ -->
+<div class="tabs-wrap">
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('arch', this)">
+      <span class="tab-num">1</span>
+      🗂️ Arsitektur Sistem
+    </button>
+    <button class="tab-btn" onclick="switchTab('script', this)">
+      <span class="tab-num">2</span>
+      🎤 Penjelasan & Kalimat Penyampaian
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 1: ARCHITECTURE DIAGRAM                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-arch" class="tab-panel active">
+
+  <div class="diagram">
+
+    <!-- LAYER 1: DATA SOURCES -->
+    <div class="section-label">Layer 1 — Data Sources</div>
+    <div class="row">
+
+      <div class="card orange" style="animation-delay:0.05s">
+        <div class="card-top">
+          <div class="card-type">⚙️ DCS / Control System</div>
+          <div class="card-title">ABB DCS System</div>
+          <div class="card-hostname">OPC DA Server · PointSource: ABB-OPC</div>
+        </div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">Protocol</span><span class="info-val orange">OPC DA (Classic)</span></div>
+          <div class="info-row"><span class="info-label">Interface</span><span class="info-val">PI Interface OPCInt.exe</span></div>
+          <div class="info-row"><span class="info-label">Total Tags</span><span class="info-val orange">215 Tags</span></div>
+          <div class="info-row"><span class="info-label">Data Type</span><span class="info-val muted">Float32</span></div>
+          <div class="tags">
+            <span class="tag-pill" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA">Turbine Temp</span>
+            <span class="tag-pill" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA">Generator Vibr</span>
+            <span class="tag-pill" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA">Flow Rate</span>
+            <span class="tag-pill" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA">Pressure</span>
+            <span class="tag-pill" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA">CT Fan Current</span>
+            <span class="tag-pill" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA">Wellhead Press</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card teal" style="animation-delay:0.12s">
+        <div class="card-top">
+          <div class="card-type">📡 Vibration Monitoring</div>
+          <div class="card-title">VC-8000 SETPOINT</div>
+          <div class="card-hostname">172.18.1.10 · Port 8001 · UNIT#1</div>
+        </div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">Software</span><span class="info-val teal">SETPOINT Connector 8.6.240.0</span></div>
+          <div class="info-row"><span class="info-label">Installed On</span><span class="info-val">IDWWDW25SCADA02</span></div>
+          <div class="info-row"><span class="info-label">Total Tags</span><span class="info-val teal">224 Tags</span></div>
+          <div class="info-row"><span class="info-label">Hardware</span><span class="info-val muted">Brüel &amp; Kjær Vibro</span></div>
+          <div class="tags">
+            <span class="tag-pill" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4">Shaft Vib 1X/1Y</span>
+            <span class="tag-pill" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4">Shaft Vib 2X/2Y</span>
+            <span class="tag-pill" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4">Thrust Bearing</span>
+            <span class="tag-pill" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4">HWP-A X/Y</span>
+            <span class="tag-pill" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4">Phase Trigger</span>
+            <span class="tag-pill" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4">Generator Vib</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /row sources -->
+
+    <!-- PIPES -->
+    <div class="pipe-zone">
+      <div class="pipe-col">
+        <div class="pipe-badge blue">OPC DA → PI Interface</div>
+        <div class="pipe-line blue"></div>
+        <div class="pipe-arrow blue"></div>
+      </div>
+      <div class="pipe-col">
+        <div class="pipe-badge teal">SETPOINT Connector → PI AF</div>
+        <div class="pipe-line teal"></div>
+        <div class="pipe-arrow teal"></div>
+      </div>
+    </div>
+
+    <!-- LAYER 2: PI SERVERS -->
+    <div class="section-label">Layer 2 — PI Servers</div>
+    <div class="row">
+
+      <div class="card blue" style="animation-delay:0.08s">
+        <div class="card-top">
+          <div class="card-type"><span class="dot-status online"></span>🖥️ Server 1 — PI Data Archive</div>
+          <div class="card-title">IDWWDW25SCADA01</div>
+          <div class="card-hostname">172.18.1.11 · NAT: 10.107.1.28</div>
+        </div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">PI DA Version</span><span class="info-val blue">3.4.460.29</span></div>
+          <div class="info-row"><span class="info-label">Archive Path</span><span class="info-val muted">D:\PI\arc</span></div>
+          <div class="info-row"><span class="info-label">Archive Size</span><span class="info-val">10,240 MB / file</span></div>
+          <div class="info-row"><span class="info-label">Backup Schedule</span><span class="info-val green">Daily 03:15 AM</span></div>
+          <div class="info-row"><span class="info-label">Backup Type</span><span class="info-val muted">Incremental</span></div>
+          <div class="info-row"><span class="info-label">License Tags</span><span class="info-val blue">6,000 Tags</span></div>
+          <div class="info-row"><span class="info-label">PointSources</span><span class="info-val muted">ABB-OPC · SETPOINT · T</span></div>
+          <div class="info-row"><span class="info-label">PI Mappings</span><span class="info-val muted">Everyone · Admin · STARENERGY</span></div>
+          <div class="info-row"><span class="info-label">Hardware</span><span class="info-val muted">Dell R760XS · Xeon Silver 4410y</span></div>
+          <div class="tags" style="margin-top:12px">
+            <span class="tag-pill" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE">PI Data Archive</span>
+            <span class="tag-pill" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE">PI Buffer Subsystem</span>
+            <span class="tag-pill" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE">PI SMT</span>
+            <span class="tag-pill" style="background:var(--green-lt);color:var(--green);border-color:#BBF7D0">TCP Port 5450</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card teal" style="animation-delay:0.15s">
+        <div class="card-top">
+          <div class="card-type"><span class="dot-status online"></span>🖥️ Server 2 — PI Vision + AF</div>
+          <div class="card-title">IDWWDW25SCADA02</div>
+          <div class="card-hostname">172.18.1.12 · NAT: 10.107.1.29</div>
+        </div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">PI Vision</span><span class="info-val teal">3.11.0.0</span></div>
+          <div class="info-row"><span class="info-label">PI AF Version</span><span class="info-val teal">2.10.12.73</span></div>
+          <div class="info-row"><span class="info-label">PI AF Client</span><span class="info-val muted">3.1.1.1182</span></div>
+          <div class="info-row"><span class="info-label">AF Database</span><span class="info-val">Vibration</span></div>
+          <div class="info-row"><span class="info-label">SQL Server</span><span class="info-val muted">\SQLEXPRESS → PIVISION</span></div>
+          <div class="info-row"><span class="info-label">PI Vision URL</span><span class="info-val teal">https://172.18.1.12/PIVision</span></div>
+          <div class="info-row"><span class="info-label">Auth Method</span><span class="info-val">Windows Only (AD)</span></div>
+          <div class="info-row"><span class="info-label">App Pool User</span><span class="info-val muted">STARENERGYID\svc_pi</span></div>
+          <div class="info-row"><span class="info-label">SETPOINT Conn</span><span class="info-val green">Running · svc_pi</span></div>
+          <div class="info-row"><span class="info-label">Hardware</span><span class="info-val muted">Dell R760XS · 2×3.84TB SSD</span></div>
+          <div class="tags" style="margin-top:12px">
+            <span class="tag-pill" style="background:var(--teal-lt);color:var(--teal);border-color:var(--teal-mid)">PI Vision Web</span>
+            <span class="tag-pill" style="background:var(--teal-lt);color:var(--teal);border-color:var(--teal-mid)">PI AF Server</span>
+            <span class="tag-pill" style="background:var(--teal-lt);color:var(--teal);border-color:var(--teal-mid)">SETPOINT Connector</span>
+            <span class="tag-pill" style="background:var(--purple-lt);color:var(--purple);border-color:#DDD6FE">IIS · HTTPS 443</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /row servers -->
+
+    <!-- QUERY CONNECTOR -->
+    <div class="query-zone">
+      <div class="qline"></div>
+      <div class="qlabel">🔗 PI Vision queries PI Data Archive · Internal Network 172.18.x.x · Port 5450</div>
+      <div class="qline"></div>
+    </div>
+
+    <!-- DOWN ARROW -->
+    <div class="down-zone">
+      <div class="down-line" style="height:28px;background:linear-gradient(180deg,#99F6E4,#0D9488);"></div>
+      <div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--teal);"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--teal);background:var(--teal-lt);border:1px solid var(--teal-mid);padding:3px 12px;border-radius:10px;margin-top:4px;">HTTPS · Web Browser</div>
+      <div class="down-line" style="height:20px;background:var(--teal-mid);"></div>
+      <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--teal-mid);"></div>
+    </div>
+
+    <!-- LAYER 3: END USER -->
+    <div class="section-label">Layer 3 — End User Access</div>
+
+  </div><!-- /diagram -->
+
+  <!-- USER ACCESS -->
+  <div class="user-section">
+    <div class="user-card">
+      <div style="font-size:28px;flex-shrink:0;">👷</div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;">Operator / Engineer / Management</div>
+        <div style="font-size:12px;color:var(--muted);">Akses PI Vision via web browser — Windows Integrated Auth (Active Directory). Role: Explorer (view), Publisher (edit display), Administrator.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0;">
+        <div class="user-url">https://172.18.1.12/PIVision</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:right;">Domain: STARENERGYID · Auth: Windows Only</div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-mini">
+        <div class="info-mini-title">🌐 Network Segments</div>
+        <div class="info-row"><span class="info-label">OT Network</span><span class="info-val teal">172.18.1.x /24</span></div>
+        <div class="info-row"><span class="info-label">IT Network (NAT)</span><span class="info-val blue">10.107.1.x</span></div>
+        <div class="info-row"><span class="info-label">Switch</span><span class="info-val muted">Cisco C9200L-24</span></div>
+        <div class="info-row"><span class="info-label">Firewall</span><span class="info-val muted">ABB FW SPFW01/02</span></div>
+      </div>
+      <div class="info-mini">
+        <div class="info-mini-title">🔐 Security Config</div>
+        <div class="info-row"><span class="info-label">Auth</span><span class="info-val">Windows Integrated (AD)</span></div>
+        <div class="info-row"><span class="info-label">PI Identities</span><span class="info-val muted">piadmin · piadmins · PIWorld</span></div>
+        <div class="info-row"><span class="info-label">Domain</span><span class="info-val blue">STARENERGYID</span></div>
+        <div class="info-row"><span class="info-label">Access</span><span class="info-val muted">RBAC (Role-based)</span></div>
+      </div>
+      <div class="info-mini">
+        <div class="info-mini-title">📊 Data Summary</div>
+        <div class="info-row"><span class="info-label">ABB OPC DA Tags</span><span class="info-val orange">215 tags</span></div>
+        <div class="info-row"><span class="info-label">VC-8000 Vib Tags</span><span class="info-val teal">224 tags</span></div>
+        <div class="info-row"><span class="info-label">Total Active</span><span class="info-val blue">~439 tags</span></div>
+        <div class="info-row"><span class="info-label">AF Database</span><span class="info-val">Vibration</span></div>
+      </div>
+      <div class="info-mini">
+        <div class="info-mini-title">🔧 Key Ports</div>
+        <div class="info-row"><span class="info-label">PI Data Archive</span><span class="info-val blue">TCP 5450</span></div>
+        <div class="info-row"><span class="info-label">PI Vision HTTPS</span><span class="info-val teal">TCP 443</span></div>
+        <div class="info-row"><span class="info-label">VC-8000 CMS</span><span class="info-val orange">TCP 8001</span></div>
+        <div class="info-row"><span class="info-label">SQL Server</span><span class="info-val muted">TCP 1433 (local)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>ABB DCS / OPC DA</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>VC-8000 Vibration</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>PI Data Archive</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>PI Vision + AF</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>System Online</div>
+    <div class="legend-item" style="margin-left:auto;color:var(--subtle);font-size:11px;">Rev. 00 · 13 Mar 2026 · PT Cistech Alpha Indonesia</div>
+  </div>
+
+</div><!-- /tab-arch -->
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 2: PENJELASAN & KALIMAT PENYAMPAIAN               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-script" class="tab-panel">
+<div class="script-wrap">
+
+  <!-- OPENING -->
+  <div class="script-block">
+    <div class="script-header" style="background:linear-gradient(135deg,#1E40AF,#2563EB);">
+      <span class="script-tag">🎤 OPENING</span>
+      <span class="script-sub">Pembuka — pengenalan sistem secara umum</span>
+    </div>
+    <div class="script-body">
+      <p>"Bapak/Ibu, izinkan kami menjelaskan arsitektur sistem <strong>Plant Information Management System (PIMS)</strong> yang telah kami implementasikan di Wayang Windu. Secara keseluruhan, sistem ini terdiri dari <strong>tiga lapisan utama</strong> — mulai dari pengumpulan data di lapangan, penyimpanan dan pengolahan di server, hingga visualisasi yang dapat diakses oleh tim operasional kapan saja melalui web browser."</p>
+    </div>
+  </div>
+
+  <!-- LAYER 1 -->
+  <div class="script-block">
+    <div class="script-header" style="background:linear-gradient(135deg,#C2410C,#EA580C);">
+      <span class="script-tag">📡 LAYER 1</span>
+      <span class="script-sub">Data Sources — sumber data dari lapangan</span>
+    </div>
+    <div class="script-body">
+      <p style="margin-bottom:16px;">"Di lapisan pertama, terdapat <strong>dua sumber data</strong> yang mengalirkan informasi ke dalam sistem PIMS secara real-time."</p>
+
+      <div class="sub-block" style="background:var(--orange-lt);border-color:var(--orange-mid);">
+        <div class="sub-title" style="color:var(--orange);">⚙️ Sumber Data 1 — ABB DCS via OPC DA</div>
+        <p>"Sumber pertama adalah <strong>ABB DCS System</strong> yang terhubung menggunakan protokol <strong>OPC DA</strong> — yaitu standar komunikasi data industri yang umum digunakan pada sistem kontrol generasi sebelumnya. Dari DCS ini, kami berhasil mengintegrasikan <strong>215 tags</strong> yang mencakup parameter proses penting seperti suhu bearing turbin, tekanan wellhead sumur produksi, flow rate brine, kecepatan turbin, arus motor cooling tower fan, hingga level kondensor. Semua data ini masuk ke PI Server melalui PI Interface yang berjalan sebagai Windows Service di server."</p>
+      </div>
+
+      <div class="sub-block" style="background:var(--teal-lt);border-color:var(--teal-mid);">
+        <div class="sub-title" style="color:var(--teal);">📡 Sumber Data 2 — VC-8000 SETPOINT Vibration</div>
+        <p>"Sumber kedua adalah <strong>VC-8000 SETPOINT</strong> dari Brüel &amp; Kjær Vibro, yaitu sistem monitoring vibrasi yang terpasang langsung di unit turbin-generator. Hardware ini mengumpulkan <strong>224 tags</strong> data vibrasi yang sangat detail dan presisi — mencakup vibrasi shaft 1X dan 1Y di sisi turbin, vibrasi shaft 2X dan 2Y di sisi generator, thrust bearing axial, HWP-A, serta phase trigger. Data dari VC-8000 ini dikirimkan ke PI Server menggunakan software <strong>SETPOINT Connector</strong> yang terinstall di Server 2."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 2 -->
+  <div class="script-block">
+    <div class="script-header" style="background:linear-gradient(135deg,#1D4ED8,#0D9488);">
+      <span class="script-tag">🖥️ LAYER 2</span>
+      <span class="script-sub">PI Servers — penyimpanan & pengelolaan data</span>
+    </div>
+    <div class="script-body">
+      <p style="margin-bottom:16px;">"Di lapisan kedua, kami menggunakan <strong>dua server Dell PowerEdge R760XS</strong> yang beroperasi di jaringan OT internal Wayang Windu dengan subnet 172.18.1.x. Kedua server ini saling terhubung dan bekerja sebagai satu ekosistem PI System yang terintegrasi."</p>
+
+      <div class="sub-block" style="background:var(--blue-lt);border-color:var(--blue-mid);">
+        <div class="sub-title" style="color:var(--blue);">🖥️ Server 1 — IDWWDW25SCADA01 (172.18.1.11) — PI Data Archive</div>
+        <p>"<strong>Server pertama</strong> berperan sebagai <strong>PI Data Archive</strong> — ini adalah inti atau jantung dari seluruh sistem PIMS. Semua data sensor dari ABB DCS maupun VC-8000 tersimpan di sini secara real-time dalam format time-series yang sangat efisien. Server ini menjalankan <strong>PI Data Archive versi 3.4.460.29</strong>, dengan kapasitas archive 10 GB per file yang tersimpan di drive D, dan dilengkapi dengan <strong>backup otomatis setiap hari pukul 03:15 pagi</strong> secara incremental. Lisensi yang terpasang mendukung hingga <strong>6.000 PI Tags</strong>, dan saat ini sudah aktif sekitar 439 tags. Keamanan akses diatur melalui PI Mappings dan PI Trusts berbasis Active Directory perusahaan."</p>
+      </div>
+
+      <div class="sub-block" style="background:var(--teal-lt);border-color:var(--teal-mid);">
+        <div class="sub-title" style="color:var(--teal);">🖥️ Server 2 — IDWWDW25SCADA02 (172.18.1.12) — PI Vision + AF</div>
+        <p>"<strong>Server kedua</strong> berperan sebagai <strong>PI Vision dan PI Asset Framework</strong>. Server ini yang mengelola visualisasi data dan struktur aset. <strong>PI Asset Framework (AF)</strong> mengorganisir seluruh data dalam hierarchy yang mencerminkan struktur fisik plant — mulai dari unit turbin, masing-masing bearing, hingga setiap parameter vibrasi yang dimonitor. Database aset yang kami bangun diberi nama <strong>'Vibration'</strong> yang merepresentasikan seluruh monitoring vibrasi di Unit 1. Selain itu, server ini juga menjalankan SETPOINT Connector untuk menerima data langsung dari hardware VC-8000."</p>
+      </div>
+
+      <div class="sub-block" style="background:var(--surface2);border-color:var(--border);border-style:dashed;">
+        <div class="sub-title" style="color:var(--muted);">🔗 Koneksi Antar Server</div>
+        <p>"Kedua server ini saling berkomunikasi melalui jaringan internal. Ketika operator membuka PI Vision di browser, Server 2 secara otomatis mengambil data historis maupun real-time dari Server 1 melalui <strong>port TCP 5450</strong> — port standar komunikasi PI System. Proses ini berlangsung otomatis dan transparan bagi pengguna."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 3 -->
+  <div class="script-block">
+    <div class="script-header" style="background:linear-gradient(135deg,#065F46,#16A34A);">
+      <span class="script-tag">👷 LAYER 3</span>
+      <span class="script-sub">End User Access — akses operator & engineer</span>
+    </div>
+    <div class="script-body">
+      <p style="margin-bottom:14px;">"Di lapisan ketiga adalah akses untuk seluruh pengguna — baik operator, engineer, maupun manajemen. Tim Bapak/Ibu dapat membuka <strong>dashboard PI Vision</strong> langsung melalui <strong>web browser</strong> tanpa perlu menginstall software apapun di komputer client."</p>
+      <div class="sub-block" style="background:var(--green-lt);border-color:#BBF7D0;">
+        <div class="sub-title" style="color:var(--green);">🌐 Cara Akses</div>
+        <p>"Alamat aksesnya adalah <strong style="font-family:'JetBrains Mono',monospace;font-size:13px;">https://172.18.1.12/PIVision</strong>. Sistem keamanannya menggunakan <strong>Windows Integrated Authentication</strong> berbasis Active Directory domain STARENERGYID, sehingga user cukup login sekali dengan akun domain masing-masing. Hak akses diatur berdasarkan role — operator mendapat akses <em>view</em> untuk monitoring, engineer mendapat akses <em>edit</em> untuk membuat atau memodifikasi display, dan administrator memiliki akses penuh ke seluruh konfigurasi sistem."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="script-block">
+    <div class="script-header" style="background:linear-gradient(135deg,#374151,#1F2937);">
+      <span class="script-tag">✅ CLOSING</span>
+      <span class="script-sub">Penutup & serah terima sistem</span>
+    </div>
+    <div class="script-body">
+      <p>"Secara keseluruhan, sistem ini telah berhasil mengintegrasikan <strong>439 tags aktif</strong> dari dua sumber data yang berbeda — yaitu DCS proses dan monitoring vibrasi — ke dalam <strong>satu platform terpadu</strong> yang dapat diakses secara real-time. Dengan arsitektur ini, tim Bapak/Ibu dapat memonitor kondisi operasional plant secara komprehensif, baik dari ruang kontrol maupun dari workstation di kantor, selama terhubung ke jaringan internal Wayang Windu."</p>
+      <p>"Kami juga telah menyiapkan <strong>dokumentasi lengkap</strong> sebagai bagian dari deliverable proyek ini — mencakup as-built configuration, prosedur backup &amp; restore, panduan troubleshooting, serta user guide untuk operator dan administrator — untuk memastikan sistem ini dapat dioperasikan dan dimaintain secara mandiri oleh tim Bapak/Ibu ke depannya."</p>
+      <p>"Demikian penjelasan arsitektur sistem PIMS Wayang Windu dari kami. Apabila ada pertanyaan lebih lanjut mengenai konfigurasi, pengoperasian, maupun rencana pengembangan sistem ke depan, kami siap mendiskusikannya bersama. Terima kasih."</p>
+    </div>
+  </div>
+
+  <!-- Footer script -->
+  <div style="text-align:center;margin-top:8px;padding:16px;font-size:11.5px;color:var(--subtle);">
+    Rev. 00 · 13 Maret 2026 · PT Cistech Alpha Indonesia — Star Energy Geothermal Wayang Windu Ltd
+  </div>
+
+</div><!-- /script-wrap -->
+</div><!-- /tab-script -->
+
+<script>
+  function switchTab(id, btn) {
+    // Hide all panels
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    // Deactivate all buttons
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    // Show target panel
+    document.getElementById('tab-' + id).classList.add('active');
+    // Activate clicked button
+    btn.classList.add('active');
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
