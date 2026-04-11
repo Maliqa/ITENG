@@ -301,6 +301,14 @@
       <span class="tab-num">2</span>
       Penjelasan Sistem
     </button>
+    <button class="tab-btn" onclick="switchTab('checklist', this)">
+      <span class="tab-num">3</span>
+      Checklist Implementasi
+    </button>
+    <button class="tab-btn" onclick="switchTab('guide', this)">
+      <span class="tab-num">4</span>
+      Panduan Step by Step
+    </button>
   </div>
 </div>
 
@@ -612,20 +620,592 @@
 </div><!-- /script-wrap -->
 </div><!-- /tab-script -->
 
-<script>
-  function switchTab(id, btn) {
-    // Hide all panels
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    // Deactivate all buttons
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    // Show target panel
-    document.getElementById('tab-' + id).classList.add('active');
-    // Activate clicked button
-    btn.classList.add('active');
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 3: CHECKLIST IMPLEMENTASI                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-checklist" class="tab-panel">
+<div style="max-width:1100px;margin:0 auto;">
+
+  <!-- Progress Summary -->
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Status Implementasi</div>
+      <div style="font-size:28px;font-weight:800;color:var(--green);">✅ Completed</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Rev. 00 · 13 Maret 2026</div>
+    </div>
+    <div style="flex:1;min-width:200px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:600;color:var(--text);">Overall Progress</span>
+        <span style="font-size:12px;font-weight:700;color:var(--green);" id="pct-label">100%</span>
+      </div>
+      <div style="height:10px;background:var(--border);border-radius:10px;overflow:hidden;">
+        <div id="prog-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#16A34A,#22C55E);border-radius:10px;transition:width 1s ease;"></div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--green);font-weight:600;" id="done-count">0 Done</span>
+        <span style="font-size:11px;color:var(--orange);font-weight:600;" id="pending-count">0 Pending</span>
+        <span style="font-size:11px;color:var(--muted);" id="total-count">0 Total</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="checkAll(true)" style="padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">✓ Check All</button>
+      <button onclick="checkAll(false)" style="padding:8px 16px;background:var(--surface);color:var(--muted);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- CHECKLIST GROUPS -->
+
+  <!-- 1. Infrastructure -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease both;">
+    <div style="background:linear-gradient(135deg,#1E40AF,#2563EB);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">🖥️ 01</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Infrastructure & Installation</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Install PI Data Archive 3.4.460.29 di Server 1 (IDWWDW25SCADA01)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Install PI Asset Framework Server 2.10.12.73 di Server 2 (IDWWDW25SCADA02)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Install PI Vision 3.11.0.0 di Server 2</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi IIS untuk PI Vision (HTTPS port 443)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Setup SQL Express sebagai database PI Vision (DB: PIVISION)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Install SETPOINT Connector 8.6.240.0 di Server 2</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi archive path D:\PI\arc dengan ukuran 10,240 MB per file</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi konektivitas jaringan antar server (ping, TCP port 5450)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Test PI SDK dan PI API dari interface node (apisnap, AboutPI-SDK)</span></label>
+    </div>
+  </div>
+
+  <!-- 2. Data Integration -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.05s both;">
+    <div style="background:linear-gradient(135deg,#C2410C,#EA580C);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">⚙️ 02</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Data Integration — ABB OPC DA</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Install PI Interface for OPC DA (OPCInt_ReadOnly.exe)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi PI ICU — buat instance baru dari OPCInt_ReadOnly.exe</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set PointSource = ABB-OPC dan Interface ID = 1 di tab General</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set OPC Server target di tab OPCInt (connect ke ABB DCS)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi scan class (frekuensi polling data)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set service account untuk PI Interface service</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Start service dan verifikasi PI Message Log (Connected to OPC Server)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Validasi data ABB DCS masuk — 215 tags aktif di PI SMT Current Values</span></label>
+    </div>
+  </div>
+
+  <!-- 3. VC-8000 SETPOINT -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.1s both;">
+    <div style="background:linear-gradient(135deg,#0F766E,#0D9488);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">📡 03</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Data Integration — VC-8000 SETPOINT Vibration</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi SETPOINT Connector — Connection Type: VC-8000, IP: 172.18.1.10</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set PI Server: 172.18.1.11, AF Server: IDWWDW25SCADA02, AF Database: Vibration</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Aktifkan "Collect data" dan "Backfill into PI System"</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Run "Check Connections" — pastikan semua status hijau (All Connections Passed)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi service SetpointConnector.MainService running dengan service account</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Validasi 224 tags vibrasi aktif — Rack\PI tag comparison: 224/224 Missing: 0</span></label>
+    </div>
+  </div>
+
+  <!-- 4. PI Tag & Data Model -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.15s both;">
+    <div style="background:linear-gradient(135deg,#6D28D9,#7C3AED);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">🏷️ 04</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">PI Tag & Data Model</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Bulk tag creation via PI Builder (CSV import dari PI OPC Client Tool)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set naming convention tag (contoh: A1_TE0401, A1_PIT0610)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi Location1=1, Location2=0, Location3=1, Location4=1 untuk semua tag ABB OPC</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set InstrumentTag sesuai OPC Item ID dari ABB DCS (case-sensitive)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set PointSource = ABB-OPC untuk semua tag dari DCS</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi EngUnit, Descriptor, Zero, Span per tag</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set Compression & Exception Deviation per tag</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi semua tag menerima data di SMT Current Values</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Validasi Point Source Table — ABB-OPC: 215, SETPOINT: 225</span></label>
+    </div>
+  </div>
+
+  <!-- 5. PI AF -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.20s both;">
+    <div style="background:linear-gradient(135deg,#0369A1,#0284C7);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">🗂️ 05</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">PI Asset Framework (AF)</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat AF Database "Vibration" di PI System Explorer</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat element hierarchy: Setpoint Racks → UNIT#1 → Turbine / Generator / Axial / HWP-A / Speed</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat element templates: Bearing, Cylinder, HydroGenerator, Rack, Waveform, dll</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Link AF Attribute ke PI Tags (PI Point Reference)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Check In semua perubahan AF ke database</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi AF Server di PI Vision Admin (Asset Servers tab)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi AF Database "Vibration" terlihat di PI Vision Configuration</span></label>
+    </div>
+  </div>
+
+  <!-- 6. Security -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.25s both;">
+    <div style="background:linear-gradient(135deg,#991B1B,#DC2626);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">🔐 06</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Security & Access Control</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat PI Identities: piadmin, piadmins, PIWorld</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat PI Mappings — link domain accounts ke PI Identities (Everyone, Admin, STARENERGY\svc_pi)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi PI Trusts untuk AFSERVER, Proxy, Client nodes</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set Windows Integrated Authentication di PI Vision Admin → Security</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi User Access Levels di PI Vision (Administrators, Publishers, Explorers)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat dedicated service account: STARENERGYID\svc_pi untuk PI Interface & Buffer</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set datasecurity & ptsecurity per tag: piadmin A(r,w) | PIWorld A(r)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi login PI Vision dengan akun domain STARENERGYID berhasil</span></label>
+    </div>
+  </div>
+
+  <!-- 7. Buffering & Reliability -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.30s both;">
+    <div style="background:linear-gradient(135deg,#065F46,#059669);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">🔄 07</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Buffering & Reliability</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi PI Buffer Subsystem via PI ICU → Tools → Buffering</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set buffer queue location di drive terpisah dari OS drive</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set service account PI Buffer: STARENERGYID\svc_pi</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Aktifkan buffering per interface di tab General PI ICU</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi Buffering Manager — Global Buffering Status: No reported issues</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Test buffering dengan pibufss -bc stop → pibufss -bc start</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfirmasi estimated buffer capacity mencukupi (sistem: 31.6 years)</span></label>
+    </div>
+  </div>
+
+  <!-- 8. Backup -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.35s both;">
+    <div style="background:linear-gradient(135deg,#92400E,#D97706);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">💾 08</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Backup & Restore</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi backup otomatis PI Data Archive — jadwal daily 03:15 AM</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set backup type: Incremental untuk efisiensi storage</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi backup history — status Success di SMT → Operation → Backups</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Setup backup AF Database via SQL Server backup mechanism</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Dokumentasi prosedur restore PI Data Archive</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Test restore procedure minimal sekali sebelum serah terima</span></label>
+    </div>
+  </div>
+
+  <!-- 9. PI Vision -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.40s both;">
+    <div style="background:linear-gradient(135deg,#4338CA,#6366F1);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">📊 09</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">PI Vision Dashboard</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi Data Server di PI Vision Admin → Configuration (172.18.1.11)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Konfigurasi Asset Server → pilih AF Database "Vibration"</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Test Connection Data Server — status hijau (Allowed)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat display monitoring proses (trend, value, gauge dari ABB tags)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Buat display monitoring vibrasi (trend shaft vibration dari VC-8000 tags)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Set permission display — siapa yang bisa view/edit</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Verifikasi akses PI Vision dari browser client menggunakan akun domain</span></label>
+    </div>
+  </div>
+
+  <!-- 10. Documentation & Handover -->
+  <div class="cl-group" style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.4s ease 0.45s both;">
+    <div style="background:linear-gradient(135deg,#374151,#4B5563);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;">📋 10</span>
+        <span style="color:#fff;font-size:13.5px;font-weight:700;">Dokumentasi & Serah Terima</span>
+      </div>
+      <span class="cl-group-count" style="color:rgba(255,255,255,0.7);font-size:11px;font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <div style="padding:8px 0;">
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">As-built configuration document (PI DA, PI AF, PI Vision)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">PI Tag list final (Excel/CSV) — ABB OPC + VC-8000</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Network & architecture diagram (VMS Wiring Diagram PTCAI-SEGWW-DWG-001)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Interface service account documentation</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Backup & restore procedure document</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Troubleshooting guide & log location guide</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">End User Guide untuk operator & engineer</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Admin / Engineer Guide untuk tim IT Star Energy</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Software & Hardware inventory (license, server spec)</span></label>
+      <label class="cl-item"><input type="checkbox" onchange="updateProgress()"><span class="cl-text">Project Sign-off document — ditandatangani kedua pihak</span></label>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:16px;font-size:11.5px;color:var(--subtle);">
+    Rev. 00 · 13 Maret 2026 · PT Cistech Alpha Indonesia — Star Energy Geothermal Wayang Windu Ltd
+  </div>
+
+</div>
+</div><!-- /tab-checklist -->
+
+<style>
+  .cl-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 22px; cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid var(--border);
   }
+  .cl-item:last-child { border-bottom: none; }
+  .cl-item:hover { background: var(--bg); }
+  .cl-item input[type="checkbox"] {
+    width: 17px; height: 17px; flex-shrink: 0;
+    accent-color: var(--green);
+    margin-top: 2px; cursor: pointer;
+  }
+  .cl-text {
+    font-size: 13.5px; color: var(--text); line-height: 1.6;
+    transition: color 0.2s;
+  }
+  .cl-item input:checked + .cl-text {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--green);
+  }
+</style>
+
+<script>
+  function updateProgress() {
+    const all = document.querySelectorAll('#tab-checklist input[type="checkbox"]');
+    const done = document.querySelectorAll('#tab-checklist input[type="checkbox"]:checked');
+    const total = all.length;
+    const doneCount = done.length;
+    const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+
+    document.getElementById('prog-bar').style.width = pct + '%';
+    document.getElementById('pct-label').textContent = pct + '%';
+    document.getElementById('done-count').textContent = doneCount + ' Done';
+    document.getElementById('pending-count').textContent = (total - doneCount) + ' Pending';
+    document.getElementById('total-count').textContent = total + ' Total';
+
+    // Update progress bar color
+    const bar = document.getElementById('prog-bar');
+    if (pct === 100) bar.style.background = 'linear-gradient(90deg,#16A34A,#22C55E)';
+    else if (pct >= 60) bar.style.background = 'linear-gradient(90deg,#0D9488,#14B8A6)';
+    else bar.style.background = 'linear-gradient(90deg,#EA580C,#F97316)';
+
+    // Update group counts
+    document.querySelectorAll('.cl-group').forEach(group => {
+      const groupAll = group.querySelectorAll('input[type="checkbox"]');
+      const groupDone = group.querySelectorAll('input[type="checkbox"]:checked');
+      const counter = group.querySelector('.cl-group-count');
+      if (counter) counter.textContent = groupDone.length + ' / ' + groupAll.length;
+    });
+  }
+
+  function checkAll(state) {
+    document.querySelectorAll('#tab-checklist input[type="checkbox"]').forEach(cb => cb.checked = state);
+    updateProgress();
+  }
+
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (id === 'checklist') updateProgress();
+  }
+
+  // Init progress on load
+  window.addEventListener('load', updateProgress);
 </script>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 4: PANDUAN STEP BY STEP                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-guide" class="tab-panel">
+<div style="max-width:1100px;margin:0 auto;">
+
+  <!-- Intro banner -->
+  <div style="background:linear-gradient(135deg,#1E40AF,#0D9488);border-radius:16px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:6px;">Quick Implementation Guide</div>
+      <div style="font-size:20px;font-weight:800;color:#fff;">10 Fase Implementasi PIMS</div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,0.75);margin-top:4px;">Panduan cepat urut dari awal sampai selesai · Star Energy Geothermal Wayang Windu</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px 16px;text-align:center;">
+        <div style="font-size:22px;font-weight:800;color:#fff;">10</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);">Fase</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px 16px;text-align:center;">
+        <div style="font-size:22px;font-weight:800;color:#fff;">71</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);">Steps Total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 1 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#1E40AF,#2563EB);">
+      <div class="fase-num">01</div>
+      <div>
+        <div class="fase-title">Persiapan Server & Network</div>
+        <div class="fase-sub">Sebelum install apapun — pastikan fondasi infrastruktur siap</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">1.1</span><div><strong>Rack & Power</strong> — Pastikan server Dell R760XS sudah terpasang di rack, power supply redundant aktif, dan UPS terhubung.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">1.2</span><div><strong>OS & Network</strong> — Install Windows Server 2025 di kedua server. Set hostname: <code>IDWWDW25SCADA01</code> dan <code>IDWWDW25SCADA02</code>. Set IP static: <code>172.18.1.11</code> dan <code>172.18.1.12</code>, gateway <code>172.18.1.254</code>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">1.3</span><div><strong>Join Domain</strong> — Join kedua server ke domain <code>STARENERGYID</code> (Active Directory).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">1.4</span><div><strong>Test Konektivitas</strong> — Ping antar server, ping ke VC-8000 (<code>172.18.1.10</code>), dan ping ke ABB DCS. Pastikan semua reachable.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">1.5</span><div><strong>Firewall Rules</strong> — Buka port TCP 5450 (PI DA), TCP 443 (HTTPS PI Vision), TCP 8001 (VC-8000 CMS) di Windows Firewall dan network firewall ABB.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">1.6</span><div><strong>Service Accounts</strong> — Buat domain service account <code>STARENERGYID\svc_pi</code> di Active Directory. Password jangan expire. Ini akan dipakai oleh PI Interface, PI Buffer, dan SETPOINT Connector.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 2 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#0369A1,#0284C7);">
+      <div class="fase-num">02</div>
+      <div>
+        <div class="fase-title">Install PI Data Archive (Server 1)</div>
+        <div class="fase-sub">Core PIMS — semua data tersimpan di sini</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#E0F2FE;color:#0284C7;border-color:#BAE6FD;">2.1</span><div><strong>Run Installer</strong> — Di IDWWDW25SCADA01, jalankan installer PI Data Archive 2023. Pilih drive D untuk archive path: <code>D:\PI\arc</code>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#E0F2FE;color:#0284C7;border-color:#BAE6FD;">2.2</span><div><strong>Konfigurasi Archive</strong> — Set ukuran archive file: 10,240 MB. Buka SMT → Operation → Archives, verifikasi archive file sudah terbuat.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#E0F2FE;color:#0284C7;border-color:#BAE6FD;">2.3</span><div><strong>Set Backup Schedule</strong> — SMT → Operation → Backups → konfigurasi jadwal daily incremental pukul <strong>03:15 AM</strong>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#E0F2FE;color:#0284C7;border-color:#BAE6FD;">2.4</span><div><strong>Apply Lisensi</strong> — SMT → Operation → Licensing. Apply license file (Installation ID: 10287114, 6000 tags). Pastikan Data Streams Allowed: 6016.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#E0F2FE;color:#0284C7;border-color:#BAE6FD;">2.5</span><div><strong>Verifikasi Services</strong> — SMT → Operation → PI Services. Pastikan semua subsystem running: pisnapss, piarchss, pibufss, piupdmgr, dll.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 3 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#0F766E,#0D9488);">
+      <div class="fase-num">03</div>
+      <div>
+        <div class="fase-title">Install PI AF + PI Vision (Server 2)</div>
+        <div class="fase-sub">Konteks aset & visualisasi dashboard</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">3.1</span><div><strong>Install SQL Express</strong> — Install SQL Server Express di IDWWDW25SCADA02. Ini dibutuhkan oleh PI Vision sebagai database internal.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">3.2</span><div><strong>Install PI AF Server</strong> — Jalankan installer PI Asset Framework Server. Set AF Server name = <code>IDWWDW25SCADA02</code>. Set SQL instance ke <code>\SQLEXPRESS</code>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">3.3</span><div><strong>Install PI Vision</strong> — Jalankan installer PI Vision. Pilih SQL database name: <code>PIVISION</code>. IIS akan dikonfigurasi otomatis oleh installer.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">3.4</span><div><strong>Konfigurasi HTTPS</strong> — Di IIS Manager, pastikan binding PIVision menggunakan HTTPS port 443. HTTP redirect ke HTTPS.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">3.5</span><div><strong>Test PI Vision</strong> — Buka browser, akses <code>https://172.18.1.12/PIVision/admin</code>. Verifikasi halaman Overview terbuka dan SQL Server status hijau.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 4 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#6D28D9,#7C3AED);">
+      <div class="fase-num">04</div>
+      <div>
+        <div class="fase-title">Konfigurasi Security & PI Mappings</div>
+        <div class="fase-sub">Kontrol akses berbasis Active Directory</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">4.1</span><div><strong>Buat PI Identities</strong> — SMT → Security → Identities, Users & Groups. Pastikan ada: <code>piadmin</code>, <code>piadmins</code>, <code>PIWorld</code>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">4.2</span><div><strong>Buat PI Mappings</strong> — SMT → Security → Mappings & Trusts → tab Mappings. Tambahkan mapping: <code>Everyone → piadmin</code>, <code>IDWWDW25SCADA01\Administrator → piadmin</code>, <code>STARENERGYID\svc_pi → piadmin</code>. Set semua Enabled = True.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">4.3</span><div><strong>Buat PI Trusts</strong> — Tab Trusts. Tambahkan trust untuk: <code>Proxy_12/1</code> (loopback), <code>AFSERVER2</code>, <code>ABB OPC FES</code>, <code>BufferingTrust_AFSERVER</code> (app: pibufss.exe), <code>Client1</code>, <code>Client2</code>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">4.4</span><div><strong>PI Vision Security</strong> — Buka PI Vision Admin → Security → Identity. Set Identity AF Server: <code>IDWWDW25SCADA02</code>. Auth: <strong>Windows only</strong>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">4.5</span><div><strong>Set User Access Levels</strong> — PI Vision Admin → Security → User Access Levels. Set: <code>Administrators → Administrator</code>, <code>World → Explorer</code>.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 5 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#C2410C,#EA580C);">
+      <div class="fase-num">05</div>
+      <div>
+        <div class="fase-title">Install & Konfigurasi PI Interface for OPC DA</div>
+        <div class="fase-sub">Koneksi ABB DCS → PI Data Archive (215 tags)</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.1</span><div><strong>Install PI ICU & OPCInt</strong> — Di IDWWDW25SCADA01, install: <code>PIICU_x.x.xx.exe</code> lalu <code>OPCInt_ReadOnly_x.x.x.exe</code> lalu <code>PIAPI-xxxx-Windows-Integrated-Security.exe</code>. Semua Run as Administrator.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.2</span><div><strong>Validasi OPC Server</strong> — Jalankan <strong>PI OPC Client Tool</strong>. Connect ke <code>localhost</code> → pilih ABB OPC Server. Pastikan Server Status = <code>RUNNING</code> sebelum lanjut.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.3</span><div><strong>Buat Instance di PI ICU</strong> — Buka PI ICU → Create new Interface Instance from .EXE → browse ke <code>OPCInt_ReadOnly.exe</code>. Set host PI Server: <code>IDWWDW25SCADA01</code>. Set PointSource: <code>ABB-OPC</code>. Klik Add → OK.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.4</span><div><strong>Tab General</strong> — Set Interface ID = <code>1</code>. Tambah scan class frequency sesuai kebutuhan (contoh: <code>00:00:05</code> untuk 5 detik).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.5</span><div><strong>Tab OPCInt</strong> — Set OPC Server Node Name = <code>localhost</code> (atau IP ABB DCS). Klik List Available Servers → pilih OPC Server ABB.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.6</span><div><strong>Tab Service</strong> — Log on as: <code>STARENERGYID\svc_pi</code>. Klik Create. Kemudian Save konfigurasi.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF7ED;color:#EA580C;border-color:#FED7AA;">5.7</span><div><strong>Start & Monitor</strong> — Klik View PI Message Log → klik Start. Pastikan muncul pesan: <code>Connected to OPC Server</code> dan <code>OPC Server current state = RUNNING</code>.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 6 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#9F1239,#E11D48);">
+      <div class="fase-num">06</div>
+      <div>
+        <div class="fase-title">Buat PI Tags — ABB OPC DA (215 Tags)</div>
+        <div class="fase-sub">Bulk import via PI Builder dari PI OPC Client Tool</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#FFF1F2;color:#E11D48;border-color:#FECDD3;">6.1</span><div><strong>Generate CSV</strong> — Buka PI OPC Client Tool → connect ke ABB OPC Server → Add Group → Browse OPC Server → Select All items → File → Save As. Set PointSource = <code>ABB-OPC</code> → Save sebagai .csv.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF1F2;color:#E11D48;border-color:#FECDD3;">6.2</span><div><strong>Edit CSV di Excel</strong> — Buka file CSV. Set kolom: <code>location1=1</code>, <code>location2=0</code>, <code>location3=1</code> (Advise), <code>location4=1</code> (scan class 1), <code>location5=0</code>. Rename kolom Tag sesuai naming convention (contoh: <code>A1_TE0401</code>).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF1F2;color:#E11D48;border-color:#FECDD3;">6.3</span><div><strong>Publish via PI Builder</strong> — Di Excel, klik tab PI Builder → Publish → Edit Mode: <strong>Create Only</strong> → OK. Tunggu hingga muncul "The requested action is complete."</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF1F2;color:#E11D48;border-color:#FECDD3;">6.4</span><div><strong>Set EngUnit & Descriptor</strong> — Gunakan PI Builder → Find PI Points (filter: PointSource=ABB-OPC) → edit kolom <code>engunits</code> dan <code>descriptor</code> → Publish dengan Edit Mode: <strong>Edit Only</strong>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFF1F2;color:#E11D48;border-color:#FECDD3;">6.5</span><div><strong>Verifikasi</strong> — SMT → Data → Current Values → filter PointSource = <code>ABB-OPC</code>. Semua 215 tags harus menampilkan nilai real-time dalam 2 menit setelah interface berjalan.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 7 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#065F46,#059669);">
+      <div class="fase-num">07</div>
+      <div>
+        <div class="fase-title">Install & Konfigurasi SETPOINT Connector (VC-8000)</div>
+        <div class="fase-sub">Koneksi VC-8000 vibration hardware → PI System (224 tags)</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#059669;border-color:#6EE7B7;">7.1</span><div><strong>Install SETPOINT Connector</strong> — Di IDWWDW25SCADA02, install SETPOINT Connector Setup 2025 (v8.6.240.0). Run as Administrator.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#059669;border-color:#6EE7B7;">7.2</span><div><strong>Add Data Connection</strong> — Buka SETPOINT Connector → klik Add. Connection Type: <code>VC-8000</code>. IP Address: <code>172.18.1.10</code>. Port: <code>8001</code>. Klik OK.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#059669;border-color:#6EE7B7;">7.3</span><div><strong>Konfigurasi PI System</strong> — File → PI System. Set: PI Server = <code>172.18.1.11</code>, AF Server = <code>IDWWDW25SCADA02</code>, AF Database = <code>Vibration</code>. Centang "Collect data" dan "Backfill into PI System".</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#059669;border-color:#6EE7B7;">7.4</span><div><strong>Check Connections</strong> — Klik tombol <strong>Check Connections</strong>. Tunggu hasil. Semua item harus centang hijau — terutama: <code>All Connections Passed</code>, Rack\PI tag comparison: <code>224/224 Missing: 0</code>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#059669;border-color:#6EE7B7;">7.5</span><div><strong>Set Service Account</strong> — Windows Services → SetpointConnector.MainService → Properties → Log On → set akun <code>STARENERGYID\svc_pi</code>. Restart service.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#059669;border-color:#6EE7B7;">7.6</span><div><strong>Verifikasi Tags</strong> — SMT → Data → Current Values → filter PointSource = <code>SETPOINT</code>. Tag vibrasi (UNIT#1.3.1.Direct.0, dll) harus mendapat data real-time.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 8 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#1D4ED8,#4338CA);">
+      <div class="fase-num">08</div>
+      <div>
+        <div class="fase-title">Buat PI Asset Framework (AF)</div>
+        <div class="fase-sub">Hierarchy aset Unit 1 — Turbine, Generator, Bearing, HWP</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#EEF2FF;color:#4338CA;border-color:#C7D2FE;">8.1</span><div><strong>Buat AF Database</strong> — Buka PI System Explorer (PSE) → klik kanan pada server <code>IDWWDW25SCADA02</code> → New Database → nama: <code>Vibration</code> → Create.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EEF2FF;color:#4338CA;border-color:#C7D2FE;">8.2</span><div><strong>Buat Element Templates</strong> — Di Library → Element Templates. Buat templates sesuai jenis sensor VC-8000: <code>Setpoint.Element.Template.Bearing</code>, <code>HydroGenerator</code>, <code>Rack</code>, <code>Cylinder</code>, dll. Setiap template berisi attribute sesuai channel (Direct, Gap, 1X Amplitude, 1X Phase, dll).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EEF2FF;color:#4338CA;border-color:#C7D2FE;">8.3</span><div><strong>Buat Hierarchy Elements</strong> — Di Elements → buat struktur: <code>Setpoint Racks</code> → <code>UNIT #1</code> → child elements: <code>Turbine</code>, <code>Generator</code>, <code>Axial</code>, <code>HWP-A</code>, <code>Speed</code>. Apply template yang sesuai ke masing-masing element.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EEF2FF;color:#4338CA;border-color:#C7D2FE;">8.4</span><div><strong>Link PI Tags ke Attribute</strong> — Pada setiap attribute di element, set Data Reference = <code>PI Point</code>. Set tag name sesuai PI Tag yang sudah dibuat (contoh: <code>UNIT#1.3.1.Direct.0</code>).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EEF2FF;color:#4338CA;border-color:#C7D2FE;">8.5</span><div><strong>Check In</strong> — Klik Check In untuk save semua perubahan ke AF Database. Verifikasi di PSE bahwa semua element dan attribute tersimpan.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 9 -->
+  <div class="guide-fase">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#92400E,#B45309);">
+      <div class="fase-num">09</div>
+      <div>
+        <div class="fase-title">Konfigurasi Buffering & Backup</div>
+        <div class="fase-sub">Pastikan data tidak hilang saat network atau server down</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A;">9.1</span><div><strong>Setup PI Buffer Subsystem</strong> — Buka PI ICU → Tools → Buffering → Yes → Continue with configuration. Pilih server <code>IDWWDW25SCADA01</code> dan interface yang ada.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A;">9.2</span><div><strong>Set Service Account Buffer</strong> — Di wizard, klik Change → Use Windows account → masukkan <code>STARENERGYID\svc_pi</code>. Set PI Identity ke <code>PI Interface & PI Buffers</code> → Create.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A;">9.3</span><div><strong>Set Buffer Queue Location</strong> — Pilih drive terpisah dari OS (contoh: <code>E:\OSIsoft\Buffering</code>). Selesaikan wizard → Exit.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A;">9.4</span><div><strong>Aktifkan per Interface</strong> — Di PI ICU → tab General → centang opsi buffering untuk setiap interface. Pastikan dependency PIBufss otomatis ditambahkan.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A;">9.5</span><div><strong>Verifikasi Buffering</strong> — Buka Buffering Manager (Tools → Buffering). Pastikan: Global Buffering Status = <em>No reported issues</em>. Total events sent terus bertambah. Estimated capacity mencukupi.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A;">9.6</span><div><strong>Verifikasi Backup</strong> — SMT → Operation → Backups. Cek Backup History — pastikan status Success. Jalankan manual backup sekali untuk test: klik Start Backup.</div></div>
+    </div>
+  </div>
+
+  <!-- FASE 10 -->
+  <div class="guide-fase" style="margin-bottom:0;">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#374151,#1F2937);">
+      <div class="fase-num">10</div>
+      <div>
+        <div class="fase-title">PI Vision Display & Final Verification</div>
+        <div class="fase-sub">Build dashboard dan verifikasi end-to-end sebelum serah terima</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.1</span><div><strong>Link Data Server</strong> — PI Vision Admin → Configuration → Data Servers. Pastikan server <code>IDWWDW25SCADA01</code> versi 3.4.460.29 sudah terdaftar dan status hijau. Klik Test Connection → Allowed.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.2</span><div><strong>Link Asset Server</strong> — Tab Asset Servers. Pastikan <code>IDWWDW25SCADA02</code> terdaftar. Expand → centang database <code>Vibration</code>. Klik Save.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.3</span><div><strong>Buat Display Proses</strong> — Buka PI Vision → New Display. Tambahkan Trend untuk tag proses ABB (suhu, tekanan, flow). Tambahkan Value Display untuk parameter kritis. Set threshold warna.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.4</span><div><strong>Buat Display Vibrasi</strong> — New Display lagi. Tambahkan Trend untuk tag VC-8000 (contoh: <code>UNIT#1.3.1.Direct.0</code>, <code>UNIT#1.3.1.nXAmplitude.1</code>). Link ke AF Element UNIT#1 supaya bisa switch equipment.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.5</span><div><strong>Set Display Permission</strong> — Klik kanan display → Manage Security. Set siapa yang bisa view dan siapa yang bisa edit.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.6</span><div><strong>End-to-End Test</strong> — Login ke PI Vision dari komputer client menggunakan akun domain user biasa (bukan admin). Pastikan display terbuka, data real-time update, historical trend bisa dilihat.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:var(--surface2);color:#374151;border-color:var(--border);">10.7</span><div><strong>Serah Terima</strong> — Siapkan dokumen Project Report (as-built config, tag list, network diagram, prosedur backup, user guide). Tandatangani Project Sign-off bersama representatif Star Energy. Sistem resmi dioperasikan oleh tim customer. ✅</div></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:24px;font-size:11.5px;color:var(--subtle);margin-top:8px;">
+    Rev. 00 · 13 Maret 2026 · PT Cistech Alpha Indonesia — Star Energy Geothermal Wayang Windu Ltd
+  </div>
+
+</div>
+</div><!-- /tab-guide -->
+
+<style>
+  .guide-fase {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    animation: fadeUp 0.45s ease both;
+  }
+  .guide-fase-header {
+    padding: 16px 22px; display: flex; align-items: center; gap: 16px;
+  }
+  .fase-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 800; color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.15);
+    width: 52px; height: 52px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .fase-title { font-size: 14.5px; font-weight: 800; color: #fff; }
+  .fase-sub   { font-size: 11.5px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+  .guide-fase-body { padding: 8px 0; }
+  .step-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 12px 22px; border-bottom: 1px solid var(--border);
+    font-size: 13.5px; color: var(--text); line-height: 1.7;
+    transition: background 0.15s;
+  }
+  .step-row:last-child { border-bottom: none; }
+  .step-row:hover { background: var(--bg); }
+  .step-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 700;
+    padding: 3px 9px; border-radius: 6px; border: 1.5px solid;
+    white-space: nowrap; flex-shrink: 0; margin-top: 3px;
+  }
+  .step-row code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 6px; color: var(--blue);
+  }
+</style>
 
 </body>
 </html>
