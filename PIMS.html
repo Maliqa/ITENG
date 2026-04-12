@@ -1154,13 +1154,181 @@
     </div>
   </div>
 
+  <!-- FASE 11 -->
+  <div class="guide-fase" style="margin-bottom:0;">
+    <div class="guide-fase-header" style="background:linear-gradient(135deg,#0F766E,#0D9488);">
+      <div class="fase-num">11</div>
+      <div>
+        <div class="fase-title">Verifikasi Scan Rate & Analisa Kapasitas Storage</div>
+        <div class="fase-sub">Cara cek scan rate aktual + kalkulasi berapa lama server bisa tampung data</div>
+      </div>
+    </div>
+    <div class="guide-fase-body">
+
+      <!-- Sub header: Cara Cek Scan Rate -->
+      <div style="background:var(--blue-lt);border-bottom:1px solid var(--border);padding:10px 22px;">
+        <span style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);">📋 Cara 1 — Cek via PI ICU (ABB OPC DA)</span>
+      </div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">11.1</span><div><strong>Buka PI ICU</strong> — Di IDWWDW25SCADA01, buka aplikasi <code>PI Interface Configuration Utility</code>. Dari dropdown interface list, pilih instance <strong>ABB-OPC</strong> (OPCInt_ReadOnly).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">11.2</span><div><strong>Tab General → Scan Classes</strong> — Lihat kolom <strong>Frequency</strong>. Format: <code>HH:MM:SS</code>. Nilai <code>00:00:01</code> = 1 detik. Inilah scan rate ABB OPC DA yang aktif.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;">11.3</span><div><strong>Ubah Scan Rate (jika perlu)</strong> — Klik kanan scan class → Edit → ubah frequency. Klik <strong>Apply</strong> → klik <strong>Restart Service</strong> di bagian atas PI ICU supaya perubahan efektif.</div></div>
+
+      <div style="background:var(--teal-lt);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 22px;">
+        <span style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);">📋 Cara 2 — Cek via SETPOINT Connector (VC-8000)</span>
+      </div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">11.4</span><div><strong>Buka SETPOINT Connector</strong> — Di IDWWDW25SCADA02, buka SETPOINT Connector Setup. Di halaman utama, lihat kolom <strong>Rack Time</strong> pada baris UNIT#1. Nilai yang tampil = polling interval VC-8000 (contoh: <code>08:23</code> = setiap ~5 detik dalam format internal).</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F0FDFA;color:#0D9488;border-color:#99F6E4;">11.5</span><div><strong>Edit Connection</strong> — Klik Edit → tab <strong>Advanced</strong>. Di sini ada setting <strong>Rack Time</strong> atau acquisition interval. Ubah sesuai kebutuhan → klik OK → Stop → Start connector.</div></div>
+
+      <div style="background:var(--purple-lt);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 22px;">
+        <span style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple);">📋 Cara 3 — Verifikasi dari PI SMT (Paling Cepat)</span>
+      </div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">11.6</span><div><strong>SMT → Current Values</strong> — Buka PI SMT → Data → Current Values. Cari tag ABB (contoh: <code>A1_TE0401</code>) dan tag VC-8000 (contoh: <code>UNIT#1.3.1.Direct.0</code>). Klik <strong>Start Updating</strong>.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">11.7</span><div><strong>Amati Timestamp</strong> — Perhatikan kolom Timestamp berubah setiap berapa detik. ABB tag harus update tiap <strong>~1 detik</strong>. VC-8000 tag harus update tiap <strong>~5 detik</strong>. Kalau tidak update — cek service interface apakah running.</div></div>
+      <div class="step-row"><span class="step-badge" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE;">11.8</span><div><strong>Cek Location4 via PI Builder</strong> — Di PI SMT → Point Builder → cari tag → tab Classic → lihat field <strong>Location4</strong>. Angka ini adalah nomor scan class. Cocokkan dengan scan class di PI ICU (scan class 1 = frequency pertama yang didefinisikan).</div></div>
+
+    </div>
+  </div>
+
+  <!-- KALKULASI STORAGE -->
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);animation:fadeUp 0.45s ease 0.1s both;">
+    <div style="background:linear-gradient(135deg,#1E40AF,#7C3AED);padding:16px 22px;display:flex;align-items:center;gap:16px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.15);width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">📊</div>
+      <div>
+        <div style="font-size:14.5px;font-weight:800;color:#fff;">Analisa Kalkulasi Kapasitas Storage</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:3px;">Estimasi berapa lama server bisa menampung data historis</div>
+      </div>
+    </div>
+
+    <div style="padding:22px 24px;">
+
+      <!-- Asumsi input -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">⚙️ Asumsi & Parameter</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px;">
+        <div style="background:var(--orange-lt);border:1.5px solid var(--orange-mid);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--orange);margin-bottom:4px;">ABB OPC DA</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text);">215 Tags</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--orange);margin-top:2px;">Scan Rate: 1 detik</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;">86,400 events/tag/hari</div>
+        </div>
+        <div style="background:var(--teal-lt);border:1.5px solid var(--teal-mid);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--teal);margin-bottom:4px;">VC-8000 SETPOINT</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text);">224 Tags</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);margin-top:2px;">Scan Rate: 5 detik</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;">17,280 events/tag/hari</div>
+        </div>
+        <div style="background:var(--blue-lt);border:1.5px solid var(--blue-mid);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:4px;">Ukuran per Event PI</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text);">~20 bytes</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);margin-top:2px;">Float32 + timestamp</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;">before compression</div>
+        </div>
+        <div style="background:var(--green-lt);border:1.5px solid #BBF7D0;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:4px;">PI Compression Ratio</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text);">÷ 10x</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);margin-top:2px;">Exception + Compression</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;">algoritma PI default</div>
+        </div>
+        <div style="background:var(--purple-lt);border:1.5px solid #DDD6FE;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--purple);margin-bottom:4px;">Kapasitas Drive</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text);">3.84 TB</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--purple);margin-top:2px;">2×3.84TB SSD RAID 1</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;">efektif ~3,840,000 MB</div>
+        </div>
+      </div>
+
+      <!-- Kalkulasi step by step -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">🧮 Kalkulasi Step by Step</div>
+
+      <!-- ABB -->
+      <div style="background:var(--orange-lt);border:1.5px solid var(--orange-mid);border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Step 1 — ABB OPC DA (215 tags @ 1 detik)</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);line-height:2;">
+          215 tags × 86,400 events/hari × 20 bytes<br>
+          = 371,520,000 bytes/hari<br>
+          = <strong>~372 MB/hari (raw)</strong><br>
+          ÷ 10 (PI compression)<br>
+          = <strong style="color:var(--orange);">~37.2 MB/hari</strong>
+        </div>
+      </div>
+
+      <!-- VC-8000 -->
+      <div style="background:var(--teal-lt);border:1.5px solid var(--teal-mid);border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Step 2 — VC-8000 SETPOINT (224 tags @ 5 detik)</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);line-height:2;">
+          224 tags × 17,280 events/hari × 20 bytes<br>
+          = 77,414,400 bytes/hari<br>
+          = <strong>~77 MB/hari (raw)</strong><br>
+          ÷ 10 (PI compression)<br>
+          = <strong style="color:var(--teal);">~7.7 MB/hari</strong>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div style="background:var(--blue-lt);border:1.5px solid var(--blue-mid);border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Step 3 — Total Konsumsi per Hari</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);line-height:2;">
+          37.2 MB + 7.7 MB<br>
+          = <strong style="color:var(--blue);">~44.9 MB/hari</strong><br>
+          = ~1.3 GB/bulan<br>
+          = <strong>~16 GB/tahun</strong>
+        </div>
+      </div>
+
+      <!-- Kapasitas -->
+      <div style="background:var(--green-lt);border:1.5px solid #BBF7D0;border-radius:12px;padding:16px 18px;margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Step 4 — Estimasi Kapasitas Storage</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);line-height:2;">
+          3,840,000 MB ÷ 44.9 MB/hari<br>
+          = ~85,523 hari<br>
+          = <strong style="color:var(--green);font-size:14px;">~234 Tahun</strong>
+        </div>
+      </div>
+
+      <!-- Summary visual -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">📈 Ringkasan Visual</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px;">
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:var(--orange);">372 MB</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">ABB Raw/hari</div>
+        </div>
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:var(--teal);">77 MB</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">VC-8000 Raw/hari</div>
+        </div>
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:var(--blue);">~45 MB</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Total Compressed/hari</div>
+        </div>
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:var(--blue);">~16 GB</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Konsumsi/tahun</div>
+        </div>
+        <div style="background:var(--green-lt);border:1.5px solid #BBF7D0;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:var(--green);">3.84 TB</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Kapasitas Drive</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#F0FDF4,#ECFDF5);border:1.5px solid #BBF7D0;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:28px;font-weight:800;color:var(--green);">~234</div>
+          <div style="font-size:10.5px;color:var(--green);font-weight:700;margin-top:2px;">TAHUN kapasitas ✅</div>
+        </div>
+      </div>
+
+      <!-- Catatan penting -->
+      <div style="background:var(--surface2);border:1.5px dashed var(--border);border-radius:12px;padding:16px 18px;">
+        <div style="font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;">📝 Catatan Penting ke Customer</div>
+        <div style="font-size:13.5px;color:var(--text);line-height:1.8;">
+          "Estimasi <strong>~234 tahun</strong> ini dihitung dengan asumsi data terus masuk 24 jam sehari tanpa henti. Namun dalam praktiknya, PI System menggunakan algoritma <strong>Exception</strong> dan <strong>Compression</strong> — artinya jika nilai sensor tidak berubah signifikan (misalnya plant sedang shutdown atau kondisi stabil), data <em>tidak</em> akan disimpan. Sehingga kapasitas efektif bisa jauh lebih lama dari estimasi ini.<br><br>
+          Selain itu, Buffering Manager sudah dikonfigurasi dengan estimated capacity <strong>31.6 tahun</strong> — artinya meskipun koneksi ke PI Server terputus selama berbulan-bulan, data tidak akan hilang dan otomatis dikirimkan kembali saat koneksi pulih."
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Footer -->
   <div style="text-align:center;padding:24px;font-size:11.5px;color:var(--subtle);margin-top:8px;">
     Rev. 00 · 13 Maret 2026 · PT Cistech Alpha Indonesia — Star Energy Geothermal Wayang Windu Ltd
   </div>
-
-</div>
-</div><!-- /tab-guide -->
 
 <style>
   .guide-fase {
