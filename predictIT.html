@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predict-IT × PI System — Integration Readiness Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --green: #00e5a0;
+    --yellow: #ffd166;
+    --red: #ff4d6d;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .dot-live {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.5s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  h1 span.x { color: var(--text-muted); font-weight: 400; }
+  h1 span.highlight { color: var(--accent); }
+
+  .header-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    line-height: 1.6;
+  }
+
+  /* Progress overview */
+  .overview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.yellow::before { background: var(--yellow); }
+  .stat-card.red::before { background: var(--red); }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card.green .stat-num { color: var(--green); }
+  .stat-card.yellow .stat-num { color: var(--yellow); }
+  .stat-card.red .stat-num { color: var(--red); }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .progress-title {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .progress-pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+    border-radius: 99px;
+    transition: width 0.8s ease;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section:nth-child(1) { animation-delay: 0.2s; }
+  .section:nth-child(2) { animation-delay: 0.25s; }
+  .section:nth-child(3) { animation-delay: 0.3s; }
+  .section:nth-child(4) { animation-delay: 0.35s; }
+  .section:nth-child(5) { animation-delay: 0.4s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .section-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-pi { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+  .badge-af { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
+  .badge-net { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+  .badge-predict { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.2); }
+  .badge-doc { background: rgba(255,209,102,0.1); color: var(--yellow); border: 1px solid rgba(255,209,102,0.2); }
+
+  /* Checklist items */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .item:hover {
+    border-color: rgba(0,212,255,0.2);
+    background: var(--surface2);
+  }
+
+  .item.checked {
+    border-color: rgba(0,229,160,0.2);
+    background: rgba(0,229,160,0.03);
+  }
+
+  .item.checked .item-text {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: rgba(100,116,139,0.4);
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.2s ease;
+    background: var(--bg);
+  }
+
+  .item.checked .checkbox {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .checkmark {
+    display: none;
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .item.checked .checkmark { display: block; }
+
+  .item-content {
+    flex: 1;
+  }
+
+  .item-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    transition: all 0.2s;
+  }
+
+  .item-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .priority {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .p-critical { background: rgba(255,77,109,0.1); color: var(--red); border: 1px solid rgba(255,77,109,0.2); }
+  .p-high { background: rgba(255,209,102,0.1); color: var(--yellow); border: 1px solid rgba(255,209,102,0.2); }
+  .p-medium { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.15); }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 12px;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  .footer-left {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .btn-reset {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">
+      <div class="dot-live"></div>
+      PT. Cistech Alpha Indonesia — Technical Readiness Doc
+    </div>
+    <h1>
+      Predict-IT <span class="x">×</span> <span class="highlight">PI System</span><br>Integration Checklist
+    </h1>
+    <p class="header-sub">
+      Prereq verification sebelum deploy Predict-IT (ECG Inc.) ke environment client.<br>
+      Prepared by: Malik Abdul Azis — IT Engineer
+    </p>
+  </div>
+
+  <!-- Stats -->
+  <div class="overview">
+    <div class="stat-card green">
+      <div class="stat-num" id="count-done">0</div>
+      <div class="stat-label">Done</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-num" id="count-remaining">0</div>
+      <div class="stat-label">Remaining</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-num" id="count-critical">0</div>
+      <div class="stat-label">Critical Pending</div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-title">Overall Readiness</span>
+      <span class="progress-pct" id="pct-text">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Section 1: PI System Foundation -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">PI System Foundation</span>
+      <span class="section-badge badge-pi">PI Core</span>
+    </div>
+    <div class="checklist">
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">PI Data Archive terinstall dan running (service: piarchss)</div>
+          <div class="item-note">Verify via: Services.msc atau PI SMT → Connections</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">PI AF Server terinstall dan connected ke PI Data Archive</div>
+          <div class="item-note">Verify via: PI System Explorer → server connection</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">PI Web API aktif dan accessible dari Predict-IT server</div>
+          <div class="item-note">Test: GET https://[piserver]/piwebapi/ → HTTP 200</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Minimum 30–90 hari historical data tersedia untuk equipment target</div>
+          <div class="item-note">Data yang "bad" atau "No Data" perlu dibersihkan sebelum training APR model</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Tag compression settings sudah dikonfigurasi tepat</div>
+          <div class="item-note">Terlalu agresif = data hilang, model APR tidak akurat. Scan rate ideal: 1–5 detik</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">PI Interface (OPC DA / SETPOINT Connector) running dan data flowing</div>
+          <div class="item-note">Cek via PI ICU → Interface status. Pastikan tidak ada scan error</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: PI Asset Framework -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">PI Asset Framework (AF) Structure</span>
+      <span class="section-badge badge-af">PI AF</span>
+    </div>
+    <div class="checklist">
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">AF database sudah dibuat dan terstruktur (Plant → Unit → Equipment)</div>
+          <div class="item-note">Contoh: PLANT_DEMO → Compressor_Train_A → Compressor-01</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Template equipment konsisten untuk semua equipment sejenis</div>
+          <div class="item-note">Contoh: semua Compressor pakai template "RotatingEquipment_Combined"</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Semua attribute pada template sudah di-mapped ke PI tag yang valid</div>
+          <div class="item-note">Attribute: Suction_Pressure, Discharge_Pressure, Temp_In, Vibration_RMS, Speed_RPM</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Naming convention attribute konsisten di seluruh hierarchy</div>
+          <div class="item-note">Predict-IT APR engine menggunakan nama attribute untuk identifikasi variable</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Unit of Measure (UOM) sudah didefinisikan di setiap attribute</div>
+          <div class="item-note">Contoh: Pressure = bar/psi, Temperature = °C, Vibration = mm/s RMS</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Daftar "good operation period" sudah diidentifikasi per equipment</div>
+          <div class="item-note">Periode operasi normal (tanpa maintenance/shutdown) untuk training APR model</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">AF element sudah mencakup semua equipment yang akan di-monitor Predict-IT</div>
+          <div class="item-note">Buat list inventory equipment: nama, tag prefix, jenis, kapasitas</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Network & Security -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Network & Security</span>
+      <span class="section-badge badge-net">Infra</span>
+    </div>
+    <div class="checklist">
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Predict-IT server dapat reach PI AF Server (port 5457)</div>
+          <div class="item-note">Test via: telnet [piserver] 5457 atau Test-NetConnection di PowerShell</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Predict-IT server dapat reach PI Data Archive (port 5450)</div>
+          <div class="item-note">Port default PI Data Archive untuk PI SDK / PI AF SDK connection</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Service account untuk Predict-IT sudah dibuat di domain / local</div>
+          <div class="item-note">Account ini akan dipakai Predict-IT service untuk autentikasi ke PI</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">PI Identity & Mapping sudah dikonfigurasi untuk Predict-IT service account</div>
+          <div class="item-note">PI Identity: "Predict-IT_Read" → Read access ke Data Archive + AF database</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Firewall rules sudah dibuka untuk port PI yang dibutuhkan</div>
+          <div class="item-note">Port: 5450 (Archive), 5457 (AF), 443 (PI Web API), 5468 (PI Notifications)</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Network latency antara Predict-IT server dan PI server < 10ms</div>
+          <div class="item-note">Latency tinggi mempengaruhi real-time anomaly detection</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Predict-IT Configuration -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Predict-IT Pre-Configuration</span>
+      <span class="section-badge badge-predict">Predict-IT</span>
+    </div>
+    <div class="checklist">
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">License Predict-IT sudah diterima dari ECG Inc.</div>
+          <div class="item-note">Jumlah license sesuai jumlah equipment yang di-monitor</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Variable list per equipment sudah didefinisikan bersama SME client</div>
+          <div class="item-note">Minimal 6–10 variable per equipment untuk APR model yang akurat</div>
+        </div>
+        <span class="priority p-critical">Critical</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Causal Asset Network (CAN) sudah tersedia (ECG Fault Library atau custom)</div>
+          <div class="item-note">CAN dipakai Diagnostic Reasoner untuk Bayesian fault diagnosis</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Alarm threshold awal sudah disepakati dengan client (per equipment)</div>
+          <div class="item-note">Threshold bisa di-tune setelah model running, tapi baseline perlu ada</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Pathway module: profil startup/shutdown sudah diidentifikasi (jika dipakai)</div>
+          <div class="item-note">Diperlukan jika client butuh monitoring saat transient state (startup, shutdown)</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Notifikasi alert sudah dikonfigurasi (email / PI Notifications)</div>
+          <div class="item-note">Tentukan siapa yang terima alert, level anomaly berapa yang trigger notif</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Documentation & Handover -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Dokumentasi & Handover</span>
+      <span class="section-badge badge-doc">Docs</span>
+    </div>
+    <div class="checklist">
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Daftar inventori equipment (nama, tag PI, template AF, lokasi fisik)</div>
+          <div class="item-note">Format: Excel/CSV, include tag prefix dan engineering unit</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Network diagram sudah dibuat (PI server, Predict-IT server, client workstation)</div>
+          <div class="item-note">Include IP address, hostname, dan port yang digunakan</div>
+        </div>
+        <span class="priority p-high">High</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Prosedur backup PI Data Archive & AF database sudah terdokumentasi</div>
+          <div class="item-note">Minimal daily backup archive + weekly AF export</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">User acceptance criteria sudah disepakati dengan client</div>
+          <div class="item-note">Misal: anomaly detection accuracy > 85%, false positive < 10%</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+      <div class="item" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Training schedule untuk end-user client sudah direncanakan</div>
+          <div class="item-note">Minimal 1 sesi: cara baca dashboard Predict-IT + respond ke anomaly alert</div>
+        </div>
+        <span class="priority p-medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      PT. Cistech Alpha Indonesia<br>
+      Predict-IT × PI System — Pre-deployment Readiness<br>
+      <span style="color: var(--accent); font-size:10px;">Prepared by Malik Abdul Azis — IT Engineer</span>
+    </div>
+    <button class="btn-reset" onclick="resetAll()">↺ Reset Semua</button>
+  </div>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'predict-it-checklist-v1';
+
+  function getItems() {
+    return document.querySelectorAll('.item');
+  }
+
+  function toggle(el) {
+    el.classList.toggle('checked');
+    saveState();
+    updateStats();
+  }
+
+  function updateStats() {
+    const items = getItems();
+    const total = items.length;
+    let done = 0;
+    let criticalPending = 0;
+
+    items.forEach(item => {
+      if (item.classList.contains('checked')) {
+        done++;
+      } else {
+        const p = item.querySelector('.priority');
+        if (p && p.classList.contains('p-critical')) criticalPending++;
+      }
+    });
+
+    const remaining = total - done;
+    const pct = Math.round((done / total) * 100);
+
+    document.getElementById('count-done').textContent = done;
+    document.getElementById('count-remaining').textContent = remaining;
+    document.getElementById('count-critical').textContent = criticalPending;
+    document.getElementById('pct-text').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function saveState() {
+    const items = getItems();
+    const state = [];
+    items.forEach((item, i) => {
+      state[i] = item.classList.contains('checked');
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      const items = getItems();
+      items.forEach((item, i) => {
+        if (state[i]) item.classList.add('checked');
+      });
+    } catch(e) {}
+  }
+
+  function resetAll() {
+    if (!confirm('Reset semua checklist?')) return;
+    getItems().forEach(item => item.classList.remove('checked'));
+    localStorage.removeItem(STORAGE_KEY);
+    updateStats();
+  }
+
+  loadState();
+  updateStats();
+</script>
+</body>
+</html>
