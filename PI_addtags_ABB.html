@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adding Tags from ABB to PI Archive — Wayang Windu</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #ffffff;
+    --surface:   #f5f7fa;
+    --card:      #ffffff;
+    --border:    #e2e8f0;
+    --border2:   #cbd5e1;
+    --accent:    #0066cc;
+    --accent2:   #00875a;
+    --accent3:   #e05c00;
+    --text:      #1a2332;
+    --muted:     #64748b;
+    --code-bg:   #f0f4f8;
+    --code-text: #334155;
+    --tag-da:    #e8f4fd;
+    --tag-af:    #e8f7f0;
+    --tag-pi:    #fef3ec;
+    --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.06);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.8; overflow-x: hidden; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 28px; }
+
+  /* NAV */
+  .sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 10px 0; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+  .nav-inner { display: flex; gap: 2px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: 0 28px; align-items: center; }
+  .nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); margin-right: 10px; letter-spacing: .04em; }
+  .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 5px 9px; border-radius: 4px; color: var(--muted); text-decoration: none; transition: all .2s; white-space: nowrap; }
+  .nav-link:hover, .nav-link.active { color: var(--accent); background: var(--tag-da); font-weight: 600; }
+
+  /* HEADER */
+  header { padding: 70px 0 52px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 50%, #f5fdf9 100%); position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 80% 20%, rgba(0,102,204,.06) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(0,135,90,.05) 0%, transparent 50%); pointer-events: none; }
+  header .wrap { position: relative; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; animation: fadeUp .5s ease both; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+  .badge.da  { background: var(--tag-da); color: var(--accent);  border: 1px solid rgba(0,102,204,.2); }
+  .badge.af  { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.2); }
+  .badge.gen { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.2); }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(28px, 5vw, 46px); font-weight: 800; line-height: 1.1; margin-bottom: 18px; color: var(--text); animation: fadeUp .5s .08s ease both; }
+  h1 .hi { color: var(--accent); } h1 .lo { color: var(--accent2); }
+  .subtitle { color: var(--muted); font-size: 15px; max-width: 600px; animation: fadeUp .5s .16s ease both; line-height: 1.6; }
+
+  /* TOC */
+  .toc { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 24px 28px; margin: 40px 0; animation: fadeUp .5s .24s ease both; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .toc > ol { padding-left: 0; list-style: none; counter-reset: toc; }
+  .toc > ol > li { counter-increment: toc; margin: 6px 0; }
+  .toc > ol > li::before { content: counter(toc, decimal-leading-zero) "."; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-right: 10px; }
+  .toc a { color: var(--text); text-decoration: none; font-size: 14px; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+  .toc .sub { margin: 4px 0 4px 28px; list-style: none; padding: 0; }
+  .toc .sub li { margin: 3px 0; font-size: 13px; color: var(--muted); }
+  .toc .sub li::before { content: "└ "; color: var(--border2); }
+
+  /* SECTIONS */
+  section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: none; }
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  h2 { font-family: 'Syne', sans-serif; font-size: clamp(22px, 3vw, 30px); font-weight: 700; margin-bottom: 16px; line-height: 1.2; color: var(--text); }
+  h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; margin: 40px 0 12px; color: var(--accent2); }
+  h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin: 28px 0 10px; color: var(--text); }
+  p { margin-bottom: 14px; color: var(--text); }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* CARDS */
+  .card-grid { display: grid; gap: 14px; margin: 20px 0; }
+  .card-grid.two   { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card-grid.three { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; box-shadow: var(--shadow); transition: box-shadow .2s, transform .2s, border-color .2s; }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--accent); }
+  .card-icon { font-size: 26px; margin-bottom: 10px; }
+  .card h4 { margin: 0 0 6px; color: var(--accent); font-size: 14px; }
+  .card p  { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* STEP CARD (big numbered) */
+  .step-card { display: flex; gap: 20px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin: 12px 0; box-shadow: var(--shadow); transition: box-shadow .2s, border-color .2s; }
+  .step-card:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
+  .step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .step-body { flex: 1; }
+  .step-body h4 { margin: 0 0 6px; font-size: 15px; color: var(--text); }
+  .step-body p  { font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
+  .step-body p:last-child { margin: 0; }
+
+  /* CODE */
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent3); border-radius: 8px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7; color: var(--code-text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--tag-da); color: var(--accent); padding: 2px 6px; border-radius: 4px; }
+  pre code { background: transparent; padding: 0; color: inherit; font-size: inherit; }
+  .cm  { color: #94a3b8; } .kw { color: #d97706; } .str { color: #059669; } .fn { color: #2563eb; } .num { color: #7c3aed; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { background: var(--surface); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--accent); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+  td.ok   { color: var(--accent2); font-weight: 600; }
+  td.warn { color: var(--accent3); font-weight: 600; }
+  td.err  { color: #dc2626; font-weight: 600; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-size: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .callout.info  { background: var(--tag-da); border-left: 4px solid var(--accent); }
+  .callout.tip   { background: var(--tag-af); border-left: 4px solid var(--accent2); }
+  .callout.warn  { background: var(--tag-pi); border-left: 4px solid var(--accent3); }
+  .callout-icon  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-text  { flex: 1; color: var(--text); line-height: 1.7; }
+  .callout strong { display: block; margin-bottom: 4px; color: var(--text); }
+
+  /* FLOW */
+  .flow { display: flex; flex-wrap: wrap; gap: 0; align-items: center; justify-content: center; margin: 28px 0; padding: 24px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); }
+  .flow-node { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 12px; font-family: 'JetBrains Mono', monospace; text-align: center; min-width: 108px; box-shadow: var(--shadow); transition: box-shadow .2s, border-color .2s; }
+  .flow-node:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
+  .flow-node .fn-label { color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px; }
+  .flow-node .fn-name  { color: var(--accent); font-weight: 700; font-size: 13px; }
+  .flow-arrow { color: var(--border2); font-size: 22px; padding: 0 6px; }
+  .flow-node.af  .fn-name { color: var(--accent2); }
+  .flow-node.src .fn-name { color: var(--accent3); }
+
+  /* ARCH BOX */
+  .arch-box { border: 1px solid var(--border); border-radius: 10px; padding: 22px; margin: 20px 0; background: #f8fafc; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; white-space: pre; overflow-x: auto; color: #475569; box-shadow: var(--shadow); line-height: 1.8; }
+  .arch-box .hl  { color: var(--accent); font-weight: 700; }
+  .arch-box .hl2 { color: var(--accent2); font-weight: 700; }
+  .arch-box .hl3 { color: var(--accent3); font-weight: 700; }
+
+  /* NUMBERED STEPS (inline) */
+  ol.steps { padding-left: 0; list-style: none; counter-reset: steps; }
+  ol.steps li { counter-increment: steps; padding: 12px 12px 12px 50px; position: relative; margin: 6px 0; background: #fff; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; box-shadow: var(--shadow); }
+  ol.steps li::before { content: counter(steps); position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #fff; background: var(--accent); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 24px; }
+
+  /* LIST */
+  ul.list { padding-left: 0; list-style: none; }
+  ul.list li { padding: 5px 0 5px 22px; position: relative; font-size: 14px; }
+  ul.list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent3); }
+
+  /* CHECKLIST */
+  ul.check { padding-left: 0; list-style: none; }
+  ul.check li { padding: 7px 0 7px 30px; position: relative; font-size: 14px; border-bottom: 1px solid var(--border); }
+  ul.check li:last-child { border-bottom: none; }
+  ul.check li::before { content: '☐'; position: absolute; left: 0; color: var(--muted); font-size: 16px; top: 6px; }
+  ul.check li.done::before { content: '✓'; color: var(--accent2); }
+
+  /* HIGHLIGHT BOX */
+  .highlight-box { background: linear-gradient(135deg, #e8f4fd, #dbeeff); border: 1px solid rgba(0,102,204,.2); border-radius: 12px; padding: 24px 28px; margin: 24px 0; }
+  .highlight-box h4 { color: var(--accent); margin: 0 0 10px; }
+  .highlight-box p  { font-size: 14px; color: #2d3748; margin: 0; }
+
+  /* FOOTER */
+  footer { padding: 40px 0; text-align: center; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; background: var(--surface); border-top: 1px solid var(--border); }
+
+  /* DIVIDER */
+  .divider { display: flex; align-items: center; gap: 12px; margin: 32px 0; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* PHASE LABEL */
+  .phase { display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .phase.blue   { background: var(--tag-da); color: var(--accent); border: 1px solid rgba(0,102,204,.2); }
+  .phase.green  { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.2); }
+  .phase.orange { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.2); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) { .nav-logo { display: none; } .step-card { flex-direction: column; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <span class="nav-logo">PI · ABB</span>
+    <a href="#overview"    class="nav-link">Overview</a>
+    <a href="#prasyarat"   class="nav-link">Prasyarat</a>
+    <a href="#opc-server"  class="nav-link">OPC Server</a>
+    <a href="#pi-interface" class="nav-link">PI Interface</a>
+    <a href="#buat-tag"    class="nav-link">Buat Tag</a>
+    <a href="#verifikasi"  class="nav-link">Verifikasi</a>
+    <a href="#troubleshoot" class="nav-link">Troubleshoot</a>
+    <a href="#referensi"   class="nav-link">Referensi Tag</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="wrap">
+    <div class="badge-row">
+      <span class="badge da">PI Data Archive</span>
+      <span class="badge gen">ABB DCS</span>
+      <span class="badge af">OPC DA</span>
+      <span class="badge gen">Wayang Windu — PIMS</span>
+    </div>
+    <h1>
+      Adding Tags from <span class="hi">ABB</span><br>
+      to <span class="lo">PI Archive</span>
+    </h1>
+    <p class="subtitle">
+      Panduan lengkap step-by-step menambahkan PI Tag dari ABB DCS ke PI Data Archive via OPC DA — mulai dari cek OPC Server, konfigurasi PI Interface, pembuatan tag, hingga verifikasi data masuk.
+    </p>
+  </div>
+</header>
+
+<main><div class="wrap">
+
+  <!-- TOC -->
+  <div class="toc reveal">
+    <div class="toc-title">📋 Table of Contents</div>
+    <ol>
+      <li><a href="#overview">Overview &amp; Arsitektur Integrasi ABB → PI</a></li>
+      <li><a href="#prasyarat">Prasyarat Sebelum Mulai</a></li>
+      <li><a href="#opc-server">Fase 1 — Verifikasi OPC DA Server (ABB)</a>
+        <ol class="sub">
+          <li><a href="#opc-browse">Browse OPC Items di ABB</a></li>
+          <li><a href="#opc-test">Test Koneksi via OPC Client</a></li>
+        </ol>
+      </li>
+      <li><a href="#pi-interface">Fase 2 — Konfigurasi PI OPC DA Interface</a>
+        <ol class="sub">
+          <li><a href="#icu-config">Konfigurasi via PI ICU</a></li>
+          <li><a href="#trust-config">PI Trust &amp; Security</a></li>
+        </ol>
+      </li>
+      <li><a href="#buat-tag">Fase 3 — Membuat PI Tags dari ABB</a>
+        <ol class="sub">
+          <li><a href="#tag-manual">Manual via PI SMT (Point Builder)</a></li>
+          <li><a href="#tag-bulk">Bulk via PICONFIG Script</a></li>
+          <li><a href="#tag-builder">Bulk via PI Builder (Excel)</a></li>
+        </ol>
+      </li>
+      <li><a href="#verifikasi">Fase 4 — Verifikasi Data Masuk ke Archive</a></li>
+      <li><a href="#troubleshoot">Troubleshooting</a></li>
+      <li><a href="#referensi">Referensi Tag ABB — Wayang Windu</a></li>
+    </ol>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 01 — OVERVIEW -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="overview">
+    <div class="section-label">01 — Overview</div>
+    <h2>Arsitektur Integrasi ABB → PI</h2>
+    <p>
+      Di Wayang Windu, ABB DCS (Distributed Control System) bertindak sebagai sumber data proses utama — mengumpulkan data dari ribuan instrumen di lapangan seperti sensor suhu, tekanan, flow, dan level. Data dari ABB DCS diekspos melalui <strong>OPC DA Server</strong>, kemudian dibaca oleh <strong>PI OPC DA Interface</strong> dan dikirim ke <strong>PI Data Archive</strong>.
+    </p>
+
+    <div class="flow reveal">
+      <div class="flow-node src"><span class="fn-label">Field</span><span class="fn-name">Instruments</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node src"><span class="fn-label">ABB DCS</span><span class="fn-name">800xA / MOD</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node src"><span class="fn-label">Protokol</span><span class="fn-name">OPC DA Server</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">Kolektor</span><span class="fn-name">OPCInt.exe</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">Buffer</span><span class="fn-name">PIBufss</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node af"><span class="fn-label">Storage</span><span class="fn-name">PI Archive</span></div>
+    </div>
+
+    <div class="card-grid three reveal">
+      <div class="card">
+        <div class="card-icon">🏭</div>
+        <h4>ABB DCS</h4>
+        <p>Controller utama proses di Wayang Windu. Mengekspos data via OPC DA Server yang berjalan di Engineering Workstation (EWS) atau OPC Server Node ABB.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔌</div>
+        <h4>PI OPC DA Interface</h4>
+        <p>Program <code>OPCInt.exe</code> yang berjalan di PI Interface Node. Berlangganan item OPC dari ABB dan meneruskan nilainya ke PI Buffer/Archive.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗄️</div>
+        <h4>PI Data Archive</h4>
+        <p>Menerima dan menyimpan semua time-series data dari ABB. Setiap OPC item yang dipantau = satu PI Tag di Archive.</p>
+      </div>
+    </div>
+
+    <div class="arch-box reveal"><span class="hl3">[ WAYANG WINDU — Integration Architecture ]</span>
+
+<span class="hl3">ABB Side</span>                        <span class="hl">PI Side</span>
+─────────────────────           ────────────────────────────
+ABB 800xA / MOD DCS             PI Interface Node (Windows)
+  │                               │
+  ├─ ABB OPC DA Server ──────────▶│ OPCInt.exe (/id=1)
+  │    ProgID: ABBGroup.OPCServer │   ↓ Exception Filter
+  │    Items: AI.FIC101.PV        │ PIBufss (disk buffer)
+  │            AI.TIC202.PV       │   ↓ Network
+  │            DI.MOT101.RUN      │
+  │            ...                ▼
+  │                          PI Data Archive (PISRVCISDEMO)
+  │                            ├─ WAWW.FIC101.PV  (Float32)
+  │                            ├─ WAWW.TIC202.PV  (Float32)
+  │                            ├─ WAWW.MOT101.RUN (Digital)
+  │                            └─ ... (ribuan tags)</div>
+
+    <div class="callout info reveal">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-text">
+        <strong>OPC DA vs OPC UA</strong>
+        Integrasi ABB ke PI di Wayang Windu menggunakan <strong>OPC DA (Classic)</strong> yang berbasis COM/DCOM — teknologi Windows lama namun sangat umum di DCS generasi ini. OPC DA bekerja secara subscription: Interface mendaftar ke OPC Server, dan OPC Server mengirim notifikasi setiap ada perubahan nilai (bukan polling konstan).
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 02 — PRASYARAT -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="prasyarat">
+    <div class="section-label">02 — Persiapan</div>
+    <h2>Prasyarat Sebelum Mulai</h2>
+    <p>Pastikan semua kondisi berikut sudah terpenuhi sebelum melanjutkan ke langkah konfigurasi. Jika ada yang belum siap, proses add tag tidak akan berhasil.</p>
+
+    <h3>2.1 Prasyarat Jaringan &amp; Server</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Item</th><th>Requirement</th><th>Cara Cek</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>PI Server running</strong></td><td><code>pinetmgr</code>, <code>piarchss</code>, <code>pisnapss</code> harus aktif</td><td><code>Get-Service "pi*"</code> di PowerShell</td><td class="ok">✓ Cek</td></tr>
+          <tr><td><strong>PI Interface Node</strong></td><td>Windows machine dengan akses ke ABB OPC Server via jaringan</td><td>Ping ke IP ABB OPC Server</td><td class="ok">✓ Cek</td></tr>
+          <tr><td><strong>OPCInt.exe terinstall</strong></td><td>PI OPC DA Interface sudah terinstall di Interface Node</td><td>Cek <code>C:\Program Files\PIPC\Interfaces\OPCInt\</code></td><td class="ok">✓ Cek</td></tr>
+          <tr><td><strong>Konektivitas TCP 5450</strong></td><td>Interface Node bisa reach PI Server port 5450</td><td><code>Test-NetConnection PISRVCISDEMO -Port 5450</code></td><td class="ok">✓ Cek</td></tr>
+          <tr><td><strong>ABB OPC DA Server running</strong></td><td>OPC Server service di ABB EWS/node harus aktif</td><td>Cek di ABB Engineering Workstation</td><td class="ok">✓ Cek</td></tr>
+          <tr><td><strong>DCOM configured</strong></td><td>DCOM permission antara Interface Node dan ABB OPC node</td><td><code>dcomcnfg</code> → My Computer → Properties</td><td class="warn">⚠ Perlu Verifikasi</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2.2 Prasyarat Akun &amp; Akses</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Akses Yang Dibutuhkan</th><th>Untuk</th></tr></thead>
+        <tbody>
+          <tr><td>Login ke PI SMT sebagai <code>piadmin</code> atau <code>PIEngineers</code></td><td>Membuat PI Tags dan Trust</td></tr>
+          <tr><td>Login Windows di PI Interface Node sebagai Administrator</td><td>Install/config OPCInt dan PIBufss service</td></tr>
+          <tr><td>Akses ke ABB EWS atau dokumentasi tag ABB (P&amp;ID / Tag List)</td><td>Mengetahui nama OPC item yang tersedia</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2.3 Informasi yang Perlu Disiapkan dari ABB</h3>
+    <div class="card-grid two reveal">
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <h4>Tag List ABB (I/O List)</h4>
+        <p>Daftar semua tag ABB yang ingin dimonitor — nama tag, deskripsi, satuan, range min/max, dan tipe data (Analog/Digital).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔑</div>
+        <h4>OPC Server ProgID</h4>
+        <p>Nama identifier OPC Server ABB, contoh: <code>ABBGroup.OPCServer</code> atau <code>ABB.OPCDA.1</code>. Dapatkan dari tim ABB atau cek via OPC client tool.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h4>IP / Hostname ABB Node</h4>
+        <p>IP address atau hostname Windows machine tempat ABB OPC DA Server berjalan (biasanya ABB Engineering Workstation).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗂️</div>
+        <h4>OPC Item Path / Browse Path</h4>
+        <p>Hierarki item OPC dari ABB — bisa berupa flat list atau bertingkat, contoh: <code>Channel1.Device1.AI.FIC101.PV</code>.</p>
+      </div>
+    </div>
+
+    <div class="callout warn reveal">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-text">
+        <strong>DCOM — Sumber Masalah Terbesar OPC DA</strong>
+        OPC DA menggunakan COM/DCOM Windows. Firewall harus mengizinkan TCP 135 (RPC Endpoint Mapper) + dynamic DCOM ports (biasanya 1024–65535). Pastikan user account yang menjalankan OPCInt service punya DCOM Launch &amp; Activation Permission ke OPC server ABB. Tanpa konfigurasi DCOM yang benar, interface tidak akan bisa connect ke OPC Server meski jaringan sudah tembus.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 03 — OPC SERVER -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="opc-server">
+    <div class="section-label">03 — Fase 1</div>
+    <h2>Verifikasi OPC DA Server (ABB)</h2>
+    <p>Sebelum membuat PI Tag, pastikan kamu bisa melihat dan membaca data dari OPC Server ABB. Gunakan tool OPC Client untuk browse dan test koneksi.</p>
+
+    <h3 id="opc-browse">3.1 Browse OPC Items dari ABB</h3>
+    <p>Gunakan <strong>Matrikon OPC Explorer</strong> atau tool OPC Client lainnya dari PI Interface Node untuk browse item yang tersedia di OPC Server ABB:</p>
+
+    <ol class="steps reveal">
+      <li>Buka <strong>Matrikon OPC Explorer</strong> (atau OPC Quick Client) di PI Interface Node</li>
+      <li>Klik <strong>Connect</strong> → pilih <strong>Remote Computer</strong> → masukkan IP/hostname ABB OPC Node</li>
+      <li>Dari daftar OPC Server yang muncul, pilih OPC Server ABB (contoh: <code>ABBGroup.OPCServer</code>)</li>
+      <li>Browse tree hierarki OPC item yang tersedia — catat nama <strong>Item ID</strong> lengkap untuk setiap tag yang ingin dipantau</li>
+      <li>Tambahkan beberapa item ke group, amati apakah nilai berubah secara real-time (Quality: <strong>Good</strong>)</li>
+    </ol>
+
+    <div class="arch-box reveal"><span class="hl3">[ Contoh Struktur OPC Item ABB di Wayang Windu ]</span>
+
+ABBGroup.OPCServer
+  └── <span class="hl">WAYANG_WINDU</span>
+        ├── <span class="hl2">ANALOG_INPUT</span>
+        │     ├── FIC101.PV        <span class="hl3">← Flow indicator controller 101, Process Value</span>
+        │     ├── FIC101.SP        <span class="hl3">← Setpoint</span>
+        │     ├── TIC202.PV        <span class="hl3">← Temperature indicator controller 202</span>
+        │     ├── PIC301.PV        <span class="hl3">← Pressure indicator controller 301</span>
+        │     └── LIC401.PV        <span class="hl3">← Level indicator controller 401</span>
+        ├── <span class="hl2">DIGITAL_INPUT</span>
+        │     ├── MOT101.RUN       <span class="hl3">← Motor 101 running status</span>
+        │     ├── VLV201.OPEN      <span class="hl3">← Valve 201 open status</span>
+        │     └── PUMP301.FAULT    <span class="hl3">← Pump 301 fault alarm</span>
+        └── <span class="hl2">ANALOG_OUTPUT</span>
+              └── FIC101.OP        <span class="hl3">← Controller output %</span></div>
+
+    <div class="callout info reveal">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-text">
+        <strong>Catat Full Item ID dengan Tepat</strong>
+        Item ID OPC adalah case-sensitive dan harus persis sama saat dikonfigurasi di PI Tag (<code>instrumenttag</code> attribute). Salah satu karakter = tag tidak bisa baca data. Contoh full Item ID: <code>WAYANG_WINDU.ANALOG_INPUT.FIC101.PV</code>
+      </div>
+    </div>
+
+    <h3 id="opc-test">3.2 Test Kualitas Data OPC</h3>
+    <p>Sebelum lanjut, pastikan semua item yang ingin dipantau memiliki kualitas data yang baik:</p>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>OPC Quality</th><th>Arti</th><th>Tindakan</th></tr></thead>
+        <tbody>
+          <tr><td class="ok">Good (192)</td><td>Data valid dan ter-update dari field</td><td>✓ Lanjutkan</td></tr>
+          <tr><td class="warn">Uncertain (68)</td><td>Data mungkin valid tapi ada kondisi tidak pasti</td><td>Investigasi di ABB DCS</td></tr>
+          <tr><td class="err">Bad (0)</td><td>Data tidak valid — instrument/jaringan bermasalah</td><td>Selesaikan masalah hardware sebelum lanjut</td></tr>
+          <tr><td class="warn">Bad — Config Error</td><td>Item ID tidak ditemukan di OPC Server</td><td>Cek kembali nama Item ID di ABB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 04 — PI INTERFACE -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="pi-interface">
+    <div class="section-label">04 — Fase 2</div>
+    <h2>Konfigurasi PI OPC DA Interface</h2>
+    <p>PI OPC DA Interface (<code>OPCInt.exe</code>) adalah bridge antara ABB OPC Server dan PI Data Archive. Interface ini dikonfigurasi via <strong>PI Interface Configuration Utility (PI ICU)</strong>.</p>
+
+    <h3 id="icu-config">4.1 Konfigurasi via PI ICU</h3>
+
+    <div class="step-card reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Buka PI ICU di Interface Node</h4>
+        <p>Jalankan <strong>PI Interface Configuration Utility (PI ICU)</strong> dari Start Menu atau:</p>
+        <pre><span class="str">C:\Program Files\PIPC\ICU\PIicu.exe</span></pre>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Buat atau Pilih Interface Instance</h4>
+        <p>Klik <strong>Add</strong> untuk membuat instance baru, atau pilih instance yang sudah ada untuk ABB. Pilih <strong>OPC DA</strong> sebagai interface type.</p>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Isi Parameter Koneksi</h4>
+        <p>Isi semua field berikut di tab <strong>General</strong>:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Parameter</th><th>Value</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td><code>/host</code></td><td><code>PISRVCISDEMO</code></td><td>Nama PI Data Archive server</td></tr>
+              <tr><td><code>/id</code></td><td><code>1</code></td><td>Interface ID unik (1–255). ABB = 1, nanti SETPOINT = 2</td></tr>
+              <tr><td><code>/opcserver</code></td><td><code>ABBGroup.OPCServer</code></td><td>ProgID OPC Server ABB (sesuaikan!)</td></tr>
+              <tr><td><code>/opchost</code></td><td><code>192.168.x.x</code></td><td>IP address ABB OPC node (jika remote)</td></tr>
+              <tr><td><code>/s</code></td><td><code>5</code></td><td>Scan interval dalam detik</td></tr>
+              <tr><td><code>/ps</code></td><td><code>L</code></td><td>Point Source — semua PI tag ABB harus punya <code>pointsource=L</code></td></tr>
+              <tr><td><code>/bf</code></td><td><code>1</code></td><td>Aktifkan PIBufss buffering (zero data loss)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Apply &amp; Start Service</h4>
+        <p>Klik <strong>Apply</strong>, kemudian <strong>Start</strong> service. Cek status di Windows Services (<code>services.msc</code>) — pastikan service <code>PI-OPCInt-1</code> berjalan dan statusnya <strong>Running</strong>.</p>
+        <pre><span class="cm"># Verifikasi di PowerShell:</span>
+<span class="kw">Get-Service</span> <span class="str">"PI-OPCInt-1"</span>
+<span class="cm"># Expected output: Running</span></pre>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Cek Log Interface</h4>
+        <p>Lihat PI Interface log untuk memastikan koneksi ke OPC Server dan PI Archive berhasil:</p>
+        <pre><span class="str">C:\Program Files\PIPC\Interfaces\OPCInt\OPCInt1.log</span>
+
+<span class="cm"># Baris yang menandakan sukses:</span>
+<span class="str">Connected to OPC server: ABBGroup.OPCServer</span>
+<span class="str">Connected to PI Server: PISRVCISDEMO</span>
+<span class="str">Subscribed to N OPC items successfully</span></pre>
+      </div>
+    </div>
+
+    <h3 id="trust-config">4.2 PI Trust &amp; Security</h3>
+    <p>PI Interface membutuhkan <strong>PI Trust</strong> agar bisa menulis data ke PI Archive tanpa password. Konfigurasi di PI SMT:</p>
+
+    <ol class="steps reveal">
+      <li>Buka <strong>PI SMT</strong> → pilih server <code>PISRVCISDEMO</code></li>
+      <li>Navigasi ke <strong>Security → Trusts</strong></li>
+      <li>Klik <strong>New</strong>, isi sebagai berikut:</li>
+    </ol>
+
+    <pre><span class="cm"># PI Trust untuk ABB OPC Interface:</span>
+Trust Name  : ABB_OPC_Trust
+Description : Trust for ABB OPC DA Interface (Wayang Windu)
+Net Mask    : <span class="str">192.168.x.x</span>    <span class="cm"># IP Interface Node</span>
+App Name    : OPCInt
+PI Identity : PIInterfaces   <span class="cm"># Identity dengan hak write data</span></pre>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-text">
+        <strong>PIInterfaces Identity</strong>
+        Identity <code>PIInterfaces</code> secara default hanya punya hak <strong>Write Data</strong> (nilai) tapi tidak bisa ubah konfigurasi tag. Ini prinsip least-privilege yang benar — interface hanya bisa kirim data, tidak bisa hapus atau modifikasi tag.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 05 — BUAT TAG -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="buat-tag">
+    <div class="section-label">05 — Fase 3</div>
+    <h2>Membuat PI Tags dari ABB</h2>
+    <p>
+      Setiap OPC item yang ingin direkam ke PI Archive harus didefinisikan sebagai <strong>PI Tag</strong>. Kunci koneksinya ada di dua atribut: <code>pointsource</code> (harus sama dengan <code>/ps</code> di interface = <code>L</code>) dan <code>instrumenttag</code> (harus sama persis dengan <strong>OPC Item ID</strong> dari ABB).
+    </p>
+
+    <div class="highlight-box reveal">
+      <h4>🔑 Dua Atribut Kunci Linking PI Tag ke OPC Item ABB</h4>
+      <p>
+        <strong>pointsource = L</strong> → Menentukan bahwa tag ini dibaca oleh interface dengan <code>/ps=L</code> (yaitu interface ABB OPC DA)<br>
+        <strong>instrumenttag = WAYANG_WINDU.ANALOG_INPUT.FIC101.PV</strong> → Full OPC Item ID dari ABB yang akan dibaca
+      </p>
+    </div>
+
+    <h3 id="tag-manual">5.1 Manual via PI SMT — Point Builder</h3>
+    <p>Cara ini cocok untuk menambahkan beberapa tag sekaligus, atau saat pertama kali testing koneksi.</p>
+
+    <div class="step-card reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Buka PI SMT → Point Builder</h4>
+        <p>Buka <strong>PI System Management Tool</strong>, connect ke <code>PISRVCISDEMO</code>, navigasi ke <strong>Points → Point Builder</strong>.</p>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Klik New &amp; Isi Tab General</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Value (Contoh)</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Tag Name</strong></td><td><code>WAWW.FIC101.PV</code></td><td>Nama PI Tag — ikuti naming convention</td></tr>
+              <tr><td><strong>Point Type</strong></td><td><code>Float32</code></td><td>Untuk analog (AI). Gunakan Digital untuk DI.</td></tr>
+              <tr><td><strong>Descriptor</strong></td><td><code>Flow IC 101 Process Value</code></td><td>Deskripsi human-readable</td></tr>
+              <tr><td><strong>Engineering Units</strong></td><td><code>t/h</code></td><td>Satuan dari P&amp;ID / I/O list ABB</td></tr>
+              <tr><td><strong>Zero</strong></td><td><code>0</code></td><td>Range minimum dari instrumen</td></tr>
+              <tr><td><strong>Span</strong></td><td><code>100</code></td><td>Range maksimum − zero</td></tr>
+              <tr><td><strong>Point Source</strong></td><td><code>L</code></td><td>Harus sama dengan <code>/ps</code> di interface!</td></tr>
+              <tr><td><strong>Instrument Tag</strong></td><td><code>WAYANG_WINDU.ANALOG_INPUT.FIC101.PV</code></td><td>Full OPC Item ID dari ABB (case-sensitive!)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Tab Archive — Atur Exception &amp; Compression</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Atribut</th><th>Nilai Rekomendasi</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td><code>excdev</code></td><td><code>1.0</code></td><td>Exception deviation 1% of span</td></tr>
+              <tr><td><code>excdevpercent</code></td><td><code>1</code></td><td>Dalam persen (bukan absolut)</td></tr>
+              <tr><td><code>excmax</code></td><td><code>600</code></td><td>Paksa kirim max tiap 10 menit</td></tr>
+              <tr><td><code>excmin</code></td><td><code>5</code></td><td>Minimal 5 detik antar pengiriman</td></tr>
+              <tr><td><code>compressing</code></td><td><code>1</code></td><td>Aktifkan compression</td></tr>
+              <tr><td><code>compdev</code></td><td><code>0.1</code></td><td>Compression deviation 0.1% of span</td></tr>
+              <tr><td><code>compmax</code></td><td><code>28800</code></td><td>Paksa simpan max tiap 8 jam (flat signal)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Klik Apply / OK</h4>
+        <p>Tag langsung aktif dan PI Interface akan mulai mengirim data dari OPC Item ABB yang terkait ke tag ini. Tunggu sekitar 5–10 detik (satu scan interval), lalu cek nilai tag di PI SMT → Current Values.</p>
+      </div>
+    </div>
+
+    <h3 id="tag-bulk">5.2 Bulk via PICONFIG Script</h3>
+    <p>Untuk membuat banyak tag sekaligus dari tag list ABB:</p>
+
+    <pre><span class="cm">! PICONFIG script — Bulk add PI Tags dari ABB DCS (Wayang Windu)</span>
+<span class="cm">! Simpan sebagai file .txt → jalankan via: piconfig < addtags_abb.txt</span>
+
+<span class="kw">@table</span>  <span class="fn">PIpoint</span>
+<span class="kw">@mode</span>   <span class="fn">create</span>
+<span class="kw">@istr</span>   tag, pointtype, descriptor, engunits, zero, span, pointsource, instrumenttag, compressing, compdev, excdev, excmax
+
+<span class="cm">! ─── ANALOG INPUT (Float32) ───────────────────────────────────────────</span>
+<span class="str">WAWW.FIC101.PV</span>, <span class="num">R</span>, <span class="str">Flow IC 101 Process Value</span>,       <span class="str">t/h</span>,   <span class="num">0</span>, <span class="num">100</span>,  <span class="str">L</span>, <span class="str">WAYANG_WINDU.ANALOG_INPUT.FIC101.PV</span>,  <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">WAWW.FIC101.SP</span>, <span class="num">R</span>, <span class="str">Flow IC 101 Setpoint</span>,            <span class="str">t/h</span>,   <span class="num">0</span>, <span class="num">100</span>,  <span class="str">L</span>, <span class="str">WAYANG_WINDU.ANALOG_INPUT.FIC101.SP</span>,  <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">WAWW.FIC101.OP</span>, <span class="num">R</span>, <span class="str">Flow IC 101 Output</span>,              <span class="str">%</span>,     <span class="num">0</span>, <span class="num">100</span>,  <span class="str">L</span>, <span class="str">WAYANG_WINDU.ANALOG_OUTPUT.FIC101.OP</span>, <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">WAWW.TIC202.PV</span>, <span class="num">R</span>, <span class="str">Temperature IC 202 Process Value</span>, <span class="str">degC</span>, <span class="num">0</span>, <span class="num">500</span>,  <span class="str">L</span>, <span class="str">WAYANG_WINDU.ANALOG_INPUT.TIC202.PV</span>,  <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">WAWW.PIC301.PV</span>, <span class="num">R</span>, <span class="str">Pressure IC 301 Process Value</span>,   <span class="str">barg</span>, <span class="num">0</span>, <span class="num">50</span>,   <span class="str">L</span>, <span class="str">WAYANG_WINDU.ANALOG_INPUT.PIC301.PV</span>,  <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">WAWW.LIC401.PV</span>, <span class="num">R</span>, <span class="str">Level IC 401 Process Value</span>,      <span class="str">%</span>,    <span class="num">0</span>, <span class="num">100</span>,  <span class="str">L</span>, <span class="str">WAYANG_WINDU.ANALOG_INPUT.LIC401.PV</span>,  <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+
+<span class="cm">! ─── DIGITAL INPUT (Digital) ───────────────────────────────────────────</span>
+<span class="str">WAWW.MOT101.RUN</span>,   <span class="num">D</span>, <span class="str">Motor 101 Running Status</span>,  <span class="str">—</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="str">L</span>, <span class="str">WAYANG_WINDU.DIGITAL_INPUT.MOT101.RUN</span>,   <span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">600</span>
+<span class="str">WAWW.VLV201.OPEN</span>,  <span class="num">D</span>, <span class="str">Valve 201 Open Status</span>,     <span class="str">—</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="str">L</span>, <span class="str">WAYANG_WINDU.DIGITAL_INPUT.VLV201.OPEN</span>,  <span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">600</span>
+<span class="str">WAWW.PUMP301.FAULT</span>, <span class="num">D</span>, <span class="str">Pump 301 Fault Alarm</span>,       <span class="str">—</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="str">L</span>, <span class="str">WAYANG_WINDU.DIGITAL_INPUT.PUMP301.FAULT</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">600</span>
+
+<span class="kw">@endtable</span></pre>
+
+    <pre><span class="cm"># Jalankan PICONFIG script dari Command Prompt:</span>
+<span class="kw">piconfig</span> < <span class="str">C:\PI_Config\addtags_abb.txt</span> > <span class="str">C:\PI_Config\addtags_abb_result.txt</span>
+
+<span class="cm"># Cek hasil import:</span>
+<span class="kw">type</span> <span class="str">C:\PI_Config\addtags_abb_result.txt</span>
+<span class="cm"># Cari baris "Errors: 0" untuk konfirmasi berhasil</span></pre>
+
+    <h3 id="tag-builder">5.3 Bulk via PI Builder (Excel) — Rekomendasi untuk Production</h3>
+    <p>Cara paling efisien saat bekerja dengan ratusan tag dari I/O List ABB format Excel:</p>
+
+    <ol class="steps reveal">
+      <li>Buka Excel, aktifkan <strong>PI Builder Add-in</strong> (tab PI Builder muncul di ribbon)</li>
+      <li>Klik <strong>Build → From Template</strong> → pilih template <code>PI Point</code></li>
+      <li>Isi data dari I/O List ABB — setiap baris = satu PI Tag. Kolom wajib: <code>Tag</code>, <code>PointType</code>, <code>Descriptor</code>, <code>EngUnits</code>, <code>PointSource</code>, <code>InstrumentTag</code></li>
+      <li>Klik <strong>Write → PI System</strong>, pilih server <code>PISRVCISDEMO</code></li>
+      <li>Review hasil di panel PI Builder — baris merah = error (tagname duplikat, field wajib kosong, dsb)</li>
+      <li>Perbaiki error, klik <strong>Write</strong> lagi sampai semua baris hijau (success)</li>
+    </ol>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-text">
+        <strong>Mapping I/O List ABB → PI Tag Attribute</strong><br>
+        I/O List ABB (Excel) biasanya punya kolom: Tag Number, Description, Eng Unit, Range Lo, Range Hi, I/O Type.<br>
+        Mappingnya ke PI: Tag Number → <code>instrumenttag</code> &amp; basis <code>tag</code>, Description → <code>descriptor</code>, Eng Unit → <code>engunits</code>, Range Lo → <code>zero</code>, Range Hi − Lo → <code>span</code>, I/O Type AI → PointType <code>R</code>, DI → PointType <code>D</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 06 — VERIFIKASI -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="verifikasi">
+    <div class="section-label">06 — Fase 4</div>
+    <h2>Verifikasi Data Masuk ke Archive</h2>
+    <p>Setelah PI Tag dibuat dan interface berjalan, lakukan verifikasi berlapis untuk memastikan data benar-benar mengalir dari ABB DCS sampai ke PI Archive.</p>
+
+    <h4>Checklist Verifikasi</h4>
+    <ul class="check reveal">
+      <li>PI Interface service (<code>PI-OPCInt-1</code>) status <strong>Running</strong> di Windows Services</li>
+      <li>Interface log tidak menampilkan error koneksi ke OPC Server atau PI Archive</li>
+      <li>Tag di PI SMT menampilkan nilai numerik (bukan <code>Pt Created</code> atau <code>Comm Fail</code>)</li>
+      <li>Nilai tag berubah seiring waktu (tidak frozen) — verifikasi dengan trend 5 menit</li>
+      <li>Nilai tag masuk akal sesuai range engineering (tidak ada nilai di luar <code>zero</code>–<code>span</code>)</li>
+      <li>Data historis bisa di-query untuk rentang waktu sebelumnya</li>
+      <li>Tag digital menampilkan state text (<code>Running</code>, <code>Open</code>) bukan angka</li>
+    </ul>
+
+    <h3>6.1 Cek Nilai Tag via PI SMT</h3>
+
+    <ol class="steps reveal">
+      <li>Buka <strong>PI SMT</strong> → <strong>Points → Point Builder</strong></li>
+      <li>Search tag yang baru dibuat, misalnya <code>WAWW.FIC101.PV</code></li>
+      <li>Klik tab <strong>Snapshot</strong> → lihat nilai terkini, timestamp, dan quality</li>
+      <li>Jika nilai berubah-ubah sesuai proses → <strong>✓ Data mengalir normal</strong></li>
+    </ol>
+
+    <h3>6.2 Cek Historis via PI SMT Data Archive</h3>
+    <pre><span class="cm"># Di PI SMT → Data Archive → Archive Editor:</span>
+<span class="cm"># - Pilih tag: WAWW.FIC101.PV</span>
+<span class="cm"># - Start time: *-10m (10 menit lalu)</span>
+<span class="cm"># - End time:   * (sekarang)</span>
+<span class="cm"># - Klik Search → harus ada baris data</span>
+
+<span class="cm"># Atau via PI DataLink (Excel add-in):</span>
+<span class="cm"># =PIArcVal("WAWW.FIC101.PV", "*-5m", 1)</span>
+<span class="cm"># =PITimeDat("WAWW.FIC101.PV", "*-5m", "*", "10s")</span></pre>
+
+    <h3>6.3 Cek via PI Web API (Python)</h3>
+    <pre><span class="kw">import</span> requests, json
+
+BASE = <span class="str">"https://PISRVCISDEMO/piwebapi"</span>
+AUTH = (<span class="str">"piadmin"</span>, <span class="str">"password"</span>)
+
+<span class="cm"># Cari WebID tag yang baru dibuat</span>
+r = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/points"</span>,
+    params={<span class="str">"nameFilter"</span>: <span class="str">"WAWW.FIC101.PV"</span>}, auth=AUTH, verify=<span class="kw">False</span>)
+web_id = r.<span class="fn">json</span>()[<span class="str">"Items"</span>][<span class="num">0</span>][<span class="str">"WebId"</span>]
+tag_name = r.<span class="fn">json</span>()[<span class="str">"Items"</span>][<span class="num">0</span>][<span class="str">"Name"</span>]
+
+<span class="cm"># Ambil current value</span>
+cv = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/streams/{web_id}/value"</span>, auth=AUTH, verify=<span class="kw">False</span>).<span class="fn">json</span>()
+<span class="fn">print</span>(<span class="str">f"[{tag_name}] {cv['Timestamp']}: {cv['Value']} → Quality: {cv.get('IsGood', 'N/A')}"</span>)
+
+<span class="cm"># Ambil historis 10 menit terakhir</span>
+hist = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/streams/{web_id}/recorded"</span>,
+    params={<span class="str">"startTime"</span>: <span class="str">"*-10m"</span>, <span class="str">"endTime"</span>: <span class="str">"*"</span>}, auth=AUTH, verify=<span class="kw">False</span>).<span class="fn">json</span>()
+<span class="fn">print</span>(<span class="str">f"Total recorded values (10 min): {len(hist['Items'])}"</span>)
+<span class="kw">for</span> item <span class="kw">in</span> hist[<span class="str">"Items"</span>][-<span class="num">5</span>:]:
+    <span class="fn">print</span>(<span class="str">f"  {item['Timestamp']}: {item['Value']}"</span>)</pre>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-text">
+        <strong>Berapa lama sampai data masuk?</strong>
+        Setelah tag dibuat dan interface running, data pertama biasanya masuk dalam <strong>5–15 detik</strong> (satu scan interval + exception filter). Kalau setelah 1 menit masih <code>Pt Created</code>, lanjutkan ke section Troubleshooting.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 07 — TROUBLESHOOT -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="troubleshoot">
+    <div class="section-label">07 — Troubleshooting</div>
+    <h2>Troubleshooting</h2>
+    <p>Masalah paling umum saat add tag dari ABB dan cara mengatasinya:</p>
+
+    <h3>7.1 Tag Stuck di "Pt Created"</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Kemungkinan Penyebab</th><th>Cara Diagnosa</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td>Interface tidak running</td><td><code>Get-Service "PI-OPCInt-1"</code></td><td>Start service PI-OPCInt-1</td></tr>
+          <tr><td><code>pointsource</code> tag tidak cocok dengan <code>/ps</code> interface</td><td>Cek <code>pointsource</code> di tag — harus <code>L</code></td><td>Edit tag, ubah pointsource ke <code>L</code></td></tr>
+          <tr><td><code>instrumenttag</code> salah (beda huruf besar/kecil, spasi, path)</td><td>Bandingkan dengan item ID di OPC client tool</td><td>Edit tag, perbaiki <code>instrumenttag</code> agar persis sama</td></tr>
+          <tr><td>PI Trust belum dikonfigurasi</td><td>Cek PI SMT → Security → Trusts</td><td>Tambahkan PI Trust untuk Interface Node</td></tr>
+          <tr><td>OPC Item Bad Quality</td><td>Cek di OPC client — quality item = Bad</td><td>Selesaikan masalah hardware/komunikasi ABB</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>7.2 Tag Menampilkan "Comm Fail"</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Penyebab</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td>Koneksi interface ke OPC Server putus</td><td>Cek jaringan ke ABB node, cek DCOM permission, restart OPCInt service</td></tr>
+          <tr><td>OPC Server ABB mati atau restart</td><td>Cek status OPC Server di ABB EWS, interface akan reconnect otomatis setelah OPC Server up</td></tr>
+          <tr><td>DCOM timeout</td><td>Cek Windows Firewall, pastikan port 135 + dynamic ports terbuka</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>7.3 Data Masuk tapi Nilai Selalu Sama (Frozen)</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Penyebab</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td><code>excdev</code> terlalu besar — nilai berubah kurang dari threshold</td><td>Turunkan <code>excdev</code> ke 0.1% atau 0</td></tr>
+          <tr><td>Instrument di lapangan memang flat (proses stabil)</td><td>Normal — tunggu sampai ada perubahan proses, atau set <code>excmax</code> lebih kecil untuk paksa kirim</td></tr>
+          <tr><td>OPC Item value memang tidak berubah di ABB</td><td>Verifikasi di ABB EWS bahwa tag tersebut memang update secara real-time</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>7.4 Interface Gagal Connect ke OPC Server (DCOM Error)</h3>
+    <pre><span class="cm"># Error umum di log interface:</span>
+<span class="str">"Failed to connect to OPC server: Access denied (0x80070005)"</span>
+<span class="str">"DCOM error: Class not registered (0x80040154)"</span>
+
+<span class="cm"># Solusi — cek DCOM permission:</span>
+<span class="cm"># 1. Buka dcomcnfg di Interface Node</span>
+<span class="cm"># 2. Component Services → Computers → My Computer → Properties</span>
+<span class="cm"># 3. Tab COM Security → Edit Limits → pastikan Allow Remote Activation</span>
+
+<span class="cm"># Solusi — cek Windows Firewall:</span>
+<span class="kw">netsh</span> advfirewall firewall add rule name=<span class="str">"DCOM TCP 135"</span> ^
+  protocol=TCP localport=135 dir=in action=allow
+
+<span class="cm"># Test koneksi OPC dari Interface Node ke ABB node:</span>
+<span class="cm"># Buka Matrikon OPC Explorer → connect ke IP ABB node</span>
+<span class="cm"># Jika gagal di sini → masalahnya DCOM, bukan PI</span></pre>
+
+    <div class="callout warn reveal">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-text">
+        <strong>Selalu Test OPC Koneksi Dulu Sebelum Blame PI</strong>
+        Jika Matrikon OPC Explorer dari Interface Node bisa browse dan baca data dari ABB OPC Server dengan baik, berarti masalahnya ada di konfigurasi PI Tag atau PI Interface — bukan di jaringan atau DCOM. Pastikan test OPC client berhasil dulu sebelum troubleshoot sisi PI.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 08 — REFERENSI TAG -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="referensi">
+    <div class="section-label">08 — Referensi</div>
+    <h2>Referensi Tag ABB — Wayang Windu</h2>
+    <p>Template referensi format PI Tag dari ABB DCS Wayang Windu. Sesuaikan <code>instrumenttag</code> dengan OPC Item ID aktual dari ABB I/O List.</p>
+
+    <div class="callout info reveal">
+      <span class="callout-icon">📋</span>
+      <div class="callout-text">
+        <strong>Naming Convention PI Tag Wayang Windu</strong>
+        Format: <code>WAWW.{LOOP_ID}.{PARAMETER}</code><br>
+        Contoh: <code>WAWW.FIC101.PV</code> → Wayang Windu, Flow IC 101, Process Value<br>
+        Parameter umum: <code>PV</code> (Process Value), <code>SP</code> (Setpoint), <code>OP</code> (Output), <code>STAT</code> (Status)
+      </div>
+    </div>
+
+    <h4>Template Tag Analog (AI) — Float32</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>PI Tag</th><th>Instrument Tag (OPC ID)</th><th>Descriptor</th><th>Unit</th><th>Zero</th><th>Span</th></tr></thead>
+        <tbody>
+          <tr><td><code>WAWW.FIC101.PV</code></td><td><code>...ANALOG_INPUT.FIC101.PV</code></td><td>Flow IC 101 Process Value</td><td>t/h</td><td>0</td><td>100</td></tr>
+          <tr><td><code>WAWW.FIC101.SP</code></td><td><code>...ANALOG_INPUT.FIC101.SP</code></td><td>Flow IC 101 Setpoint</td><td>t/h</td><td>0</td><td>100</td></tr>
+          <tr><td><code>WAWW.FIC101.OP</code></td><td><code>...ANALOG_OUTPUT.FIC101.OP</code></td><td>Flow IC 101 Output</td><td>%</td><td>0</td><td>100</td></tr>
+          <tr><td><code>WAWW.TIC202.PV</code></td><td><code>...ANALOG_INPUT.TIC202.PV</code></td><td>Temperature IC 202 Process Value</td><td>°C</td><td>0</td><td>500</td></tr>
+          <tr><td><code>WAWW.PIC301.PV</code></td><td><code>...ANALOG_INPUT.PIC301.PV</code></td><td>Pressure IC 301 Process Value</td><td>barg</td><td>0</td><td>50</td></tr>
+          <tr><td><code>WAWW.LIC401.PV</code></td><td><code>...ANALOG_INPUT.LIC401.PV</code></td><td>Level IC 401 Process Value</td><td>%</td><td>0</td><td>100</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Template Tag Digital (DI) — Digital</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>PI Tag</th><th>Instrument Tag (OPC ID)</th><th>Descriptor</th><th>Digital State Set</th></tr></thead>
+        <tbody>
+          <tr><td><code>WAWW.MOT101.RUN</code></td><td><code>...DIGITAL_INPUT.MOT101.RUN</code></td><td>Motor 101 Running Status</td><td>MotorState (Stopped/Running/Fault)</td></tr>
+          <tr><td><code>WAWW.VLV201.OPEN</code></td><td><code>...DIGITAL_INPUT.VLV201.OPEN</code></td><td>Valve 201 Open Status</td><td>ValveState (Closed/Open/Partial)</td></tr>
+          <tr><td><code>WAWW.PUMP301.FAULT</code></td><td><code>...DIGITAL_INPUT.PUMP301.FAULT</code></td><td>Pump 301 Fault Alarm</td><td>OnOff (Off/On)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Quick Summary — Atribut Wajib untuk Tag ABB</h4>
+    <div class="card-grid two reveal">
+      <div class="card">
+        <div class="card-icon">🔑</div>
+        <h4>pointsource = L</h4>
+        <p>Wajib sama dengan parameter <code>/ps=L</code> di OPCInt. Ini yang menentukan interface mana yang akan membaca tag ini.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <h4>instrumenttag = OPC Item ID</h4>
+        <p>Harus sama persis (case-sensitive) dengan Item ID di OPC Server ABB. Ini yang menentukan nilai dari mana yang akan disimpan ke tag.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>pointtype = R (Float32)</h4>
+        <p>Untuk semua sensor analog dari ABB (AI). Gunakan <code>D</code> untuk digital input (valve, motor status).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚙️</div>
+        <h4>compressing = 1</h4>
+        <p>Selalu aktifkan compression untuk tag analog. Menghemat storage hingga 10x tanpa kehilangan akurasi data.</p>
+      </div>
+    </div>
+
+    <div class="divider">— End of Document —</div>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">📚</span>
+      <div class="callout-text">
+        <strong>Dokumen Terkait</strong>
+        PI System README (PI Data Archive &amp; PI AF) · PI Vision Display Guide · SETPOINT CMS Integration Guide · Predict-IT Readiness Checklist
+      </div>
+    </div>
+  </section>
+
+</div></main>
+
+<footer>
+  <p style="margin-bottom:6px;">Adding Tags from ABB to PI Archive &nbsp;·&nbsp; OPC DA Integration Guide</p>
+  <p style="color:#94a3b8;">AVEVA OSIsoft &nbsp;·&nbsp; Wayang Windu PIMS Project &nbsp;·&nbsp; PT. Cistech Alpha Indonesia</p>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  document.querySelectorAll('section[id]').forEach(sec => {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+          const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px' }).observe(sec);
+  });
+</script>
+</body>
+</html>
