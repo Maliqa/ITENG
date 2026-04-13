@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI System PIMS — FAQ & Solusi | Wayang Windu</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #ffffff;
+  --surface:   #f5f7fa;
+  --card:      #ffffff;
+  --border:    #e2e8f0;
+  --border2:   #cbd5e1;
+  --accent:    #0066cc;
+  --accent2:   #00875a;
+  --accent3:   #e05c00;
+  --accent4:   #7c3aed;
+  --text:      #1a2332;
+  --muted:     #64748b;
+  --code-bg:   #f0f4f8;
+  --code-text: #334155;
+  --tag-da:    #e8f4fd;
+  --tag-af:    #e8f7f0;
+  --tag-pi:    #fef3ec;
+  --tag-pu:    #f3f0ff;
+  --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.8; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 28px; }
+
+/* NAV */
+.sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 10px 0; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+.nav-inner { display: flex; gap: 4px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: 0 28px; align-items: center; }
+.nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); margin-right: 8px; }
+.nav-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 5px 9px; border-radius: 4px; color: var(--muted); text-decoration: none; transition: all .2s; white-space: nowrap; }
+.nav-link:hover, .nav-link.active { color: var(--accent); background: var(--tag-da); font-weight: 600; }
+
+/* HEADER */
+header { padding: 60px 0 44px; background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 40%, #f5fdf9 100%); border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+header::before { content:''; position:absolute; inset:0; background-image: radial-gradient(circle at 80% 20%, rgba(0,102,204,.06) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(0,135,90,.05) 0%, transparent 50%); pointer-events:none; }
+header .wrap { position: relative; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; animation: fadeUp .5s ease both; }
+.badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.badge.da  { background: var(--tag-da); color: var(--accent);  border: 1px solid rgba(0,102,204,.2); }
+.badge.af  { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.2); }
+.badge.gen { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.2); }
+.badge.pu  { background: var(--tag-pu); color: var(--accent4); border: 1px solid rgba(124,58,237,.2); }
+h1 { font-family: 'Syne', sans-serif; font-size: clamp(28px,5vw,46px); font-weight: 800; line-height: 1.1; margin-bottom: 14px; animation: fadeUp .5s .08s ease both; }
+h1 .hi { color: var(--accent); } h1 .lo { color: var(--accent2); }
+.subtitle { color: var(--muted); font-size: 14.5px; max-width: 580px; animation: fadeUp .5s .16s ease both; line-height: 1.6; }
+.header-meta { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; animation: fadeUp .5s .22s ease both; }
+.header-meta span { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.header-meta span strong { color: var(--text); }
+
+/* SEARCH */
+.search-wrap { padding: 24px 0 0; }
+.search-box { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; box-shadow: var(--shadow); }
+.search-box input { flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); background: transparent; }
+.search-box input::placeholder { color: var(--muted); }
+.search-box .si { font-size: 18px; flex-shrink: 0; }
+.search-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+/* CATEGORY FILTER */
+.cat-filter { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 8px; }
+.cat-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; transition: all .2s; letter-spacing: .04em; text-transform: uppercase; }
+.cat-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cat-btn.active { color: #fff; border-color: transparent; }
+.cat-btn.all.active   { background: var(--text); }
+.cat-btn.ops.active   { background: #0284c7; }
+.cat-btn.eng.active   { background: var(--accent2); }
+.cat-btn.it.active    { background: var(--accent4); }
+.cat-btn.mgmt.active  { background: var(--accent3); }
+.cat-btn.vib.active   { background: #0891b2; }
+.cat-btn.ecg.active   { background: #dc2626; }
+.cat-btn.field.active { background: #7c3aed; }
+
+/* STATS BAR */
+.stats-bar { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px 0 8px; }
+.stat { text-align: center; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--accent); line-height: 1; }
+.stat-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 2px; }
+
+/* SECTION */
+.faq-section { padding: 32px 0 8px; }
+.sec-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+.sec-icon { font-size: 24px; }
+.sec-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
+.sec-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.sec-badge.ops  { background: #e0f2fe; color: #0284c7; }
+.sec-badge.eng  { background: var(--tag-af); color: var(--accent2); }
+.sec-badge.it   { background: var(--tag-pu); color: var(--accent4); }
+.sec-badge.mgmt { background: var(--tag-pi); color: var(--accent3); }
+.sec-badge.vib  { background: #e0f9ff; color: #0891b2; }
+.sec-badge.ecg  { background: #fff0f0; color: #dc2626; }
+.sec-badge.field { background: #f5f0ff; color: #7c3aed; }
+
+/* FAQ ITEM */
+.faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; box-shadow: var(--shadow); overflow: hidden; transition: box-shadow .2s; }
+.faq-item:hover { box-shadow: var(--shadow-md); }
+.faq-item.hidden { display: none; }
+
+.faq-q { display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px; cursor: pointer; user-select: none; }
+.faq-q:hover { background: #f8fafc; }
+.faq-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #fff; background: var(--accent); min-width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.faq-q-text { flex: 1; font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.faq-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.faq-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.faq-tag.ops  { background: #e0f2fe; color: #0284c7; }
+.faq-tag.eng  { background: var(--tag-af); color: var(--accent2); }
+.faq-tag.it   { background: var(--tag-pu); color: var(--accent4); }
+.faq-tag.mgmt { background: var(--tag-pi); color: var(--accent3); }
+.faq-tag.vib  { background: #e0f9ff; color: #0891b2; }
+.faq-tag.ecg  { background: #fff0f0; color: #dc2626; }
+.faq-tag.field { background: #f5f0ff; color: #7c3aed; }
+.faq-tag.hot  { background: #fef2f2; color: #dc2626; }
+.faq-chevron { font-size: 16px; color: var(--muted); flex-shrink: 0; transition: transform .3s; margin-top: 3px; }
+.faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+.faq-ans { display: none; border-top: 1px solid var(--border); }
+.faq-item.open .faq-ans { display: block; animation: fadeIn .25s ease; }
+
+.ans-body { padding: 20px 22px; }
+.ans-section { margin-bottom: 18px; }
+.ans-section:last-child { margin-bottom: 0; }
+.ans-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.ans-label.cause { color: var(--accent3); }
+.ans-label.sol   { color: var(--accent2); }
+.ans-label.note  { color: var(--accent); }
+.ans-label.cmd   { color: var(--accent4); }
+.ans-text { font-size: 14px; color: var(--text); line-height: 1.7; }
+.ans-text p { margin-bottom: 10px; }
+.ans-text p:last-child { margin-bottom: 0; }
+
+/* SOLUTION STEPS */
+.sol-steps { display: flex; flex-direction: column; gap: 8px; }
+.sol-step { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+.sol-step .ss-num { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--accent2); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.sol-step .ss-text { flex: 1; color: var(--text); line-height: 1.5; }
+
+/* CODE BLOCK */
+pre.ans-code { background: var(--code-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent3); border-radius: 8px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.7; color: var(--code-text); overflow-x: auto; margin: 10px 0; }
+code.ic { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--tag-da); color: var(--accent); padding: 2px 6px; border-radius: 4px; }
+.cm  { color: #94a3b8; } .kw { color: #d97706; } .str { color: #059669; } .fn { color: #2563eb; } .num { color: #7c3aed; }
+
+/* CALLOUT */
+.callout { border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 13.5px; display: flex; gap: 10px; align-items: flex-start; }
+.callout.info { background: var(--tag-da); border-left: 4px solid var(--accent); }
+.callout.tip  { background: var(--tag-af); border-left: 4px solid var(--accent2); }
+.callout.warn { background: var(--tag-pi); border-left: 4px solid var(--accent3); }
+.ci { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.ct { flex: 1; color: var(--text); line-height: 1.6; }
+.ct strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+/* TABLE */
+.ans-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.ans-table th { background: var(--surface); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 9px 14px; text-align: left; border-bottom: 2px solid var(--accent); }
+.ans-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ans-table tr:last-child td { border-bottom: none; }
+.ans-table tr:hover td { background: #f8fafc; }
+
+/* NO RESULT */
+.no-result { text-align: center; padding: 48px 20px; color: var(--muted); }
+.no-result .ni { font-size: 40px; margin-bottom: 12px; }
+
+/* FOOTER */
+footer { background: var(--card); border-top: 1px solid var(--border); padding: 28px 0; text-align: center; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-top: 40px; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@media print { .sticky-nav, .search-wrap, .cat-filter { display:none!important; } .faq-ans { display:block!important; } body { background:#fff; } }
+</style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <span class="nav-logo">PI · FAQ</span>
+    <a href="#ops"   class="nav-link">Operasi</a>
+    <a href="#eng"   class="nav-link">Engineering</a>
+    <a href="#it"    class="nav-link">IT/Infra</a>
+    <a href="#mgmt"  class="nav-link">Manajemen</a>
+    <a href="#vib"   class="nav-link">Vibrasi</a>
+    <a href="#ecg"   class="nav-link">Predict-IT</a>
+    <a href="#field" class="nav-link">Lapangan</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <div class="badge-row">
+      <span class="badge da">PI System</span>
+      <span class="badge af">PIMS Wayang Windu</span>
+      <span class="badge gen">FAQ & Solusi</span>
+      <span class="badge pu">Training Guide</span>
+    </div>
+    <h1><span class="hi">FAQ</span> &amp; Solusi<br><span class="lo">PI System</span> PIMS</h1>
+    <p class="subtitle">Kumpulan pertanyaan yang paling sering muncul dari tim Operasi, Engineering, IT, Manajemen, dan Vibrasi selama implementasi PIMS Wayang Windu — beserta jawaban dan solusi lengkapnya.</p>
+    <div class="header-meta">
+      <span><strong>Proyek:</strong> PIMS Wayang Windu — Star Energy</span>
+      <span><strong>Sistem:</strong> AVEVA PI System + SETPOINT CMS + Predict-IT</span>
+      <span><strong>Versi:</strong> April 2026</span>
+    </div>
+  </div>
+</header>
+
+<main><div class="wrap">
+
+  <!-- SEARCH & FILTER -->
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="si">🔍</span>
+      <input type="text" id="searchInput" placeholder="Cari pertanyaan... (contoh: Comm Fail, backup, OPC, compression)" oninput="filterFAQ()">
+      <span class="search-count" id="searchCount"></span>
+    </div>
+
+    <div class="cat-filter">
+      <button class="cat-btn all active" onclick="filterCat('all', this)">Semua</button>
+      <button class="cat-btn ops"  onclick="filterCat('ops', this)">🏭 Operasi</button>
+      <button class="cat-btn eng"  onclick="filterCat('eng', this)">⚙️ Engineering</button>
+      <button class="cat-btn it"   onclick="filterCat('it', this)">💻 IT / Infra</button>
+      <button class="cat-btn mgmt" onclick="filterCat('mgmt', this)">📊 Manajemen</button>
+      <button class="cat-btn vib"  onclick="filterCat('vib', this)">📳 Vibrasi</button>
+      <button class="cat-btn ecg"  onclick="filterCat('ecg', this)">🔮 Predict-IT</button>
+      <button class="cat-btn field" onclick="filterCat('field', this)">🔧 Lapangan</button>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-num" id="totalQ">42</div><div class="stat-label">Total FAQ</div></div>
+      <div class="stat"><div class="stat-num">7</div><div class="stat-label">Kategori</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Hot Issues</div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 1 — OPERASI -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="ops">
+    <div class="sec-header">
+      <span class="sec-icon">🏭</span>
+      <span class="sec-title">Dari Tim Operasi / Operator</span>
+      <span class="sec-badge ops">Operasi</span>
+    </div>
+
+    <!-- Q1 -->
+    <div class="faq-item" data-cats="ops field" data-text="comm fail tag kenapa data tidak masuk pi archive komunikasi putus">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">1</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Tag ini kenapa nilainya "Comm Fail" terus? Data tidak masuk sama sekali.</div>
+          <div class="faq-tags"><span class="faq-tag ops">Operasi</span><span class="faq-tag hot">🔥 Hot Issue</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penyebab Umum</div>
+            <div class="ans-text"><p><code class="ic">Comm Fail</code> artinya PI Interface berhasil terhubung ke PI Server, tapi tidak berhasil membaca nilai dari sumber data (OPC Server / DCS ABB). Ini bukan masalah PI Archive-nya, tapi masalah di jalur komunikasi antara Interface dan sumber data.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Langkah Solusi</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Buka <strong>Matrikon OPC Explorer</strong> di Interface Node → connect ke ABB OPC Server → cek apakah item tersebut masih ada dan Quality-nya <strong>Good</strong>.</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Cek atribut <code class="ic">instrumenttag</code> di PI SMT — pastikan nama OPC Item ID-nya <strong>sama persis</strong> dengan yang ada di ABB OPC Server (case-sensitive!).</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Cek apakah instrumen fisik di lapangan dalam kondisi baik — <code class="ic">Comm Fail</code> bisa juga muncul kalau instrumen mati atau kabel terputus.</div></div>
+              <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Restart PI Interface service: <code class="ic">Restart-Service "PI-OPCInt-1"</code> di PowerShell Interface Node.</div></div>
+              <div class="sol-step"><div class="ss-num">5</div><div class="ss-text">Lihat log interface di <code class="ic">C:\Program Files\PIPC\Interfaces\OPCInt\OPCInt1.log</code> untuk detail error spesifik.</div></div>
+            </div>
+          </div>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct"><strong>Jangan Langsung Salahkan PI!</strong> Selalu test OPC koneksi dulu via Matrikon OPC Explorer. Kalau OPC client bisa baca data normal tapi PI masih Comm Fail, baru masalahnya ada di konfigurasi PI Tag atau PI Trust.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="faq-item" data-cats="ops" data-text="nilai pi vision berbeda dcs pembacaan tidak sama selisih beda">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">2</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Nilai yang tampil di PI Vision berbeda dengan pembacaan di DCS. Mana yang benar?</div>
+          <div class="faq-tags"><span class="faq-tag ops">Operasi</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penyebab Umum</div>
+            <div class="ans-text"><p>Ada beberapa kemungkinan: (1) PI Vision menampilkan nilai <em>interpolated</em> bukan <em>snapshot</em>, (2) ada delay network antara DCS dan PI Interface, (3) Exception filter menyebabkan nilai terakhir yang disimpan berbeda dengan nilai terkini di DCS.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Cara Membedakan</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Cek <strong>timestamp</strong> nilai di PI Vision — apakah sama dengan waktu sekarang atau tertinggal beberapa menit?</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Di PI SMT → Points → klik tag → tab <strong>Snapshot</strong>. Nilai Snapshot = nilai terbaru yang PI terima dari Interface. Jika Snapshot sama dengan DCS tapi PI Vision berbeda, masalahnya di display setting Vision (interpolated vs recorded).</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Kalau Snapshot juga berbeda dari DCS, turunkan nilai <code class="ic">excdev</code> tag tersebut agar perubahan kecil tetap terkirim ke PI.</div></div>
+            </div>
+          </div>
+          <div class="callout info">
+            <span class="ci">ℹ️</span>
+            <div class="ct"><strong>PI bukan pengganti DCS readout!</strong> PI adalah historian — tujuannya menyimpan tren data, bukan real-time HMI. Perbedaan kecil (terutama pada nilai yang berubah sangat cepat) adalah normal karena exception filter.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="faq-item" data-cats="ops" data-text="trend grafik melompat tidak smooth stepping data aneh">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">3</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Kenapa grafik trend di PI Vision kelihatan "melompat-lompat" dan tidak smooth?</div>
+          <div class="faq-tags"><span class="faq-tag ops">Operasi</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penjelasan</div>
+            <div class="ans-text"><p>Ini adalah efek normal dari <strong>PI Compression (Swinging Door Algorithm)</strong>. PI tidak menyimpan setiap data point — hanya menyimpan titik-titik "patahan" ketika perubahan tidak bisa lagi direpresentasikan secara linear. Sehingga saat ditampilkan, garis terlihat seperti lurus-lurus yang disambung.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Solusi</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Di PI Vision, ganti mode display trend dari <strong>Recorded</strong> ke <strong>Interpolated</strong> — PI akan mengisi gap antar titik secara linear, hasilnya lebih halus.</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Jika membutuhkan resolusi lebih tinggi, turunkan nilai <code class="ic">compdev</code> di atribut tag (misalnya dari 0.5% ke 0.1%). Tapi ini akan menambah storage usage.</div></div>
+            </div>
+          </div>
+          <div class="callout tip">
+            <span class="ci">💡</span>
+            <div class="ct">Grafik stepping adalah tanda bahwa PI Compression bekerja dengan baik — data dikompres efisien tanpa kehilangan akurasi yang berarti. Ini fitur, bukan bug.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="faq-item" data-cats="ops" data-text="data historis DCS sebelum pi dipasang bisa diimport backfill">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">4</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah data historis dari DCS ABB sebelum PI dipasang bisa di-import ke PI Archive?</div>
+          <div class="faq-tags"><span class="faq-tag ops">Operasi</span><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p>Bisa, dengan syarat data historis dari DCS bisa diekspor ke format CSV atau Excel. Prosesnya disebut <strong>PI Backfill</strong> dan bisa dilakukan via:</p></div>
+          </div>
+          <div class="sol-steps">
+            <div class="sol-step"><div class="ss-num">1</div><div class="ss-text"><strong>PI Web API</strong> — kirim data historical via HTTP PUT ke endpoint <code class="ic">/streams/{webId}/recorded</code> dengan timestamp masa lalu.</div></div>
+            <div class="sol-step"><div class="ss-num">2</div><div class="ss-text"><strong>PICONFIG</strong> — bisa tulis data historical langsung ke archive menggunakan command <code class="ic">@putval</code>.</div></div>
+            <div class="sol-step"><div class="ss-num">3</div><div class="ss-text"><strong>Python + PI Web API</strong> — paling fleksibel untuk data dalam jumlah besar dari CSV export DCS ABB.</div></div>
+          </div>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct"><strong>Perhatikan Archive File Coverage!</strong> Data historis hanya bisa ditulis ke archive file yang mencakup periode waktu tersebut. Pastikan archive file untuk periode yang bersangkutan sudah dibuat sebelum backfill.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="faq-item" data-cats="ops" data-text="pi vision tidak bisa dibuka blank putih error browser">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">5</span>
+        <div style="flex:1">
+          <div class="faq-q-text">PI Vision tidak bisa dibuka — halaman putih atau error di browser.</div>
+          <div class="faq-tags"><span class="faq-tag ops">Operasi</span><span class="faq-tag it">IT</span><span class="faq-tag hot">🔥 Hot Issue</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Solusi Bertahap</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Reset IIS dulu: buka Command Prompt as Administrator → ketik <code class="ic">iisreset /noforce</code></div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Jika masih error, coba buka dari browser lain (Chrome, Edge, Firefox) untuk eliminasi masalah browser cache.</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Cek PI Vision service di server: <code class="ic">Get-Service "PIVision*"</code> — pastikan status Running.</div></div>
+              <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Jika icon tidak muncul / tampilan corrupt, kemungkinan IIS corrupt — perlu uninstall PI Vision + reinstall IIS + reinstall PI Vision.</div></div>
+            </div>
+          </div>
+          <pre class="ans-code"><span class="cm"># Quick fix PI Vision — jalankan di server PI Vision:</span>
+<span class="kw">iisreset</span> /noforce
+
+<span class="cm"># Jika IIS perlu reinstall:</span>
+<span class="fn">Install-WindowsFeature</span> -Name Web-Server -IncludeManagementTools -IncludeAllSubFeature
+<span class="cm"># Lalu reinstall PI Vision dari installer</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 2 — ENGINEERING -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="eng">
+    <div class="sec-header">
+      <span class="sec-icon">⚙️</span>
+      <span class="sec-title">Dari Tim Engineering / Instrument</span>
+      <span class="sec-badge eng">Engineering</span>
+    </div>
+
+    <!-- Q6 -->
+    <div class="faq-item" data-cats="eng" data-text="nama tag pi harus sama pid p&id instrumen naming convention">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">6</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah nama PI Tag harus sama persis dengan tag di P&ID atau DCS?</div>
+          <div class="faq-tags"><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text">
+              <p><strong>Tidak harus sama</strong>, dan justru sebaiknya berbeda. PI Tag name adalah identifier di dalam PI System, sedangkan nama instrumen di P&ID/DCS disimpan di atribut <code class="ic">instrumenttag</code>.</p>
+              <p>Untuk Wayang Windu, kita menggunakan naming convention: <code class="ic">WAWW.{LOOP_ID}.{PARAMETER}</code> — contoh: <code class="ic">WAWW.FIC101.PV</code>. Ini lebih konsisten dan mudah di-query dari sistem lain.</p>
+            </div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Atribut PI Tag</th><th>Isi</th><th>Contoh</th></tr></thead>
+            <tbody>
+              <tr><td><code class="ic">tag</code></td><td>Nama PI internal — ikuti naming convention PIMS</td><td><code class="ic">WAWW.FIC101.PV</code></td></tr>
+              <tr><td><code class="ic">instrumenttag</code></td><td>Tag name dari DCS/P&ID/OPC Item ID</td><td><code class="ic">WAYANG_WINDU.FIC101.PV</code></td></tr>
+              <tr><td><code class="ic">descriptor</code></td><td>Deskripsi lengkap human-readable</td><td><code class="ic">Flow IC 101 Process Value</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="faq-item" data-cats="eng" data-text="range instrument berubah kalibrasi zero span apakah data historis ikut berubah">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">7</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Kalau range instrumen berubah setelah kalibrasi ulang, apakah data historis PI ikut berubah?</div>
+          <div class="faq-tags"><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text">
+              <p><strong>Tidak.</strong> PI menyimpan nilai aktual dalam satuan engineering (EU), bukan persentase range. Ketika atribut <code class="ic">zero</code> dan <code class="ic">span</code> diubah, itu hanya mempengaruhi cara PI menampilkan dan menginterpretasikan data <em>baru</em> yang masuk — data historis yang sudah tersimpan tidak berubah.</p>
+              <p>Namun, jika instrumen sebelumnya dikalibrasi ulang tapi nilai raw-nya sudah salah masuk ke archive, data tersebut tidak bisa dikoreksi secara otomatis — harus di-overwrite manual via PI Web API atau PICONFIG.</p>
+            </div>
+          </div>
+          <div class="callout tip">
+            <span class="ci">💡</span>
+            <div class="ct">Best practice: tambahkan catatan di <strong>PI Event Frame</strong> setiap kali ada kalibrasi ulang instrumen, sehingga ada jejak audit kapan range berubah.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="faq-item" data-cats="eng" data-text="digital state set motor valve status angka bukan running stopped teks">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">8</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Motor status tag menampilkan angka (0, 1, 2) bukan teks Running/Stopped. Kenapa?</div>
+          <div class="faq-tags"><span class="faq-tag eng">Engineering</span><span class="faq-tag ops">Operasi</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penyebab</div>
+            <div class="ans-text"><p>Tag dibuat dengan tipe <code class="ic">Digital</code> tapi atribut <code class="ic">digitalset</code>-nya belum diisi, atau Digital State Set belum dibuat di PI System.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Solusi</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Buat <strong>Digital State Set</strong> dulu: PI SMT → System → Digital States → New Set → tambahkan state: 0=Stopped, 1=Running, 2=Fault</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Edit PI Tag: PI SMT → Points → cari tag → ubah atribut <code class="ic">digitalset</code> → pilih Digital State Set yang baru dibuat (misal: <code class="ic">MotorState</code>)</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Save dan cek kembali — nilai sekarang harus tampil sebagai teks.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="faq-item" data-cats="eng" data-text="instrumen diganti rusak PI tag apakah perlu dibuat baru atau bisa dipakai ulang">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">9</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Kalau instrumen fisik diganti, PI Tag-nya perlu dibuat baru atau bisa dipakai ulang?</div>
+          <div class="faq-tags"><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text">
+              <p><strong>Tidak perlu dibuat baru</strong> selama instrumen pengganti mengukur hal yang sama dan punya OPC Item ID yang sama di DCS. PI Tag hanyalah wadah time-series — yang penting adalah kontinuitas data.</p>
+              <p>Yang perlu dilakukan:</p>
+            </div>
+          </div>
+          <div class="sol-steps">
+            <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Update atribut <code class="ic">descriptor</code> kalau ada perubahan nama/model instrumen.</div></div>
+            <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Update <code class="ic">zero</code> dan <code class="ic">span</code> kalau range instrumen baru berbeda.</div></div>
+            <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Catat tanggal penggantian di <strong>PI Event Frame</strong> atau di <code class="ic">descriptor</code> tag.</div></div>
+            <div class="sol-step"><div class="ss-num">4</div><div class="ss-step">Jika OPC Item ID berubah, update atribut <code class="ic">instrumenttag</code>.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="faq-item" data-cats="eng" data-text="AF attribute nilai no data tidak ada data string builder template tidak resolve">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">10</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Attribute di PI AF menampilkan "No Data" padahal PI Tag-nya ada dan sudah ada datanya.</div>
+          <div class="faq-tags"><span class="faq-tag eng">Engineering</span><span class="faq-tag hot">🔥 Hot Issue</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penyebab Paling Umum</div>
+            <div class="ans-text"><p>String Builder tidak bisa me-resolve tagname karena nama Element di AF tidak cocok dengan bagian nama PI Tag. Contoh: Element bernama <code class="ic">Compressor-01</code> tapi PI Tag-nya <code class="ic">COMP-01.SUCT.PRESS</code> — String Builder <code class="ic">%Element%.SUCT.PRESS</code> akan menghasilkan <code class="ic">Compressor-01.SUCT.PRESS</code> yang tidak ada.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Langkah Diagnosa</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Di PI System Explorer → klik attribute → kanan atas ada tombol <strong>Test Value</strong> → klik → lihat tagname yang dihasilkan String Builder.</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Bandingkan tagname hasil resolusi dengan nama tag yang ada di PI SMT. Harus sama persis.</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Solusi: sesuaikan nama Element AF dengan prefix yang dipakai di PI Tag, atau ubah template String Builder agar cocok.</div></div>
+            </div>
+          </div>
+          <pre class="ans-code"><span class="cm"># Contoh masalah:</span>
+Element name  : <span class="str">Compressor-01</span>
+String Builder: <span class="str">%Element%.SUCT.PRESS</span>
+Hasil resolusi: <span class="kw">Compressor-01.SUCT.PRESS</span>  <span class="cm">← tidak ada!</span>
+PI Tag actual : <span class="str">COMP01.SUCT.PRESS</span>
+
+<span class="cm"># Solusi A — rename element:</span>
+Element name  : <span class="str">COMP01</span>  <span class="cm">← ganti agar cocok</span>
+
+<span class="cm"># Solusi B — ubah String Builder:</span>
+String Builder: <span class="str">COMP%Element:~4,2%.SUCT.PRESS</span>  <span class="cm">← pakai substring</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 3 — IT / INFRASTRUKTUR -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="it">
+    <div class="sec-header">
+      <span class="sec-icon">💻</span>
+      <span class="sec-title">Dari Tim IT / Infrastruktur</span>
+      <span class="sec-badge it">IT / Infra</span>
+    </div>
+
+    <!-- Q11 -->
+    <div class="faq-item" data-cats="it" data-text="pi bisa diakses dari luar jaringan pabrik remote VPN internet firewall">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">11</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah PI bisa diakses dari luar jaringan pabrik (remote/internet)?</div>
+          <div class="faq-tags"><span class="faq-tag it">IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p>Bisa, dengan beberapa pendekatan tergantung kebutuhan keamanan:</p></div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Metode</th><th>Keamanan</th><th>Cocok Untuk</th></tr></thead>
+            <tbody>
+              <tr><td><strong>VPN + PI Client</strong></td><td>Tinggi</td><td>Engineer yang perlu akses penuh dari laptop</td></tr>
+              <tr><td><strong>PI Web API via DMZ</strong></td><td>Tinggi</td><td>Aplikasi eksternal, dashboard web</td></tr>
+              <tr><td><strong>PI Vision HTTPS</strong></td><td>Medium–Tinggi</td><td>Operator/manajemen via browser</td></tr>
+              <tr><td><strong>Direct port 5450 expose</strong></td><td>❌ Tidak disarankan</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct"><strong>Ikuti ISA-99 / IEC 62443!</strong> PI Server harus berada di Level 3 (PIMS Zone) dan tidak boleh langsung terekspos ke internet. Gunakan DMZ dan PI Web API sebagai gateway.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="faq-item" data-cats="it" data-text="backup recovery PI server crash disaster recovery restore">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">12</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Bagaimana strategi backup dan recovery kalau PI Server crash?</div>
+          <div class="faq-tags"><span class="faq-tag it">IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Strategi Backup</div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Komponen</th><th>Metode</th><th>Frekuensi</th></tr></thead>
+            <tbody>
+              <tr><td>Archive Files (.arc/.ann)</td><td>Copy shifted archives ke storage terpisah</td><td>Daily</td></tr>
+              <tr><td>Snapshot Database</td><td>PI SMT → Backup Snapshot</td><td>Weekly</td></tr>
+              <tr><td>PI Tag Configuration</td><td>PICONFIG export / PI Builder Excel export</td><td>Weekly</td></tr>
+              <tr><td>AF Database</td><td>PI System Explorer → Export AF Database</td><td>Weekly</td></tr>
+              <tr><td>Full System</td><td>VM Snapshot / Windows Backup seluruh PI Server</td><td>Monthly</td></tr>
+            </tbody>
+          </table>
+          <pre class="ans-code"><span class="cm"># PowerShell — automated daily archive backup</span>
+<span class="kw">$src</span> = <span class="str">"C:\ProgramData\OSIsoft\PI\dat"</span>
+<span class="kw">$dst</span> = <span class="str">"\\NAS\PIBackup\$(Get-Date -f 'yyyy-MM-dd')"</span>
+<span class="fn">New-Item</span> -ItemType Directory -Force -Path <span class="kw">$dst</span>
+<span class="fn">Copy-Item</span> <span class="str">"$src\piarch*.arc"</span> -Destination <span class="kw">$dst</span>
+<span class="fn">Copy-Item</span> <span class="str">"$src\piarch*.ann"</span> -Destination <span class="kw">$dst</span>
+<span class="cm"># Jangan copy piarchive.arc yang sedang aktif ditulis!</span></pre>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct">Data yang belum di-flush dari PIBufss ke Archive (saat crash) bisa hilang. Gunakan <strong>PI Collective</strong> (redundant PI Server) jika zero data loss adalah requirement.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="faq-item" data-cats="it" data-text="windows update patch PI service berhenti berjalan update OS">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">13</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah PI Service akan tetap berjalan setelah Windows Update / OS patch?</div>
+          <div class="faq-tags"><span class="faq-tag it">IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text">
+              <p>Umumnya PI services akan <strong>restart otomatis</strong> setelah Windows restart karena di-set sebagai Automatic startup. Tapi ada risiko: beberapa update bisa mengubah DCOM permission atau .NET framework yang mempengaruhi PI.</p>
+            </div>
+          </div>
+          <div class="sol-steps">
+            <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Sebelum update: catat status semua PI services. Backup konfigurasi DCOM.</div></div>
+            <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Lakukan update di luar jam operasi kritis, pastikan PIBufss aktif agar data tidak hilang saat restart.</div></div>
+            <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Setelah update: cek semua PI services running, cek data tag masih masuk, test PI Vision masih bisa diakses.</div></div>
+          </div>
+          <pre class="ans-code"><span class="cm"># Verifikasi semua PI services setelah update:</span>
+<span class="kw">Get-Service</span> <span class="str">"pi*"</span> | <span class="fn">Select-Object</span> Name, Status | <span class="fn">Format-Table</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="faq-item" data-cats="it" data-text="berapa storage yang dibutuhkan 5 10 tahun kapasitas disk">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">14</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Berapa storage yang dibutuhkan untuk 5–10 tahun ke depan?</div>
+          <div class="faq-tags"><span class="faq-tag it">IT</span><span class="faq-tag mgmt">Manajemen</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Formula Kalkulasi</div>
+            <div class="ans-text"><p>Gunakan formula standar OSIsoft:</p></div>
+          </div>
+          <pre class="ans-code"><span class="cm"># Formula:</span>
+Storage = Tags × DataRate × Days × 16 bytes / CompressionRatio × 1.2
+
+<span class="cm"># Contoh Wayang Windu (5.000 tags, 5 tahun):</span>
+= <span class="num">5000</span> × <span class="num">60</span> ev/tag/day × <span class="num">1825</span> days × <span class="num">16</span> bytes / <span class="num">5</span> × <span class="num">1.2</span>
+= ~<span class="str">5.3 GB</span> untuk 5 tahun  <span class="cm">← sangat kecil karena compression!</span>
+
+<span class="cm"># Tanpa compression (worst case):</span>
+= <span class="num">5000</span> × <span class="num">60</span> × <span class="num">1825</span> × <span class="num">16</span> × <span class="num">1.2</span>
+= ~<span class="str">26.3 GB</span>  <span class="cm">← masih kecil!</span></pre>
+          <div class="callout tip">
+            <span class="ci">💡</span>
+            <div class="ct">PI sangat efisien untuk storage. Untuk 5.000 tag dengan 5 tahun retention, 100–200 GB sudah lebih dari cukup. Gunakan PI Storage Longevity Calculator yang sudah dibuat untuk kalkulasi lebih akurat.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="faq-item" data-cats="it" data-text="DCOM permission OPC DA gagal connect access denied error interface">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">15</span>
+        <div style="flex:1">
+          <div class="faq-q-text">PI Interface gagal connect ke OPC Server ABB — error "Access Denied" atau DCOM error.</div>
+          <div class="faq-tags"><span class="faq-tag it">IT</span><span class="faq-tag hot">🔥 Hot Issue</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penyebab</div>
+            <div class="ans-text"><p>DCOM (Distributed COM) yang digunakan OPC DA membutuhkan konfigurasi Windows permission khusus. Ini adalah <strong>masalah paling sering</strong> di deployment OPC DA.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Langkah Fix DCOM</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Buka <code class="ic">dcomcnfg</code> di Interface Node → Component Services → Computers → My Computer → Properties → tab COM Security → Edit Limits → centang Allow Remote Activation dan Allow Remote Launch untuk user service account.</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Buka Windows Firewall → Allow TCP port 135 (RPC Endpoint Mapper) dari Interface Node ke ABB OPC Node.</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Test via Matrikon OPC Explorer dari Interface Node — bisa connect ke ABB OPC Server? Jika belum bisa dari OPC Explorer pun, berarti DCOM belum beres.</div></div>
+              <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Jika OPC Explorer sudah bisa tapi PI masih gagal, cek PI Trust di PI SMT — pastikan IP Interface Node sudah didaftarkan.</div></div>
+            </div>
+          </div>
+          <pre class="ans-code"><span class="cm"># Allow DCOM port 135 via PowerShell:</span>
+<span class="kw">netsh</span> advfirewall firewall add rule name=<span class="str">"DCOM RPC"</span> ^
+  protocol=TCP localport=135 dir=in action=allow
+
+<span class="cm"># Test koneksi ke ABB OPC node:</span>
+<span class="fn">Test-NetConnection</span> <span class="str">192.168.x.x</span> -Port <span class="num">135</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 4 — MANAJEMEN -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="mgmt">
+    <div class="sec-header">
+      <span class="sec-icon">📊</span>
+      <span class="sec-title">Dari Manajemen / Project Owner</span>
+      <span class="sec-badge mgmt">Manajemen</span>
+    </div>
+
+    <!-- Q16 -->
+    <div class="faq-item" data-cats="mgmt" data-text="berapa lama implementasi selesai timeline proyek PIMS">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">16</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Berapa lama implementasi PIMS ini bisa selesai?</div>
+          <div class="faq-tags"><span class="faq-tag mgmt">Manajemen</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <table class="ans-table">
+            <thead><tr><th>Fase</th><th>Aktivitas</th><th>Estimasi Durasi</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1. Infrastruktur</strong></td><td>Install PI Server, AF Server, PI Vision, konfigurasi jaringan</td><td>1–2 minggu</td></tr>
+              <tr><td><strong>2. Integrasi ABB</strong></td><td>Setup OPC DA, buat PI Tags dari I/O List, verifikasi data masuk</td><td>2–3 minggu</td></tr>
+              <tr><td><strong>3. SETPOINT CMS</strong></td><td>Konfigurasi SETPOINT Connector, VC-8000, PI Tags vibrasi</td><td>1–2 minggu</td></tr>
+              <tr><td><strong>4. PI AF Build</strong></td><td>Bangun hierarchy, buat templates, konfigurasi analytics</td><td>2–4 minggu</td></tr>
+              <tr><td><strong>5. PI Vision</strong></td><td>Buat display dashboard, training operator</td><td>1–2 minggu</td></tr>
+              <tr><td><strong>6. Predict-IT</strong></td><td>Deployment ECG Predict-IT, training model, go-live</td><td>4–8 minggu</td></tr>
+              <tr><td colspan="2"><strong>Total Estimasi</strong></td><td><strong>3–5 bulan</strong></td></tr>
+            </tbody>
+          </table>
+          <div class="callout info">
+            <span class="ci">ℹ️</span>
+            <div class="ct">Faktor terbesar yang memperlambat implementasi biasanya adalah: (1) I/O List dari ABB yang belum lengkap, (2) akses ke ABB OPC Server yang terkendala DCOM/firewall, dan (3) proses review & approval desain AF hierarchy.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="faq-item" data-cats="mgmt" data-text="PI server mati berapa lama data hilang data loss downtime">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">17</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Kalau PI Server mati, berapa banyak data yang akan hilang?</div>
+          <div class="faq-tags"><span class="faq-tag mgmt">Manajemen</span><span class="faq-tag it">IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p><strong>Dengan PIBufss aktif: nol data hilang.</strong> PIBufss (PI Buffer Subsystem) menyimpan semua data di disk lokal Interface Node saat PI Server tidak tersedia. Begitu PI Server kembali online, semua data yang tertahan di-replay otomatis ke Archive.</p><p>Data hanya akan hilang jika: (1) PIBufss tidak dikonfigurasi, (2) disk lokal Interface Node juga penuh/rusak, atau (3) Interface Node ikut mati.</p></div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Skenario</th><th>Data Loss</th></tr></thead>
+            <tbody>
+              <tr><td>PI Server mati, PIBufss aktif di Interface Node</td><td><strong style="color:var(--accent2)">Nol (0)</strong></td></tr>
+              <tr><td>PI Server mati, PIBufss tidak aktif</td><td>Semua data selama downtime</td></tr>
+              <tr><td>PI Server + Interface Node mati bersamaan</td><td>Semua data selama downtime</td></tr>
+              <tr><td>PI Collective (redundant) — 2 server</td><td><strong style="color:var(--accent2)">Nol (0)</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="faq-item" data-cats="mgmt" data-text="PI integrasi SAP ERP MES sistem lain koneksi">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">18</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah PI bisa diintegrasikan dengan SAP atau sistem ERP/MES yang sudah ada?</div>
+          <div class="faq-tags"><span class="faq-tag mgmt">Manajemen</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p>Ya, PI mendukung berbagai metode integrasi dengan sistem enterprise:</p></div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Metode</th><th>Cocok Untuk</th></tr></thead>
+            <tbody>
+              <tr><td><strong>PI Web API (REST/JSON)</strong></td><td>Integrasi modern — SAP S/4HANA, custom app, web dashboard</td></tr>
+              <tr><td><strong>PI OLEDB/OLEDB Enterprise</strong></td><td>Query PI data via SQL-like syntax dari tools analitik</td></tr>
+              <tr><td><strong>PI DataLink (Excel)</strong></td><td>Laporan Excel otomatis untuk manajemen</td></tr>
+              <tr><td><strong>PI Connector for UFL</strong></td><td>Import data dari file CSV/JSON/XML ke PI</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="faq-item" data-cats="mgmt" data-text="satu PI server multi site dua site Wayang Windu cukup">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">19</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah satu PI Server bisa menangani dua unit (STG #1 dan HWP-A) sekaligus?</div>
+          <div class="faq-tags"><span class="faq-tag mgmt">Manajemen</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p><strong>Ya, satu PI Server bisa menangani kedua unit.</strong> Pemisahan dilakukan di level PI AF dengan membuat dua sub-hierarchy terpisah dalam satu AF Database atau dua AF Database berbeda. Di level PI Tags, cukup gunakan naming convention yang membedakan unit, misalnya prefix <code class="ic">STG1.</code> dan <code class="ic">HWPA.</code></p></div>
+          </div>
+          <div class="callout tip">
+            <span class="ci">💡</span>
+            <div class="ct">Dengan pendekatan satu server, tim engineering bisa melihat data dari kedua unit secara bersamaan dalam satu PI Vision dashboard — sangat berguna untuk perbandingan performa antar unit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 5 — VIBRASI / SETPOINT -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="vib">
+    <div class="sec-header">
+      <span class="sec-icon">📳</span>
+      <span class="sec-title">Dari Tim SETPOINT / Vibrasi</span>
+      <span class="sec-badge vib">Vibrasi</span>
+    </div>
+
+    <!-- Q20 -->
+    <div class="faq-item" data-cats="vib" data-text="VC-8000 semua channel vibrasi bisa masuk PI sekaligus berapa channel">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">20</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah semua channel VC-8000 bisa masuk ke PI sekaligus? Berapa batas channel-nya?</div>
+          <div class="faq-tags"><span class="faq-tag vib">Vibrasi</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p>Ya, semua channel VC-8000 bisa masuk ke PI. SETPOINT Connector membaca data dari VC-8000 dan mengirimkannya ke PI Data Archive. Tidak ada batas channel dari sisi PI — batasnya adalah lisensi jumlah PI Tag yang dimiliki.</p><p>Setiap channel vibrasi biasanya menghasilkan beberapa PI Tag: <code class="ic">RMS</code>, <code class="ic">Peak</code>, <code class="ic">1X amplitude</code>, <code class="ic">1X phase</code>, <code class="ic">2X amplitude</code>, dll.</p></div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Channel VC-8000</th><th>Contoh PI Tags yang Dibuat</th></tr></thead>
+            <tbody>
+              <tr><td>Channel 1 (Radial X)</td><td><code class="ic">STG1.MTR01.CH1.RMS</code>, <code class="ic">.PEAK</code>, <code class="ic">.1X</code>, <code class="ic">.2X</code></td></tr>
+              <tr><td>Channel 2 (Radial Y)</td><td><code class="ic">STG1.MTR01.CH2.RMS</code>, dst.</td></tr>
+              <tr><td>Channel 3 (Axial)</td><td><code class="ic">STG1.MTR01.CH3.RMS</code>, dst.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="faq-item" data-cats="vib" data-text="waveform data spectrum bisa disimpan PI atau hanya trend RMS">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">21</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah data waveform / spectrum bisa disimpan di PI, atau hanya data trend (RMS, Peak)?</div>
+          <div class="faq-tags"><span class="faq-tag vib">Vibrasi</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text">
+              <p>Data trend (RMS, Peak, 1X, 2X) disimpan sebagai PI Tag Float32 — ini yang paling umum dan ringan untuk storage.</p>
+              <p>Data waveform/spectrum bisa disimpan di PI menggunakan tipe <strong>Blob</strong> (Binary Large Object), tapi ini membutuhkan space storage yang jauh lebih besar dan konfigurasi khusus. Biasanya waveform disimpan di SETPOINT CMS sendiri, dan PI hanya menyimpan derived values-nya.</p>
+            </div>
+          </div>
+          <table class="ans-table">
+            <thead><tr><th>Tipe Data</th><th>Disimpan Di</th><th>PI Tag Type</th></tr></thead>
+            <tbody>
+              <tr><td>RMS, Peak, 1X, 2X trend</td><td>PI Archive</td><td>Float32</td></tr>
+              <tr><td>Overall vibration level</td><td>PI Archive</td><td>Float32</td></tr>
+              <tr><td>Full waveform buffer</td><td>SETPOINT CMS (recommended)</td><td>Blob (opsional)</td></tr>
+              <tr><td>FFT Spectrum snapshot</td><td>SETPOINT CMS (recommended)</td><td>Blob (opsional)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="faq-item" data-cats="vib" data-text="perbedaan data SETPOINT OPC ABB satu dashboard PI Vision bersama">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">22</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Bisakah data vibrasi (SETPOINT) dan data proses (ABB) ditampilkan bersama dalam satu dashboard PI Vision?</div>
+          <div class="faq-tags"><span class="faq-tag vib">Vibrasi</span><span class="faq-tag ops">Operasi</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p><strong>Bisa, dan ini salah satu kelebihan utama PI System.</strong> Karena semua data — baik dari ABB OPC DA maupun dari SETPOINT Connector — akhirnya tersimpan di PI Data Archive yang sama, PI Vision bisa menampilkan keduanya dalam satu display tanpa konfigurasi tambahan.</p></div>
+          </div>
+          <div class="callout tip">
+            <span class="ci">💡</span>
+            <div class="ct">Contoh use case yang powerful: satu halaman PI Vision menampilkan trend RMS vibrasi bearing bersama dengan suhu, tekanan, dan kecepatan motor — operator langsung bisa korelasikan apakah kenaikan vibrasi berkaitan dengan perubahan kondisi proses.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 6 — PREDICT-IT / ECG INC. -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="ecg">
+    <div class="sec-header">
+      <span class="sec-icon">🔮</span>
+      <span class="sec-title">Dari ECG Inc. / Predict-IT</span>
+      <span class="sec-badge ecg">Predict-IT</span>
+    </div>
+
+    <!-- Q23 -->
+    <div class="faq-item" data-cats="ecg" data-text="AF structure hierarchy sudah siap Predict-IT template element attribute">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">23</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apakah PI AF structure perlu disiapkan sebelum Predict-IT bisa berjalan?</div>
+          <div class="faq-tags"><span class="faq-tag ecg">Predict-IT</span><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p><strong>Ya, AF structure adalah prasyarat utama Predict-IT.</strong> Predict-IT dari ECG Inc. menggunakan PI AF SDK untuk membaca data — ia mencari asset hierarchy, element, dan attribute yang sudah terdefinisi di AF. Tanpa AF yang terstruktur, Predict-IT tidak bisa berjalan.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Yang Perlu Disiapkan di PI AF</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text"><strong>Element Hierarchy</strong> yang mencerminkan asset yang akan dipantau (Equipment → Sub-Equipment).</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text"><strong>Attribute linked ke PI Tags</strong> untuk semua variabel yang dibutuhkan model Predict-IT (temperature, pressure, vibration, flow).</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text"><strong>Minimal historical data</strong> — Predict-IT butuh data historis untuk training model similarity. Minimum 3–6 bulan data bersih sangat disarankan.</div></div>
+              <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Data tidak boleh ada gap panjang atau banyak <code class="ic">Comm Fail</code> — data kualitas buruk akan menghasilkan model prediksi yang tidak akurat.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q24 -->
+    <div class="faq-item" data-cats="ecg" data-text="gap data comm fail apakah model predict-it masih valid berlaku">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">24</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Kalau ada gap data atau banyak Comm Fail di archive, apakah model Predict-IT masih valid?</div>
+          <div class="faq-tags"><span class="faq-tag ecg">Predict-IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Jawaban</div>
+            <div class="ans-text"><p>Tergantung seberapa banyak dan panjang gap-nya. Predict-IT menggunakan <strong>similarity-based model</strong> — model dibangun dari pola data historis normal. Gap data kecil dan terisolasi (beberapa jam) masih bisa ditoleransi. Gap panjang (berhari-hari) atau gap yang terjadi berulang kali akan menurunkan akurasi model secara signifikan.</p></div>
+          </div>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct"><strong>Rekomendasi:</strong> Selesaikan semua masalah <code class="ic">Comm Fail</code> dan pastikan data mengalir bersih <strong>minimal 3 bulan</strong> sebelum Predict-IT digunakan untuk training model produksi. Data berkualitas buruk = model prediksi tidak bisa dipercaya.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q25 -->
+    <div class="faq-item" data-cats="ecg" data-text="latency delay berapa lama data sampai Predict-IT bisa dibaca real-time">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">25</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Berapa delay antara data di sensor sampai bisa dibaca oleh Predict-IT?</div>
+          <div class="faq-tags"><span class="faq-tag ecg">Predict-IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <table class="ans-table">
+            <thead><tr><th>Tahap</th><th>Latency Tipikal</th></tr></thead>
+            <tbody>
+              <tr><td>Sensor → ABB DCS</td><td>Real-time (ms)</td></tr>
+              <tr><td>ABB DCS → OPC DA Server</td><td>&lt; 1 detik</td></tr>
+              <tr><td>OPC DA → PI Interface (scan)</td><td>1–5 detik (tergantung scan interval)</td></tr>
+              <tr><td>PI Interface → PI Archive</td><td>&lt; 1 detik (exception filter)</td></tr>
+              <tr><td>PI Archive → Predict-IT (via AF SDK)</td><td>&lt; 1 detik (polling interval Predict-IT)</td></tr>
+              <tr><td><strong>Total end-to-end</strong></td><td><strong>5–15 detik tipikal</strong></td></tr>
+            </tbody>
+          </table>
+          <div class="callout info">
+            <span class="ci">ℹ️</span>
+            <div class="ct">Untuk predictive analytics, latency 5–15 detik sangat wajar. Predict-IT bukan real-time safety system — tujuannya mendeteksi anomali yang berkembang dalam jam hingga hari, bukan milidetik.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SEKSI 7 — MASALAH LAPANGAN -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="faq-section" id="field">
+    <div class="sec-header">
+      <span class="sec-icon">🔧</span>
+      <span class="sec-title">Masalah Paling Sering di Lapangan</span>
+      <span class="sec-badge field">Lapangan</span>
+    </div>
+
+    <!-- Q26 -->
+    <div class="faq-item" data-cats="field" data-text="PI Trust belum dikonfigurasi tag pt created data tidak masuk interface tidak bisa kirim">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">26</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Semua tag baru stuck di "Pt Created" — data tidak masuk sama sekali meski interface running.</div>
+          <div class="faq-tags"><span class="faq-tag field">Lapangan</span><span class="faq-tag hot">🔥 Hot Issue</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label cause">⚠️ Penyebab Paling Sering</div>
+            <div class="ans-text"><p><strong>PI Trust belum dikonfigurasi.</strong> Interface tidak memiliki izin untuk menulis data ke PI Server. Ini adalah penyebab nomor satu <code class="ic">Pt Created</code> pada tag baru.</p></div>
+          </div>
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Urutan Pengecekan</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text"><strong>Cek PI Trust</strong>: PI SMT → Security → Trusts → pastikan ada entry untuk IP Interface Node dengan App Name <code class="ic">OPCInt</code> dan PI Identity <code class="ic">PIInterfaces</code>.</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text"><strong>Cek pointsource</strong>: atribut <code class="ic">pointsource</code> di PI Tag harus sama dengan parameter <code class="ic">/ps</code> di startup command OPCInt (biasanya <code class="ic">L</code>).</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text"><strong>Cek OPC connection</strong>: buka Matrikon OPC Explorer dari Interface Node, pastikan OPC items ABB kualitasnya Good.</div></div>
+              <div class="sol-step"><div class="ss-num">4</div><div class="ss-step"><strong>Restart interface service</strong>: <code class="ic">Restart-Service "PI-OPCInt-1"</code> setelah semua fix di atas.</div></div>
+            </div>
+          </div>
+          <pre class="ans-code"><span class="cm"># Checklist cepat di PowerShell:</span>
+
+<span class="cm"># 1. Cek interface service berjalan:</span>
+<span class="kw">Get-Service</span> <span class="str">"PI-OPCInt*"</span>
+
+<span class="cm"># 2. Cek log interface untuk error message:</span>
+<span class="kw">Get-Content</span> <span class="str">"C:\Program Files\PIPC\Interfaces\OPCInt\OPCInt1.log"</span> -Tail <span class="num">30</span>
+
+<span class="cm"># 3. Cek semua PI Server services:</span>
+<span class="kw">Get-Service</span> <span class="str">"pi*"</span> | <span class="fn">Select-Object</span> Name, Status</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q27 -->
+    <div class="faq-item" data-cats="field" data-text="AF analytics tidak berjalan PIAnalysis service mati tidak jalan">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">27</span>
+        <div style="flex:1">
+          <div class="faq-q-text">PI AF Analytics tidak berjalan — nilai kalkulasi tidak ter-update.</div>
+          <div class="faq-tags"><span class="faq-tag field">Lapangan</span><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="sol-steps">
+            <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Cek PI Analysis Service: <code class="ic">Get-Service "PIAnalysis"</code> — jika Stopped, jalankan <code class="ic">Start-Service "PIAnalysis"</code></div></div>
+            <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Di PI System Explorer → Analytics → klik analytics → cek tab <strong>Status</strong>, apakah ada error message.</div></div>
+            <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Pastikan analytics sudah di-enable dan dalam status <strong>Active</strong> (bukan Inactive/Disabled).</div></div>
+            <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Cek apakah semua input attribute yang dibutuhkan analytics ada datanya — analytics tidak akan run jika inputnya <code class="ic">No Data</code>.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q28 -->
+    <div class="faq-item" data-cats="field" data-text="archive penuh PI berhenti simpan data disk full storage habis">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">28</span>
+        <div style="flex:1">
+          <div class="faq-q-text">PI tiba-tiba berhenti menyimpan data — setelah dicek ternyata archive penuh.</div>
+          <div class="faq-tags"><span class="faq-tag field">Lapangan</span><span class="faq-tag it">IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Tindakan Darurat</div>
+            <div class="sol-steps">
+              <div class="sol-step"><div class="ss-num">1</div><div class="ss-text">Buka PI SMT → Data Archive → Archives → cek status archive aktif. Jika penuh, PI butuh archive baru untuk menulis data.</div></div>
+              <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Buat archive baru: PI SMT → Data Archive → Archives → New → tentukan lokasi dan ukuran file.</div></div>
+              <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Set archive baru sebagai primary archive (Archives → klik kanan → Set as Primary).</div></div>
+              <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Pastikan ada cukup ruang disk — jika disk penuh, hapus file temporary atau pindahkan archive lama ke NAS/backup storage.</div></div>
+            </div>
+          </div>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct"><strong>Data Tidak Hilang (jika PIBufss aktif)!</strong> Selama PIBufss berjalan, data yang tidak bisa disimpan karena archive penuh masih tersimpan di buffer disk Interface Node. Begitu archive baru tersedia, data akan di-replay otomatis.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q29 -->
+    <div class="faq-item" data-cats="field eng" data-text="check in gagal AF PSE tidak bisa simpan perubahan conflict">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">29</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Check In di PI System Explorer gagal — perubahan AF tidak bisa disimpan.</div>
+          <div class="faq-tags"><span class="faq-tag field">Lapangan</span><span class="faq-tag eng">Engineering</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="sol-steps">
+            <div class="sol-step"><div class="ss-num">1</div><div class="ss-text"><strong>Undo all changes</strong> terlebih dahulu: File → Undo All Changes. Lalu coba Check In ulang dari awal.</div></div>
+            <div class="sol-step"><div class="ss-num">2</div><div class="ss-text">Cek koneksi ke AF Server: File → Connections → pastikan AF Server <code class="ic">PISRVCISDEMO</code> berstatus Connected.</div></div>
+            <div class="sol-step"><div class="ss-num">3</div><div class="ss-text">Cek AF Service di server: <code class="ic">Get-Service "AFService"</code> di PI Server → pastikan Running.</div></div>
+            <div class="sol-step"><div class="ss-num">4</div><div class="ss-text">Jika ada konflik dengan user lain yang sedang edit database yang sama, koordinasi dulu — hanya satu yang boleh Check Out pada saat bersamaan.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q30 -->
+    <div class="faq-item" data-cats="field" data-text="PI service cara restart urutan yang benar pinetmgr piarchss pisnapss">
+      <div class="faq-q" onclick="toggle(this)">
+        <span class="faq-num">30</span>
+        <div style="flex:1">
+          <div class="faq-q-text">Apa urutan yang benar untuk restart PI services?</div>
+          <div class="faq-tags"><span class="faq-tag field">Lapangan</span><span class="faq-tag it">IT</span></div>
+        </div>
+        <span class="faq-chevron">▼</span>
+      </div>
+      <div class="faq-ans">
+        <div class="ans-body">
+          <div class="ans-section">
+            <div class="ans-label sol">✅ Urutan yang Benar</div>
+          </div>
+          <pre class="ans-code"><span class="cm"># STOP — urutan dari atas ke bawah:</span>
+<span class="kw">Stop-Service</span> <span class="str">"PIBufss"</span>       <span class="cm"># 1. Buffer dulu</span>
+<span class="kw">Stop-Service</span> <span class="str">"pieventss"</span>    <span class="cm"># 2. Events</span>
+<span class="kw">Stop-Service</span> <span class="str">"piarchss"</span>     <span class="cm"># 3. Archive</span>
+<span class="kw">Stop-Service</span> <span class="str">"pisnapss"</span>     <span class="cm"># 4. Snapshot</span>
+<span class="kw">Stop-Service</span> <span class="str">"pinetmgr"</span>     <span class="cm"># 5. Network manager terakhir</span>
+Start-Sleep <span class="num">5</span>
+
+<span class="cm"># START — urutan terbalik (dari bawah ke atas):</span>
+<span class="kw">Start-Service</span> <span class="str">"pinetmgr"</span>    <span class="cm"># 1. Network manager dulu</span>
+Start-Sleep <span class="num">3</span>
+<span class="kw">Start-Service</span> <span class="str">"pisnapss"</span>    <span class="cm"># 2. Snapshot</span>
+<span class="kw">Start-Service</span> <span class="str">"piarchss"</span>    <span class="cm"># 3. Archive</span>
+<span class="kw">Start-Service</span> <span class="str">"pieventss"</span>   <span class="cm"># 4. Events</span>
+<span class="kw">Start-Service</span> <span class="str">"PIBufss"</span>      <span class="cm"># 5. Buffer terakhir</span>
+
+<span class="cm"># Verifikasi semua running:</span>
+<span class="kw">Get-Service</span> <span class="str">"pi*"</span>,<span class="str">"PIBufss"</span> | <span class="fn">Select-Object</span> Name, Status | <span class="fn">Format-Table</span></pre>
+          <div class="callout warn">
+            <span class="ci">⚠️</span>
+            <div class="ct">Jangan pernah kill <code class="ic">piarchss</code> paksa tanpa stop service dulu — bisa menyebabkan archive file corrupt.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NO RESULT MESSAGE -->
+  <div class="no-result" id="noResult" style="display:none;">
+    <div class="ni">🔍</div>
+    <p>Tidak ada FAQ yang cocok dengan pencarian "<span id="searchTerm"></span>".</p>
+    <p style="margin-top:8px; font-size:13px;">Coba kata kunci lain atau pilih kategori berbeda.</p>
+  </div>
+
+</div></main>
+
+<footer>
+  <p>PI System PIMS FAQ &amp; Solusi &nbsp;·&nbsp; Wayang Windu — Star Energy &nbsp;·&nbsp; PT. Cistech Alpha Indonesia &nbsp;·&nbsp; April 2026</p>
+</footer>
+
+<script>
+// ── TOGGLE FAQ ────────────────────────────────────────────────────
+function toggle(el) {
+  const item = el.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ── FILTER BY CATEGORY ───────────────────────────────────────────
+let currentCat = 'all';
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterFAQ();
+}
+
+// ── SEARCH + FILTER ──────────────────────────────────────────────
+function filterFAQ() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const items = document.querySelectorAll('.faq-item');
+  let visible = 0;
+
+  items.forEach(item => {
+    const text = (item.dataset.text || '') + ' ' + item.querySelector('.faq-q-text').textContent.toLowerCase();
+    const cats = (item.dataset.cats || '').split(' ');
+    const matchCat  = currentCat === 'all' || cats.includes(currentCat);
+    const matchText = !q || text.includes(q);
+    const show = matchCat && matchText;
+    item.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+
+  // Hide/show sections with no visible items
+  document.querySelectorAll('.faq-section').forEach(sec => {
+    const hasVisible = [...sec.querySelectorAll('.faq-item')].some(i => !i.classList.contains('hidden'));
+    sec.style.display = hasVisible ? '' : 'none';
+  });
+
+  const noRes = document.getElementById('noResult');
+  noRes.style.display = visible === 0 ? 'block' : 'none';
+  if (visible === 0) document.getElementById('searchTerm').textContent = q;
+
+  const cnt = document.getElementById('searchCount');
+  cnt.textContent = q || currentCat !== 'all' ? `${visible} hasil` : '';
+  document.getElementById('totalQ').textContent = visible || document.querySelectorAll('.faq-item').length;
+}
+
+// ── NAV ACTIVE ────────────────────────────────────────────────────
+document.querySelectorAll('.faq-section[id]').forEach(sec => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' }).observe(sec);
+});
+</script>
+</body>
+</html>
