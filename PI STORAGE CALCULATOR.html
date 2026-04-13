@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI System Storage Longevity Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #ffffff;
+  --surface:   #f5f7fa;
+  --card:      #ffffff;
+  --border:    #e2e8f0;
+  --border2:   #cbd5e1;
+  --accent:    #0066cc;
+  --accent2:   #00875a;
+  --accent3:   #e05c00;
+  --accent4:   #7c3aed;
+  --text:      #1a2332;
+  --muted:     #64748b;
+  --tag-da:    #e8f4fd;
+  --tag-af:    #e8f7f0;
+  --tag-pi:    #fef3ec;
+  --tag-pu:    #f3f0ff;
+  --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.06);
+  --ok:    #00875a;
+  --warn:  #d97706;
+  --danger:#dc2626;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+.wrap { max-width: 1020px; margin: 0 auto; padding: 0 24px; }
+
+/* NAV */
+nav { background: rgba(255,255,255,.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 0; position: sticky; top: 0; z-index: 200; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+.nav-inner { display: flex; align-items: center; gap: 6px; max-width: 1020px; margin: 0 auto; padding: 0 24px; flex-wrap: wrap; }
+.nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--accent); margin-right: 8px; letter-spacing: .04em; }
+.nav-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 5px 10px; border-radius: 4px; color: var(--muted); background: none; border: none; cursor: pointer; transition: all .2s; }
+.nav-btn:hover { color: var(--accent); background: var(--tag-da); }
+.calc-btn-nav { margin-left: auto; padding: 8px 20px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .2s; }
+.calc-btn-nav:hover { background: #0052a3; }
+
+/* HEADER */
+header { background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 50%, #fef3ec 100%); padding: 48px 0 36px; border-bottom: 1px solid var(--border); }
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.badge.da  { background: var(--tag-da); color: var(--accent);  border: 1px solid rgba(0,102,204,.2); }
+.badge.gen { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.2); }
+.badge.af  { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.2); }
+h1 { font-family: 'Syne', sans-serif; font-size: clamp(26px,4vw,42px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 10px; }
+h1 .hi { color: var(--accent); } h1 .lo { color: var(--accent3); }
+.subtitle { color: var(--muted); font-size: 14px; max-width: 560px; line-height: 1.6; }
+
+/* LAYOUT */
+.page-grid { display: grid; grid-template-columns: 420px 1fr; gap: 24px; padding: 28px 0; align-items: start; }
+@media(max-width:860px){ .page-grid { grid-template-columns: 1fr; } }
+
+/* PANEL */
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.panel-head { padding: 16px 22px 12px; border-bottom: 1px solid var(--border); }
+.panel-head .ph-icon { font-size: 20px; margin-bottom: 4px; }
+.panel-head .ph-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+.panel-head .ph-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.panel-body { padding: 20px 22px; }
+
+/* FORM */
+.fsec { margin-bottom: 22px; }
+.fsec-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.frow.full { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.field .hint { font-size: 11px; color: var(--muted); }
+.field input, .field select {
+  padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text);
+  background: var(--surface); transition: border-color .2s, box-shadow .2s; outline: none;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,204,.1); background: #fff; }
+
+/* UNIT TOGGLE */
+.unit-toggle { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 12px; width: fit-content; }
+.unit-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 6px 16px; border: none; background: var(--surface); color: var(--muted); cursor: pointer; transition: all .2s; text-transform: uppercase; letter-spacing: .04em; }
+.unit-btn.active { background: var(--accent); color: #fff; }
+
+/* SLIDER */
+.slider-wrap { display: flex; align-items: center; gap: 10px; }
+.slider-wrap input[type=range] { flex: 1; accent-color: var(--accent); }
+.slider-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); min-width: 52px; text-align: right; }
+
+/* CALC BUTTON */
+.calc-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .2s, transform .1s; margin-top: 4px; }
+.calc-btn:hover { background: #0052a3; }
+.calc-btn:active { transform: scale(.99); }
+
+/* ── RESULT PANEL ── */
+.result-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+/* BIG STATUS CARD */
+.status-card { border-radius: 14px; padding: 28px 28px 22px; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
+.status-card.ok     { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #6ee7b7; }
+.status-card.warn   { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #fcd34d; }
+.status-card.danger { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border: 2px solid #fca5a5; }
+.status-card.critical { background: linear-gradient(135deg, #fff1f2, #fecdd3); border: 2px solid var(--danger); }
+.status-icon { font-size: 44px; margin-bottom: 8px; }
+.status-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; opacity: .7; }
+.status-duration { font-family: 'Syne', sans-serif; font-size: clamp(36px,6vw,56px); font-weight: 800; line-height: 1; margin-bottom: 8px; }
+.status-card.ok     .status-duration { color: #065f46; }
+.status-card.warn   .status-duration { color: #92400e; }
+.status-card.danger .status-duration,
+.status-card.critical .status-duration { color: #991b1b; }
+.status-desc { font-size: 14px; opacity: .8; max-width: 420px; line-height: 1.5; }
+.status-deadline { position: absolute; top: 22px; right: 24px; text-align: right; }
+.status-deadline .sd-label { font-size: 11px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .06em; opacity: .6; }
+.status-deadline .sd-date { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; opacity: .85; }
+
+/* METRICS GRID */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); text-align: center; }
+.metric-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+.metric-val.blue   { color: var(--accent); }
+.metric-val.green  { color: var(--accent2); }
+.metric-val.orange { color: var(--accent3); }
+.metric-val.purple { color: var(--accent4); }
+.metric-val.red    { color: var(--danger); }
+.metric-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+/* TIMELINE */
+.timeline-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+.timeline-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 18px; }
+.timeline { display: flex; flex-direction: column; gap: 0; position: relative; padding-left: 28px; }
+.timeline::before { content:''; position:absolute; left:10px; top:8px; bottom:8px; width:2px; background: var(--border); }
+.tl-item { position: relative; padding: 10px 0 10px 18px; }
+.tl-dot { position: absolute; left: -18px; top: 14px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px var(--border); }
+.tl-dot.ok     { background: var(--ok); box-shadow: 0 0 0 2px #6ee7b7; }
+.tl-dot.warn   { background: var(--warn); box-shadow: 0 0 0 2px #fcd34d; }
+.tl-dot.danger { background: var(--danger); box-shadow: 0 0 0 2px #fca5a5; }
+.tl-dot.now    { background: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,204,.3); }
+.tl-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 2px; }
+.tl-event { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.tl-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* DETAIL TABLE */
+.detail-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.detail-card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 20px; border-bottom: 1px solid var(--border); color: var(--text); }
+.detail-rows { padding: 8px 20px 12px; }
+.dr { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+.dr:last-child { border-bottom: none; }
+.dr .dl { color: var(--muted); }
+.dr .dv { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); }
+.dr .dv.ok     { color: var(--ok); }
+.dr .dv.warn   { color: var(--warn); }
+.dr .dv.danger { color: var(--danger); }
+
+/* RECO BOX */
+.reco-card { border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow); }
+.reco-card.ok     { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; }
+.reco-card.warn   { background: linear-gradient(135deg, #fffbeb, #fef9c3); border: 1px solid #fde047; }
+.reco-card.danger { background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 1px solid #fdba74; }
+.reco-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+.reco-card.ok   .reco-title { color: var(--ok); }
+.reco-card.warn .reco-title { color: var(--warn); }
+.reco-card.danger .reco-title { color: var(--accent3); }
+.reco-items { display: flex; flex-direction: column; gap: 8px; }
+.reco-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+.reco-item .ri-icon { flex-shrink: 0; margin-top: 1px; }
+.reco-item .ri-text { color: #374151; line-height: 1.5; }
+
+/* FILL METER */
+.fill-meter { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow); }
+.fill-meter-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+.meter-row { margin-bottom: 14px; }
+.meter-label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-family: 'JetBrains Mono', monospace; }
+.meter-bar { background: var(--surface); border-radius: 20px; height: 14px; overflow: hidden; border: 1px solid var(--border); }
+.meter-fill { height: 100%; border-radius: 20px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+.meter-fill.ok     { background: linear-gradient(90deg, #34d399, #10b981); }
+.meter-fill.warn   { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.meter-fill.danger { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+/* EXPORT */
+.export-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.export-head { padding: 14px 20px; background: linear-gradient(135deg, var(--tag-pu), #ede9fe); border-bottom: 1px solid var(--border); }
+.export-head h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--accent4); }
+.export-body { padding: 18px 20px; }
+.export-preview { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #334155; line-height: 1.8; max-height: 260px; overflow-y: auto; white-space: pre; }
+.export-btns { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.ebtn { padding: 8px 18px; border-radius: 8px; border: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .2s; letter-spacing: .04em; text-transform: uppercase; }
+.ebtn.copy  { background: var(--accent); color: #fff; }
+.ebtn.copy:hover  { background: #0052a3; }
+.ebtn.csv   { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.3); }
+.ebtn.csv:hover   { background: #bbf7d0; }
+.ebtn.print { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.3); }
+.ebtn.print:hover { background: #fed7aa; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 60px 20px; color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+.empty .ei { font-size: 48px; margin-bottom: 14px; }
+.empty p { font-size: 14px; }
+
+/* CALLOUT */
+.callout { border-radius: 8px; padding: 13px 16px; font-size: 13.5px; display: flex; gap: 10px; align-items: flex-start; }
+.callout.info { background: var(--tag-da); border-left: 4px solid var(--accent); }
+.callout.warn { background: var(--tag-pi); border-left: 4px solid var(--accent3); }
+.callout.tip  { background: var(--tag-af); border-left: 4px solid var(--accent2); }
+.ci { font-size: 16px; flex-shrink: 0; }
+.ct { flex: 1; color: var(--text); line-height: 1.6; }
+.ct strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+/* FOOTER */
+footer { background: var(--card); border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-top: 8px; }
+
+/* ANIM */
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.fade-in { animation: fadeIn .4s ease both; }
+@keyframes countUp { from { opacity:0; transform:scale(.8); } to { opacity:1; transform:scale(1); } }
+.count-up { animation: countUp .5s cubic-bezier(.34,1.56,.64,1) both; }
+
+@media print { nav, .calc-btn-nav, .export-btns, .calc-btn { display:none!important; } body { background:#fff; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">PI · LONGEVITY</span>
+    <button class="nav-btn" onclick="scrollTo(0,0)">Input</button>
+    <button class="nav-btn" onclick="document.getElementById('result-area').scrollIntoView({behavior:'smooth'})">Hasil</button>
+    <button class="nav-btn" onclick="document.getElementById('export-area').scrollIntoView({behavior:'smooth'})">Export</button>
+    <button class="calc-btn-nav" onclick="calculate()">⚡ Hitung Sekarang</button>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <div class="badge-row">
+      <span class="badge da">PI Data Archive</span>
+      <span class="badge gen">Storage Longevity</span>
+      <span class="badge af">Wayang Windu — PIMS</span>
+    </div>
+    <h1>Storage <span class="hi">Longevity</span><br>Calculator <span class="lo">PI System</span></h1>
+    <p class="subtitle">Masukkan kapasitas disk yang tersedia dan parameter sistem — kalkulator akan menghitung <strong>berapa lama storage tersebut bisa bertahan</strong> sebelum penuh.</p>
+  </div>
+</header>
+
+<main><div class="wrap">
+<div class="page-grid">
+
+  <!-- ── LEFT: INPUT FORM ── -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="ph-icon">💾</div>
+        <div class="ph-title">Storage Yang Tersedia</div>
+        <div class="ph-sub">Kapasitas disk yang dialokasikan untuk PI Archive</div>
+      </div>
+      <div class="panel-body">
+        <div class="fsec">
+          <div class="fsec-title">📦 Disk Capacity</div>
+
+          <div class="frow">
+            <div class="field">
+              <label>Total Disk Size</label>
+              <input type="number" id="totalDisk" value="2000" min="1" step="1">
+            </div>
+            <div class="field">
+              <label>Unit</label>
+              <select id="diskUnit">
+                <option value="GB" selected>GB</option>
+                <option value="TB">TB</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="frow">
+            <div class="field">
+              <label>Disk Already Used (%)</label>
+              <div class="slider-wrap">
+                <input type="range" id="usedPct_slider" min="0" max="95" value="20" oninput="syncS('usedPct')">
+                <span class="slider-val" id="usedPct_val">20%</span>
+              </div>
+              <span class="hint">Berapa % disk yang sudah terisi (OS, software, existing archive)</span>
+            </div>
+          </div>
+
+          <div class="frow">
+            <div class="field">
+              <label>Reserve / Safety Buffer (%)</label>
+              <div class="slider-wrap">
+                <input type="range" id="reservePct_slider" min="5" max="40" value="20" oninput="syncS('reservePct')">
+                <span class="slider-val" id="reservePct_val">20%</span>
+              </div>
+              <span class="hint">Ruang yang tidak boleh dipakai (OS, temp, rekomendasi: 20%)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fsec">
+          <div class="fsec-title">🗂️ Existing Archive Info</div>
+          <div class="frow">
+            <div class="field">
+              <label>Jumlah Archive File (.arc) Saat Ini</label>
+              <input type="number" id="existingFiles" value="0" min="0">
+              <span class="hint">Isi 0 jika instalasi baru</span>
+            </div>
+            <div class="field">
+              <label>Ukuran Archive File (GB / file)</label>
+              <input type="number" id="archiveFileSize" value="10" min="0.1" step="0.5">
+              <span class="hint">Ukuran satu file .arc</span>
+            </div>
+          </div>
+          <div class="frow">
+            <div class="field">
+              <label>Tanggal Mulai Operasi PI</label>
+              <input type="date" id="startDate" value="">
+              <span class="hint">Biarkan kosong jika baru mulai hari ini</span>
+            </div>
+            <div class="field">
+              <label>Data Sudah Tersimpan (bulan)</label>
+              <input type="number" id="existingMonths" value="0" min="0">
+              <span class="hint">Berapa bulan data sudah ada di archive</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="ph-icon">🏷️</div>
+        <div class="ph-title">Parameter Tag & Data Rate</div>
+        <div class="ph-sub">Seberapa cepat data masuk ke PI Archive</div>
+      </div>
+      <div class="panel-body">
+        <div class="fsec">
+          <div class="fsec-title">📡 Data Ingestion</div>
+          <div class="frow">
+            <div class="field">
+              <label>Jumlah PI Tags Aktif</label>
+              <input type="number" id="tagCount" value="5000" min="1" step="100">
+            </div>
+            <div class="field">
+              <label>Data Rate (ev/tag/hari)</label>
+              <input type="number" id="dataRate" value="60" min="1" max="86400">
+              <span class="hint">Setelah exception filter (~48 stabil, ~86 dinamis)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fsec">
+          <div class="fsec-title">🗜️ Kompresi</div>
+          <div class="frow full">
+            <div class="field">
+              <label>PI Compression Ratio (X:1)</label>
+              <div class="slider-wrap">
+                <input type="range" id="compRatio_slider" min="1" max="20" step="0.5" value="5" oninput="syncS('compRatio')">
+                <span class="slider-val" id="compRatio_val">5:1</span>
+              </div>
+            </div>
+          </div>
+          <div class="frow full">
+            <div class="field">
+              <label>Exception Reduction (%)</label>
+              <div class="slider-wrap">
+                <input type="range" id="excReduction_slider" min="0" max="95" value="25" oninput="syncS('excReduction')">
+                <span class="slider-val" id="excReduction_val">25%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fsec">
+          <div class="fsec-title">⚠️ Warning Thresholds</div>
+          <div class="frow">
+            <div class="field">
+              <label>Warning Threshold (%)</label>
+              <input type="number" id="warnThreshold" value="75" min="50" max="95">
+              <span class="hint">% kapasitas — tampilkan peringatan</span>
+            </div>
+            <div class="field">
+              <label>Critical Threshold (%)</label>
+              <input type="number" id="critThreshold" value="90" min="60" max="99">
+              <span class="hint">% kapasitas — tindakan segera diperlukan</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="calc-btn" onclick="calculate()">⚡ Hitung Umur Storage</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT: RESULTS ── -->
+  <div id="result-area">
+    <div class="empty fade-in">
+      <div class="ei">⏳</div>
+      <p>Isi parameter di sebelah kiri<br>lalu klik <strong>Hitung Umur Storage</strong></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- EXPORT -->
+<div id="export-area" style="padding-bottom:32px;">
+  <div class="export-card">
+    <div class="export-head">
+      <h3>📄 Export Summary</h3>
+    </div>
+    <div class="export-body">
+      <div class="export-preview" id="exportPreview">-- Belum ada hasil. Klik "Hitung Umur Storage" terlebih dahulu. --</div>
+      <div class="export-btns">
+        <button class="ebtn copy" onclick="copyExport()">📋 Copy</button>
+        <button class="ebtn csv"  onclick="downloadCSV()">⬇️ CSV</button>
+        <button class="ebtn print" onclick="window.print()">🖨️ Print / PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></main>
+
+<footer>
+  PI System Storage Longevity Calculator &nbsp;·&nbsp; AVEVA OSIsoft &nbsp;·&nbsp; PT. Cistech Alpha Indonesia
+</footer>
+
+<script>
+// ── SLIDER SYNC ──────────────────────────────────────────────────
+function syncS(key) {
+  const sl  = document.getElementById(`${key}_slider`);
+  const val = parseFloat(sl.value);
+  const el  = document.getElementById(`${key}_val`);
+  if (key === 'compRatio')    el.textContent = val + ':1';
+  else if (key === 'usedPct' || key === 'reservePct' || key === 'excReduction')
+    el.textContent = val + '%';
+  else el.textContent = val;
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function fmtBytes(b) {
+  if (b >= 1e12) return (b/1e12).toFixed(2) + ' TB';
+  if (b >= 1e9)  return (b/1e9).toFixed(2)  + ' GB';
+  if (b >= 1e6)  return (b/1e6).toFixed(2)  + ' MB';
+  return (b/1e3).toFixed(1) + ' KB';
+}
+function fmtNum(n) { return Number(n).toLocaleString('id-ID'); }
+function addDays(date, days) {
+  const d = new Date(date); d.setDate(d.getDate() + Math.round(days));
+  return d;
+}
+function fmtDate(d) {
+  return d.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+}
+function durationStr(days) {
+  if (days <= 0) return '0 hari';
+  const y = Math.floor(days / 365);
+  const m = Math.floor((days % 365) / 30);
+  const d = Math.floor(days % 30);
+  let s = '';
+  if (y > 0) s += y + ' tahun ';
+  if (m > 0) s += m + ' bulan ';
+  if (d > 0 && y === 0) s += d + ' hari';
+  return s.trim();
+}
+
+// ── MAIN CALCULATE ────────────────────────────────────────────────
+function calculate() {
+  // Read inputs
+  const totalDisk      = parseFloat(document.getElementById('totalDisk').value) || 2000;
+  const diskUnit       = document.getElementById('diskUnit').value;
+  const usedPct        = parseFloat(document.getElementById('usedPct_slider').value) / 100;
+  const reservePct     = parseFloat(document.getElementById('reservePct_slider').value) / 100;
+  const existingFiles  = parseFloat(document.getElementById('existingFiles').value) || 0;
+  const archiveFileGB  = parseFloat(document.getElementById('archiveFileSize').value) || 10;
+  const existingMonths = parseFloat(document.getElementById('existingMonths').value) || 0;
+  const tagCount       = parseFloat(document.getElementById('tagCount').value) || 5000;
+  const dataRate       = parseFloat(document.getElementById('dataRate').value) || 60;
+  const compRatio      = parseFloat(document.getElementById('compRatio_slider').value) || 5;
+  const excReduction   = parseFloat(document.getElementById('excReduction_slider').value) / 100;
+  const warnThreshold  = parseFloat(document.getElementById('warnThreshold').value) / 100;
+  const critThreshold  = parseFloat(document.getElementById('critThreshold').value) / 100;
+
+  const startDateVal   = document.getElementById('startDate').value;
+  const today = new Date();
+  const startDate = startDateVal ? new Date(startDateVal) : today;
+
+  // Convert disk to bytes
+  const totalDiskBytes = diskUnit === 'TB'
+    ? totalDisk * 1e12
+    : totalDisk * 1e9;
+
+  // Available for PI Archive
+  const usedBytes      = totalDiskBytes * usedPct;
+  const reserveBytes   = totalDiskBytes * reservePct;
+  const existingArchiveBytes = existingFiles * archiveFileGB * 1e9;
+  const availableBytes = totalDiskBytes - usedBytes - reserveBytes - existingArchiveBytes;
+
+  // Daily write rate (bytes/day)
+  const bytesPerEvent  = 16;
+  const dailyRaw       = tagCount * dataRate * bytesPerEvent;
+  const afterException = dailyRaw * (1 - excReduction);
+  const afterComp      = afterException / compRatio;
+  const dailyWrite     = afterComp * 1.20; // +20% overhead
+
+  // Days until full, warn, critical
+  const daysTotal    = availableBytes / dailyWrite;
+  const daysWarn     = (availableBytes * warnThreshold) / dailyWrite;
+  const daysCritical = (availableBytes * critThreshold) / dailyWrite;
+
+  // Date projections
+  const dateWarn     = addDays(today, daysWarn);
+  const dateCritical = addDays(today, daysCritical);
+  const dateFull     = addDays(today, daysTotal);
+
+  // Archive files that will be created
+  const archiveBytesPerFile = archiveFileGB * 1e9;
+  const totalArchiveFiles   = Math.ceil(availableBytes / archiveBytesPerFile);
+  const daysPerFile         = archiveBytesPerFile / dailyWrite;
+
+  // Fill pct from existing
+  const existingFillPct = existingArchiveBytes / totalDiskBytes * 100;
+  const usedFillPct     = usedPct * 100;
+  const reserveFillPct  = reservePct * 100;
+
+  // Status
+  let status = 'ok', statusIcon = '✅', statusMsg = '';
+  if (daysTotal < 90)       { status = 'critical'; statusIcon = '🚨'; }
+  else if (daysTotal < 365) { status = 'danger';   statusIcon = '⚠️'; }
+  else if (daysTotal < 730) { status = 'warn';     statusIcon = '⚡'; }
+  else                      { status = 'ok';       statusIcon = '✅'; }
+
+  if (status === 'ok')       statusMsg = 'Storage sangat mencukupi. Tidak perlu tindakan dalam waktu dekat.';
+  else if (status === 'warn') statusMsg = 'Storage masih aman, namun perlu perencanaan upgrade dalam 1–2 tahun ke depan.';
+  else if (status === 'danger') statusMsg = 'Storage akan habis dalam kurang dari 1 tahun. Segera rencanakan penambahan disk.';
+  else statusMsg = 'KRITIS — Storage akan habis dalam < 3 bulan. Tindakan segera diperlukan!';
+
+  // Recommendations
+  const recos = buildRecos(daysTotal, dailyWrite, availableBytes, totalDiskBytes, status, archiveFileGB, daysPerFile);
+
+  // Render
+  renderResult({ daysTotal, daysWarn, daysCritical, status, statusIcon, statusMsg,
+    dateFull, dateWarn, dateCritical,
+    totalDiskBytes, availableBytes, usedBytes, reserveBytes, existingArchiveBytes,
+    dailyWrite, tagCount, dataRate, compRatio, excReduction,
+    archiveFileGB, totalArchiveFiles, daysPerFile,
+    existingFillPct, usedFillPct, reserveFillPct,
+    warnThreshold, critThreshold, recos,
+    existingMonths, startDate
+  });
+
+  buildExport({ daysTotal, dateFull, dateWarn, dateCritical, daysWarn, daysCritical,
+    totalDiskBytes, availableBytes, dailyWrite, tagCount, dataRate,
+    compRatio, excReduction, archiveFileGB, totalArchiveFiles, daysPerFile, status
+  });
+
+  document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── BUILD RECOMMENDATIONS ────────────────────────────────────────
+function buildRecos(days, dailyWrite, avail, total, status, fileSize, daysPerFile) {
+  const r = [];
+  if (days < 90) {
+    r.push({ icon:'🚨', text:'<strong>Tindakan Segera:</strong> Tambahkan disk storage sebelum PI Archive penuh. Pertimbangkan cleanup archive lama atau kompresi ulang data historis.' });
+  }
+  if (days < 365) {
+    r.push({ icon:'📋', text:'<strong>Rencanakan Upgrade:</strong> Ajukan request pengadaan disk tambahan. Lead time procurement biasanya 1–3 bulan — jangan menunggu sampai kritis.' });
+  }
+  if (daysPerFile < 14) {
+    r.push({ icon:'🗂️', text:`<strong>Archive File Terlalu Kecil:</strong> Dengan ukuran ${fileSize} GB/file, archive shift terjadi setiap ${Math.round(daysPerFile)} hari — terlalu sering. Pertimbangkan perbesar ukuran file ke ${Math.round(fileSize * 3)} GB.` });
+  }
+  if (days >= 730) {
+    r.push({ icon:'✅', text:'<strong>Storage Aman:</strong> Kapasitas lebih dari cukup untuk 2+ tahun. Lakukan review tahunan untuk memastikan proyeksi masih akurat.' });
+  }
+  r.push({ icon:'💡', text:'<strong>Optimasi Kompresi:</strong> Pastikan <code>compdev</code> dan <code>excdev</code> dikonfigurasi dengan tepat. Kenaikan compression ratio dari 5:1 ke 8:1 bisa perpanjang umur storage ~60%.' });
+  r.push({ icon:'📊', text:'<strong>Monitor Rutin:</strong> Setup PI System Health Monitoring atau script PowerShell untuk alert otomatis saat disk mencapai warning threshold.' });
+  return r;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────
+function renderResult(d) {
+  const pctUsed     = Math.min((d.usedBytes / d.totalDiskBytes * 100), 100).toFixed(1);
+  const pctReserve  = Math.min((d.reserveBytes / d.totalDiskBytes * 100), 100).toFixed(1);
+  const pctExisting = Math.min((d.existingArchiveBytes / d.totalDiskBytes * 100), 100).toFixed(1);
+  const pctAvail    = Math.max(0, 100 - parseFloat(pctUsed) - parseFloat(pctReserve) - parseFloat(pctExisting)).toFixed(1);
+
+  // Color helpers
+  const sc = d.status;
+  const mv = sc === 'ok' ? 'green' : sc === 'warn' ? 'orange' : 'red';
+
+  let html = `<div class="result-wrap fade-in">`;
+
+  // ── BIG STATUS ──
+  html += `
+  <div class="status-card ${sc} count-up">
+    <div class="status-deadline">
+      <div class="sd-label">Perkiraan Penuh</div>
+      <div class="sd-date">${fmtDate(d.dateFull)}</div>
+    </div>
+    <div class="status-icon">${d.statusIcon}</div>
+    <div class="status-label">Estimasi Umur Storage</div>
+    <div class="status-duration">${durationStr(Math.floor(d.daysTotal))}</div>
+    <div class="status-desc">${d.statusMsg}</div>
+  </div>`;
+
+  // ── METRICS ──
+  html += `<div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-val ${mv}">${Math.floor(d.daysTotal).toLocaleString('id-ID')}</div>
+      <div class="metric-label">Hari Tersisa</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val blue">${fmtBytes(d.availableBytes)}</div>
+      <div class="metric-label">Tersedia untuk PI</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val orange">${fmtBytes(d.dailyWrite)}</div>
+      <div class="metric-label">Write Rate / Hari</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val purple">${fmtNum(d.totalArchiveFiles)}</div>
+      <div class="metric-label">Total Archive Files</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val green">${Math.round(d.daysPerFile)}</div>
+      <div class="metric-label">Hari / Archive File</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val ${mv}">${fmtBytes(d.dailyWrite * 365)}</div>
+      <div class="metric-label">Write Rate / Tahun</div>
+    </div>
+  </div>`;
+
+  // ── FILL METER ──
+  html += `
+  <div class="fill-meter">
+    <div class="fill-meter-title">💾 Disk Allocation Breakdown</div>
+    <div class="meter-row">
+      <div class="meter-label-row"><span>OS / Software / Existing Data</span><span>${pctUsed}% (${fmtBytes(d.usedBytes)})</span></div>
+      <div class="meter-bar"><div class="meter-fill warn" style="width:${pctUsed}%;"></div></div>
+    </div>
+    <div class="meter-row">
+      <div class="meter-label-row"><span>Existing PI Archive (${Math.round(d.existingArchiveBytes/1e9)} GB)</span><span>${pctExisting}%</span></div>
+      <div class="meter-bar"><div class="meter-fill ok" style="width:${pctExisting}%;"></div></div>
+    </div>
+    <div class="meter-row">
+      <div class="meter-label-row"><span>Safety Reserve</span><span>${pctReserve}% (${fmtBytes(d.reserveBytes)})</span></div>
+      <div class="meter-bar"><div class="meter-fill danger" style="width:${pctReserve}%;"></div></div>
+    </div>
+    <div class="meter-row" style="margin-bottom:0;">
+      <div class="meter-label-row"><span>✅ Available for New PI Archive</span><span style="color:var(--ok); font-weight:700;">${pctAvail}% (${fmtBytes(d.availableBytes)})</span></div>
+      <div class="meter-bar"><div class="meter-fill ok" style="width:${pctAvail}%;"></div></div>
+    </div>
+  </div>`;
+
+  // ── TIMELINE ──
+  html += `
+  <div class="timeline-card">
+    <div class="timeline-title">📅 Upgrade Timeline</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot now"></div>
+        <div class="tl-date">Hari ini — ${fmtDate(new Date())}</div>
+        <div class="tl-event">Mulai operasi / kondisi saat ini</div>
+        <div class="tl-detail">Available: ${fmtBytes(d.availableBytes)} · Daily write: ${fmtBytes(d.dailyWrite)}/hari</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot warn"></div>
+        <div class="tl-date">${fmtDate(d.dateWarn)} (${Math.floor(d.daysWarn)} hari lagi)</div>
+        <div class="tl-event">⚡ Warning Threshold (${Math.round(d.warnThreshold*100)}% kapasitas)</div>
+        <div class="tl-detail">Mulai perencanaan penambahan storage. Ajukan proposal ke manajemen.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot danger"></div>
+        <div class="tl-date">${fmtDate(d.dateCritical)} (${Math.floor(d.daysCritical)} hari lagi)</div>
+        <div class="tl-event">🚨 Critical Threshold (${Math.round(d.critThreshold*100)}% kapasitas)</div>
+        <div class="tl-detail">Storage harus sudah diperluas. Disk baru harus sudah terpasang.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot danger"></div>
+        <div class="tl-date">${fmtDate(d.dateFull)} (${Math.floor(d.daysTotal)} hari lagi)</div>
+        <div class="tl-event">🛑 Storage Penuh — PI Archive Berhenti</div>
+        <div class="tl-detail">Jika tidak ada penambahan disk, PI akan berhenti menyimpan data baru.</div>
+      </div>
+    </div>
+  </div>`;
+
+  // ── DETAIL BREAKDOWN ──
+  html += `
+  <div class="detail-card">
+    <div class="detail-card-title">📐 Detail Kalkulasi</div>
+    <div class="detail-rows">
+      <div class="dr"><span class="dl">Total Disk Size</span><span class="dv">${fmtBytes(d.totalDiskBytes)}</span></div>
+      <div class="dr"><span class="dl">Used (OS/Software/Existing)</span><span class="dv warn">− ${fmtBytes(d.usedBytes)} (${(d.usedFillPct).toFixed(0)}%)</span></div>
+      <div class="dr"><span class="dl">Safety Reserve</span><span class="dv warn">− ${fmtBytes(d.reserveBytes)} (${(d.reserveFillPct).toFixed(0)}%)</span></div>
+      <div class="dr"><span class="dl">Existing Archive Files</span><span class="dv warn">− ${fmtBytes(d.existingArchiveBytes)}</span></div>
+      <div class="dr"><span class="dl">✅ Available for New Archive</span><span class="dv ok">${fmtBytes(d.availableBytes)}</span></div>
+      <div class="dr"><span class="dl">Daily Raw Write (before compression)</span><span class="dv">${fmtBytes(d.tagCount * d.dataRate * 16)}/hari</span></div>
+      <div class="dr"><span class="dl">Setelah Exception Filter (−${(d.excReduction*100).toFixed(0)}%)</span><span class="dv ok">${fmtBytes(d.tagCount * d.dataRate * 16 * (1-d.excReduction))}/hari</span></div>
+      <div class="dr"><span class="dl">Setelah Compression (÷${d.compRatio}:1)</span><span class="dv ok">${fmtBytes(d.tagCount * d.dataRate * 16 * (1-d.excReduction) / d.compRatio)}/hari</span></div>
+      <div class="dr"><span class="dl">+20% PI Overhead → Effective Daily Write</span><span class="dv warn">${fmtBytes(d.dailyWrite)}/hari</span></div>
+      <div class="dr"><span class="dl">Total Archive Files (${d.archiveFileGB} GB/file)</span><span class="dv">${fmtNum(d.totalArchiveFiles)} files</span></div>
+      <div class="dr"><span class="dl">Coverage per Archive File</span><span class="dv ok">${Math.round(d.daysPerFile)} hari/file</span></div>
+    </div>
+  </div>`;
+
+  // ── RECOMMENDATIONS ──
+  const recoClass = d.status === 'ok' ? 'ok' : d.status === 'warn' ? 'warn' : 'danger';
+  html += `
+  <div class="reco-card ${recoClass}">
+    <div class="reco-title">💡 Rekomendasi & Tindakan</div>
+    <div class="reco-items">
+      ${d.recos.map(r => `
+        <div class="reco-item">
+          <span class="ri-icon">${r.icon}</span>
+          <span class="ri-text">${r.text}</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  html += `</div>`;
+  document.getElementById('result-area').innerHTML = html;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────
+let _exportData = null;
+
+function buildExport(d) {
+  _exportData = d;
+  const ts = new Date().toLocaleString('id-ID');
+  let txt = `PI SYSTEM STORAGE LONGEVITY CALCULATOR — SUMMARY REPORT\n`;
+  txt += `Generated  : ${ts}\n`;
+  txt += `${'='.repeat(72)}\n\n`;
+  txt += `STORAGE CONFIGURATION\n${'─'.repeat(40)}\n`;
+  txt += `  Total Disk              : ${fmtBytes(d.totalDiskBytes)}\n`;
+  txt += `  Available for PI        : ${fmtBytes(d.availableBytes)}\n`;
+  txt += `  Archive File Size       : ${d.archiveFileGB} GB / file\n\n`;
+  txt += `TAG & DATA PARAMETERS\n${'─'.repeat(40)}\n`;
+  txt += `  PI Tag Count            : ${fmtNum(d.tagCount)} tags\n`;
+  txt += `  Data Rate               : ${d.dataRate} ev/tag/day\n`;
+  txt += `  Exception Reduction     : ${(d.excReduction*100).toFixed(0)}%\n`;
+  txt += `  Compression Ratio       : ${d.compRatio}:1\n`;
+  txt += `  Effective Daily Write   : ${fmtBytes(d.dailyWrite)}/day\n\n`;
+  txt += `LONGEVITY RESULTS\n${'─'.repeat(40)}\n`;
+  txt += `  Storage Lasts           : ${durationStr(Math.floor(d.daysTotal))} (${Math.floor(d.daysTotal)} hari)\n`;
+  txt += `  Status                  : ${d.status.toUpperCase()}\n`;
+  txt += `  Warning Date (${(d.warnThreshold || .75)*100}%)      : ${fmtDate(d.dateWarn)} (${Math.floor(d.daysWarn)} hari lagi)\n`;
+  txt += `  Critical Date (${(d.critThreshold || .9)*100}%)     : ${fmtDate(d.dateCritical)} (${Math.floor(d.daysCritical)} hari lagi)\n`;
+  txt += `  Full Date               : ${fmtDate(d.dateFull)}\n\n`;
+  txt += `ARCHIVE FILES\n${'─'.repeat(40)}\n`;
+  txt += `  Total Archive Files     : ${fmtNum(d.totalArchiveFiles)} files\n`;
+  txt += `  Days per Archive File   : ${Math.round(d.daysPerFile)} days\n`;
+  txt += `  Yearly Write Rate       : ${fmtBytes(d.dailyWrite * 365)}\n\n`;
+  txt += `${'='.repeat(72)}\n`;
+  txt += `Formula: Available / (Tags × Rate × 16B × (1-Exc%) / CompRatio × 1.20)\n`;
+
+  document.getElementById('exportPreview').textContent = txt;
+  window._exportTxt = txt;
+  window._csvData   = buildCSV(d);
+}
+
+function buildCSV(d) {
+  return [
+    'Parameter,Value',
+    `Total Disk,${fmtBytes(d.totalDiskBytes)}`,
+    `Available for PI,${fmtBytes(d.availableBytes)}`,
+    `Tag Count,${d.tagCount}`,
+    `Data Rate (ev/tag/day),${d.dataRate}`,
+    `Exception Reduction %,${(d.excReduction*100).toFixed(0)}`,
+    `Compression Ratio,${d.compRatio}`,
+    `Daily Write Rate,${fmtBytes(d.dailyWrite)}`,
+    `Storage Longevity (days),${Math.floor(d.daysTotal)}`,
+    `Storage Longevity,${durationStr(Math.floor(d.daysTotal))}`,
+    `Status,${d.status.toUpperCase()}`,
+    `Warning Date,${fmtDate(d.dateWarn)}`,
+    `Critical Date,${fmtDate(d.dateCritical)}`,
+    `Full Date,${fmtDate(d.dateFull)}`,
+    `Total Archive Files,${d.totalArchiveFiles}`,
+    `Days per Archive File,${Math.round(d.daysPerFile)}`
+  ].join('\n');
+}
+
+function copyExport() {
+  navigator.clipboard.writeText(window._exportTxt || '').then(() => {
+    const btn = document.querySelector('.ebtn.copy');
+    btn.textContent = '✓ Copied!'; btn.style.background = '#00875a';
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.style.background = ''; }, 2000);
+  });
+}
+
+function downloadCSV() {
+  if (!window._csvData) return;
+  const blob = new Blob([window._csvData], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a'); a.href = url;
+  a.download = `PI_Storage_Longevity_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// Set default date to today
+document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
