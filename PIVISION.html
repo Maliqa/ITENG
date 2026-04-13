@@ -3,1041 +3,1150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>README — PI Vision Trend Display Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<title>PI Vision README — Display, Multi-State & Troubleshooting | Wayang Windu</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0c0f;
-    --surface: #111318;
-    --surface2: #181b22;
-    --border: #1e2530;
-    --border-glow: #00c9ff33;
-    --accent: #00c9ff;
-    --accent2: #00ff9d;
-    --accent3: #ff6b35;
-    --text: #c8d4e0;
-    --text-dim: #5a6a7a;
-    --text-bright: #eaf4ff;
-    --danger: #ff3e3e;
-    --warn: #ffb347;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-weight: 300;
-    line-height: 1.7;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* SCANLINE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,201,255,0.015) 2px,
-      rgba(0,201,255,0.015) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* HEADER */
-  header {
-    position: relative;
-    padding: 60px 0 50px;
-    overflow: hidden;
-    border-bottom: 1px solid var(--border);
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    top: -100px; left: -100px; right: -100px;
-    height: 400px;
-    background: radial-gradient(ellipse at 20% 50%, rgba(0,201,255,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 30%, rgba(0,255,157,0.05) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  .header-grid {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 40px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 32px;
-    align-items: center;
-  }
-
-  .logo-block {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .logo-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, rgba(0,201,255,0.15), rgba(0,201,255,0.05));
-    border: 1px solid rgba(0,201,255,0.3);
-    border-radius: 4px;
-    padding: 6px 14px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    width: fit-content;
-    animation: pulseGlow 3s ease-in-out infinite;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 8px rgba(0,201,255,0.2); }
-    50% { box-shadow: 0 0 20px rgba(0,201,255,0.4); }
-  }
-
-  .logo-badge::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent2);
-    box-shadow: 0 0 8px var(--accent2);
-    animation: blink 1.5s ease-in-out infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  h1 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: clamp(2.2rem, 5vw, 3.5rem);
-    line-height: 1;
-    color: var(--text-bright);
-    letter-spacing: -1px;
-    margin-top: 12px;
-  }
-
-  h1 span { color: var(--accent); }
-
-  .subtitle {
-    font-size: 14px;
-    color: var(--text-dim);
-    font-family: 'Share Tech Mono', monospace;
-    letter-spacing: 1px;
-    margin-top: 8px;
-  }
-
-  .header-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-end;
-  }
-
-  .meta-chip {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 1.5px;
-    padding: 4px 10px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-  }
-
-  /* FLOW DIAGRAM */
-  .flow-section {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 48px 40px 0;
-  }
-
-  .flow-diagram {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px 32px;
-    overflow-x: auto;
-    position: relative;
-  }
-
-  .flow-diagram::before {
-    content: 'DATA FLOW';
-    position: absolute;
-    top: -10px; left: 20px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: var(--text-dim);
-    background: var(--surface);
-    padding: 0 8px;
-    letter-spacing: 2px;
-  }
-
-  .flow-node {
-    flex-shrink: 0;
-    text-align: center;
-    padding: 12px 20px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    min-width: 130px;
-  }
-
-  .flow-node.highlight {
-    border-color: var(--accent);
-    background: rgba(0,201,255,0.06);
-    box-shadow: 0 0 16px rgba(0,201,255,0.1);
-  }
-
-  .flow-node-icon {
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-
-  .flow-node-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: var(--text-bright);
-    text-transform: uppercase;
-  }
-
-  .flow-node-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: var(--text-dim);
-    margin-top: 2px;
-  }
-
-  .flow-arrow {
-    flex-shrink: 0;
-    width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent);
-    font-size: 18px;
-    position: relative;
-  }
-
-  .flow-arrow::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 4px; right: 4px;
-    height: 1px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    opacity: 0.4;
-  }
-
-  /* MAIN CONTENT */
-  .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 48px 40px;
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 40px;
-    align-items: start;
-  }
-
-  /* SIDEBAR */
-  .sidebar {
-    position: sticky;
-    top: 24px;
-  }
-
-  .sidebar-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .toc-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(30,37,48,0.5);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    color: var(--text-dim);
-  }
-
-  .toc-item:hover {
-    color: var(--accent);
-    padding-left: 4px;
-  }
-
-  .toc-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
-    width: 20px;
-    flex-shrink: 0;
-  }
-
-  .toc-label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  /* MODULES */
-  .content { min-width: 0; }
-
-  .module {
-    margin-bottom: 40px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: border-color 0.3s;
-    animation: fadeIn 0.5s ease both;
-  }
-
-  .module:hover { border-color: rgba(0,201,255,0.2); }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .module:nth-child(1) { animation-delay: 0.05s; }
-  .module:nth-child(2) { animation-delay: 0.1s; }
-  .module:nth-child(3) { animation-delay: 0.15s; }
-  .module:nth-child(4) { animation-delay: 0.2s; }
-  .module:nth-child(5) { animation-delay: 0.25s; }
-  .module:nth-child(6) { animation-delay: 0.3s; }
-  .module:nth-child(7) { animation-delay: 0.35s; }
-  .module:nth-child(8) { animation-delay: 0.4s; }
-
-  .module-header {
-    padding: 16px 24px;
-    background: var(--surface);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .module-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    background: rgba(0,201,255,0.08);
-    border: 1px solid rgba(0,201,255,0.2);
-    padding: 3px 8px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-
-  .module-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: 1px;
-    color: var(--text-bright);
-    text-transform: uppercase;
-    flex: 1;
-  }
-
-  .module-badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    padding: 2px 8px;
-    border-radius: 2px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-
-  .badge-prereq { background: rgba(255,107,53,0.15); color: var(--accent3); border: 1px solid rgba(255,107,53,0.3); }
-  .badge-core { background: rgba(0,201,255,0.1); color: var(--accent); border: 1px solid rgba(0,201,255,0.25); }
-  .badge-bonus { background: rgba(0,255,157,0.08); color: var(--accent2); border: 1px solid rgba(0,255,157,0.2); }
-
-  .module-body {
-    padding: 20px 24px;
-    background: var(--bg);
-  }
-
-  .module-goal {
-    font-size: 12px;
-    color: var(--text-dim);
-    font-family: 'Share Tech Mono', monospace;
-    letter-spacing: 0.5px;
-    margin-bottom: 16px;
-    padding: 8px 12px;
-    background: var(--surface);
-    border-left: 2px solid var(--accent);
-    border-radius: 0 4px 4px 0;
-  }
-
-  .steps {
-    list-style: none;
-    counter-reset: steps;
-  }
-
-  .steps li {
-    counter-increment: steps;
-    display: flex;
-    gap: 14px;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: var(--text);
-    line-height: 1.6;
-  }
-
-  .steps li::before {
-    content: counter(steps, decimal-leading-zero);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    background: rgba(0,201,255,0.08);
-    border: 1px solid rgba(0,201,255,0.2);
-    min-width: 30px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 3px;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .steps li strong {
-    color: var(--text-bright);
-    font-weight: 600;
-  }
-
-  .steps li em {
-    color: var(--accent);
-    font-style: normal;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    background: rgba(0,201,255,0.06);
-    padding: 1px 5px;
-    border-radius: 3px;
-  }
-
-  /* TABLE */
-  .config-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    font-size: 13px;
-  }
-
-  .config-table th {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-align: left;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .config-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(30,37,48,0.7);
-    vertical-align: top;
-  }
-
-  .config-table tr:last-child td { border-bottom: none; }
-
-  .config-table tr:hover td { background: rgba(0,201,255,0.03); }
-
-  .config-table td:first-child {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    color: var(--accent2);
-    white-space: nowrap;
-  }
-
-  .config-table td:last-child {
-    color: var(--text-dim);
-    font-size: 12px;
-  }
-
-  /* CHECKPOINT BOX */
-  .checkpoint {
-    margin-top: 16px;
-    padding: 12px 16px;
-    border: 1px solid rgba(0,255,157,0.2);
-    background: rgba(0,255,157,0.04);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--accent2);
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  .checkpoint-icon { font-size: 16px; flex-shrink: 0; }
-
-  .warning-box {
-    margin-top: 16px;
-    padding: 12px 16px;
-    border: 1px solid rgba(255,179,71,0.2);
-    background: rgba(255,179,71,0.04);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--warn);
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  /* CHECKLIST */
-  .checklist-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 40px;
-  }
-
-  .checklist-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 20px;
-    color: var(--text-bright);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .checklist-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-    opacity: 0.3;
-  }
-
-  .check-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(30,37,48,0.6);
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .check-item:last-child { border-bottom: none; }
-  .check-item:hover { padding-left: 4px; }
-
-  .check-box {
-    width: 18px; height: 18px;
-    border: 1.5px solid var(--border);
-    border-radius: 3px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .check-box:hover { border-color: var(--accent2); }
-  .check-box.checked { background: var(--accent2); border-color: var(--accent2); }
-  .check-box.checked::after { content: '✓'; font-size: 11px; color: #000; font-weight: 900; }
-
-  .check-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    width: 24px;
-    flex-shrink: 0;
-  }
-
-  .check-text { flex: 1; color: var(--text); }
-  .check-text.done { color: var(--text-dim); text-decoration: line-through; }
-
-  /* COMMON ERRORS */
-  .errors-section {
-    background: var(--surface);
-    border: 1px solid rgba(255,62,62,0.15);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 40px;
-  }
-
-  .error-item {
-    display: flex;
-    gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(30,37,48,0.6);
-    align-items: flex-start;
-    font-size: 13px;
-  }
-
-  .error-item:last-child { border-bottom: none; }
-
-  .error-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: var(--danger);
-    background: rgba(255,62,62,0.08);
-    border: 1px solid rgba(255,62,62,0.2);
-    padding: 2px 8px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    white-space: nowrap;
-    margin-top: 1px;
-  }
-
-  .error-cause { color: var(--text); }
-  .error-cause strong { color: var(--warn); }
-
-  /* FOOTER */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 32px 40px;
-    max-width: 960px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-  }
-
-  .footer-brand { color: var(--accent); }
-
-  @media (max-width: 700px) {
-    .container { grid-template-columns: 1fr; }
-    .sidebar { position: static; }
-    .header-grid { grid-template-columns: 1fr; }
-    .header-meta { align-items: flex-start; }
-    .flow-diagram { gap: 8px; }
-    footer { flex-direction: column; gap: 8px; }
-  }
+:root {
+  --bg:        #ffffff;
+  --surface:   #f5f7fa;
+  --card:      #ffffff;
+  --border:    #e2e8f0;
+  --border2:   #cbd5e1;
+  --accent:    #0066cc;
+  --accent2:   #00875a;
+  --accent3:   #e05c00;
+  --accent4:   #7c3aed;
+  --text:      #1a2332;
+  --muted:     #64748b;
+  --code-bg:   #f0f4f8;
+  --code-text: #334155;
+  --tag-da:    #e8f4fd;
+  --tag-af:    #e8f7f0;
+  --tag-pi:    #fef3ec;
+  --tag-pu:    #f3f0ff;
+  --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.06);
+  /* Risk colors */
+  --normal:  #00875a;
+  --alert:   #d97706;
+  --danger:  #dc2626;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.8; overflow-x: hidden; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 28px; }
+
+/* NAV */
+.sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 10px 0; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+.nav-inner { display: flex; gap: 2px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: 0 28px; align-items: center; }
+.nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); margin-right: 10px; letter-spacing: .04em; }
+.nav-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 5px 9px; border-radius: 4px; color: var(--muted); text-decoration: none; transition: all .2s; white-space: nowrap; }
+.nav-link:hover, .nav-link.active { color: var(--accent); background: var(--tag-da); font-weight: 600; }
+
+/* HEADER */
+header { padding: 64px 0 48px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 50%, #f5fdf9 100%); position: relative; overflow: hidden; }
+header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 80% 20%, rgba(0,102,204,.07) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(0,135,90,.05) 0%, transparent 50%); pointer-events: none; }
+header .wrap { position: relative; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; animation: fadeUp .5s ease both; }
+.badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.badge.da  { background: var(--tag-da); color: var(--accent);  border: 1px solid rgba(0,102,204,.2); }
+.badge.af  { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.2); }
+.badge.gen { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.2); }
+.badge.pu  { background: var(--tag-pu); color: var(--accent4); border: 1px solid rgba(124,58,237,.2); }
+h1 { font-family: 'Syne', sans-serif; font-size: clamp(28px,5vw,46px); font-weight: 800; line-height: 1.1; margin-bottom: 16px; color: var(--text); animation: fadeUp .5s .08s ease both; }
+h1 .hi { color: var(--accent); } h1 .lo { color: var(--accent2); }
+.subtitle { color: var(--muted); font-size: 15px; max-width: 580px; animation: fadeUp .5s .16s ease both; line-height: 1.6; }
+
+/* TOC */
+.toc { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 24px 28px; margin: 36px 0; animation: fadeUp .5s .22s ease both; box-shadow: var(--shadow); }
+.toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.toc > ol { padding-left: 0; list-style: none; counter-reset: toc; }
+.toc > ol > li { counter-increment: toc; margin: 6px 0; }
+.toc > ol > li::before { content: counter(toc, decimal-leading-zero) "."; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-right: 10px; }
+.toc a { color: var(--text); text-decoration: none; font-size: 14px; }
+.toc a:hover { color: var(--accent); text-decoration: underline; }
+.toc .sub { margin: 4px 0 4px 28px; list-style: none; padding: 0; }
+.toc .sub li { margin: 3px 0; font-size: 13px; color: var(--muted); }
+.toc .sub li::before { content: "└ "; color: var(--border2); }
+
+/* SECTIONS */
+section { padding: 56px 0; border-bottom: 1px solid var(--border); background: var(--bg); }
+section:nth-child(even) { background: var(--surface); }
+section:last-of-type { border-bottom: none; }
+.section-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+h2 { font-family: 'Syne', sans-serif; font-size: clamp(22px,3vw,30px); font-weight: 700; margin-bottom: 16px; line-height: 1.2; color: var(--text); }
+h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; margin: 38px 0 12px; color: var(--accent2); }
+h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin: 26px 0 10px; color: var(--text); }
+p { margin-bottom: 14px; color: var(--text); }
+strong { color: var(--text); font-weight: 600; }
+
+/* CARDS */
+.card-grid { display: grid; gap: 14px; margin: 20px 0; }
+.card-grid.two   { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card-grid.three { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; box-shadow: var(--shadow); transition: box-shadow .2s, transform .2s, border-color .2s; }
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--accent); }
+.card-icon { font-size: 26px; margin-bottom: 10px; }
+.card h4 { margin: 0 0 6px; color: var(--accent); font-size: 14px; }
+.card p  { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* STEP CARDS */
+.step-card { display: flex; gap: 18px; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin: 10px 0; box-shadow: var(--shadow); transition: box-shadow .2s, border-color .2s; }
+.step-card:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
+.step-num { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.step-body { flex: 1; }
+.step-body h4 { margin: 0 0 6px; font-size: 15px; }
+.step-body p  { font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
+.step-body p:last-child { margin: 0; }
+
+/* CODE */
+pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent3); border-radius: 8px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7; color: var(--code-text); }
+code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--tag-da); color: var(--accent); padding: 2px 6px; border-radius: 4px; }
+pre code { background: transparent; padding: 0; color: inherit; font-size: inherit; }
+.cm  { color: #94a3b8; } .kw { color: #d97706; } .str { color: #059669; } .fn { color: #2563eb; } .num { color: #7c3aed; }
+
+/* TABLES */
+.table-wrap { overflow-x: auto; margin: 18px 0; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { background: var(--surface); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--accent); }
+td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
+
+/* CALLOUTS */
+.callout { border-radius: 8px; padding: 14px 18px; margin: 18px 0; font-size: 14px; display: flex; gap: 12px; align-items: flex-start; }
+.callout.info { background: var(--tag-da); border-left: 4px solid var(--accent); }
+.callout.tip  { background: var(--tag-af); border-left: 4px solid var(--accent2); }
+.callout.warn { background: var(--tag-pi); border-left: 4px solid var(--accent3); }
+.callout.pu   { background: var(--tag-pu); border-left: 4px solid var(--accent4); }
+.ci { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.ct { flex: 1; color: var(--text); line-height: 1.7; }
+.ct strong { font-weight: 700; display: block; margin-bottom: 3px; }
+
+/* NUMBERED STEPS */
+ol.steps { padding-left: 0; list-style: none; counter-reset: steps; }
+ol.steps li { counter-increment: steps; padding: 11px 12px 11px 48px; position: relative; margin: 6px 0; background: var(--card); border-radius: 8px; border: 1px solid var(--border); font-size: 14px; box-shadow: var(--shadow); }
+ol.steps li::before { content: counter(steps); position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #fff; background: var(--accent); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 24px; }
+
+/* LIST */
+ul.list { padding-left: 0; list-style: none; }
+ul.list li { padding: 5px 0 5px 22px; position: relative; font-size: 14px; }
+ul.list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent3); }
+
+/* ARCH BOX */
+.arch-box { border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; margin: 18px 0; background: #f8fafc; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; white-space: pre; overflow-x: auto; color: #475569; box-shadow: var(--shadow); line-height: 1.8; }
+.arch-box .hl  { color: var(--accent); font-weight: 700; }
+.arch-box .hl2 { color: var(--accent2); font-weight: 700; }
+.arch-box .hl3 { color: var(--accent3); font-weight: 700; }
+.arch-box .hl4 { color: var(--accent4); font-weight: 700; }
+
+/* FLOW */
+.flow { display: flex; flex-wrap: wrap; gap: 0; align-items: center; justify-content: center; margin: 24px 0; padding: 22px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); }
+.flow-node { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 12px; font-family: 'JetBrains Mono', monospace; text-align: center; min-width: 104px; box-shadow: var(--shadow); transition: box-shadow .2s, border-color .2s; }
+.flow-node:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
+.flow-node .fn-label { color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px; }
+.flow-node .fn-name  { color: var(--accent); font-weight: 700; font-size: 13px; }
+.flow-arrow { color: var(--border2); font-size: 22px; padding: 0 6px; }
+.flow-node.af  .fn-name { color: var(--accent2); }
+.flow-node.src .fn-name { color: var(--accent3); }
+
+/* ── RISK LEVEL DEMO ── */
+.risk-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 20px 0; }
+.risk-card { border-radius: 12px; padding: 20px; text-align: center; box-shadow: var(--shadow-md); transition: transform .2s; cursor: default; }
+.risk-card:hover { transform: translateY(-3px); }
+.risk-card.normal  { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #6ee7b7; }
+.risk-card.alert   { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #fcd34d; }
+.risk-card.danger  { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border: 2px solid #fca5a5; }
+.risk-card .rc-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+.risk-card.normal .rc-val  { color: var(--normal); }
+.risk-card.alert  .rc-val  { color: var(--alert); }
+.risk-card.danger .rc-val  { color: var(--danger); }
+.risk-card .rc-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.risk-card.normal .rc-label { color: var(--normal); }
+.risk-card.alert  .rc-label { color: var(--alert); }
+.risk-card.danger .rc-label { color: var(--danger); }
+.risk-card .rc-range { font-size: 12px; margin-top: 6px; color: var(--muted); }
+.risk-card .rc-action { font-size: 12px; margin-top: 4px; font-style: italic; }
+
+/* ── SYMBOL SHOWCASE ── */
+.symbol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 18px 0; }
+.symbol-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 14px; text-align: center; box-shadow: var(--shadow); }
+.symbol-icon { font-size: 30px; margin-bottom: 8px; }
+.symbol-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.symbol-desc { font-size: 11.5px; color: var(--muted); }
+
+/* ── MULTISTATE TABLE ── */
+.ms-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.ms-table th { background: #1a2332; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 10px 14px; text-align: left; }
+.ms-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.ms-table tr:last-child td { border-bottom: none; }
+.state-normal { background: #ecfdf5; color: #065f46; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 3px 10px; border-radius: 12px; display: inline-block; }
+.state-alert  { background: #fffbeb; color: #92400e; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 3px 10px; border-radius: 12px; display: inline-block; }
+.state-danger { background: #fff1f2; color: #991b1b; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 3px 10px; border-radius: 12px; display: inline-block; }
+
+/* ── TROUBLESHOOT ── */
+.ts-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.ts-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: linear-gradient(90deg, #fff8f5, var(--card)); border-bottom: 1px solid var(--border); }
+.ts-icon { font-size: 20px; flex-shrink: 0; }
+.ts-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.ts-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: .06em; background: var(--tag-pi); color: var(--accent3); }
+.ts-body { padding: 16px 20px; }
+.ts-section { margin-bottom: 14px; }
+.ts-section:last-child { margin-bottom: 0; }
+.ts-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+.ts-label.cause { color: var(--accent3); }
+.ts-label.sol   { color: var(--accent2); }
+
+/* ── DISPLAY PREVIEW MOCKUP ── */
+.display-mockup { background: #1a2332; border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: var(--shadow-md); overflow: hidden; }
+.mockup-titlebar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.mockup-dots { display: flex; gap: 6px; }
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mockup-dot.r { background: #ff5f57; }
+.mockup-dot.y { background: #ffbd2e; }
+.mockup-dot.g { background: #28ca41; }
+.mockup-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,.5); margin-left: 8px; }
+.mockup-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.mockup-widget { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px; }
+.mw-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.mw-val   { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; line-height: 1; }
+.mw-unit  { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,.5); margin-top: 3px; }
+.mw-val.ok     { color: #34d399; }
+.mw-val.warn   { color: #fbbf24; }
+.mw-val.danger { color: #f87171; }
+.mockup-trend { grid-column: 1 / -1; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 12px; }
+.trend-line { width: 100%; height: 60px; overflow: visible; }
+
+/* HIGHLIGHT BOX */
+.highlight-box { border-radius: 12px; padding: 22px 26px; margin: 20px 0; }
+.highlight-box.blue   { background: linear-gradient(135deg, #e8f4fd, #dbeeff); border: 1px solid rgba(0,102,204,.15); }
+.highlight-box.green  { background: linear-gradient(135deg, #e8f7f0, #d1f5e5); border: 1px solid rgba(0,135,90,.15); }
+.highlight-box.orange { background: linear-gradient(135deg, #fef3ec, #fde8d8); border: 1px solid rgba(224,92,0,.15); }
+.highlight-box h4 { margin: 0 0 10px; font-size: 15px; }
+.highlight-box.blue h4   { color: var(--accent); }
+.highlight-box.green h4  { color: var(--accent2); }
+.highlight-box.orange h4 { color: var(--accent3); }
+.highlight-box p { font-size: 14px; color: #2d3748; margin: 0; }
+
+/* DIVIDER */
+.divider { display: flex; align-items: center; gap: 12px; margin: 30px 0; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* FOOTER */
+footer { padding: 36px 0; text-align: center; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; background: var(--card); border-top: 1px solid var(--border); }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+@media (max-width: 600px) { .nav-logo { display: none; } .mockup-body { grid-template-columns: 1fr 1fr; } }
+@media print { .sticky-nav { display: none !important; } body { background: #fff; } }
 </style>
 </head>
 <body>
 
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <span class="nav-logo">PI VISION</span>
+    <a href="#overview"    class="nav-link">Overview</a>
+    <a href="#interface"   class="nav-link">Interface</a>
+    <a href="#display"     class="nav-link">Buat Display</a>
+    <a href="#symbols"     class="nav-link">Symbols</a>
+    <a href="#multistate"  class="nav-link">Multi-State</a>
+    <a href="#risklevel"   class="nav-link">Risk Level</a>
+    <a href="#dashboard"   class="nav-link">Dashboard</a>
+    <a href="#permission"  class="nav-link">Permission</a>
+    <a href="#embed"       class="nav-link">Embed</a>
+    <a href="#troubleshoot" class="nav-link">Troubleshoot</a>
+  </div>
+</nav>
+
 <header>
-  <div class="header-grid">
-    <div class="logo-block">
-      <div class="logo-badge">AVEVA PI Vision 2024 · Lab Guide</div>
-      <h1>PI AF → <span>Trend</span><br>Display</h1>
-      <div class="subtitle">// SILABUS PRAKTIS — MENAMPILKAN DATA TREND</div>
+  <div class="wrap">
+    <div class="badge-row">
+      <span class="badge da">PI Vision</span>
+      <span class="badge af">AVEVA OSIsoft</span>
+      <span class="badge gen">Wayang Windu PIMS</span>
+      <span class="badge pu">Technical README</span>
     </div>
-    <div class="header-meta">
-      <div class="meta-chip">VERSION 1.0.0</div>
-      <div class="meta-chip">PLATFORM: PI VISION 2024</div>
-      <div class="meta-chip">LEVEL: BEGINNER → INTERMEDIATE</div>
-      <div class="meta-chip">LANG: INDONESIA</div>
-    </div>
+    <h1><span class="hi">PI Vision</span><br>Technical <span class="lo">README</span></h1>
+    <p class="subtitle">Panduan lengkap PI Vision — membuat display &amp; dashboard operasional, konfigurasi Multi-State symbol, visualisasi Risk Level Normal/Alert/Danger, permission, embed URL, dan troubleshooting.</p>
   </div>
 </header>
 
-<!-- FLOW DIAGRAM -->
-<section class="flow-section">
-  <div class="flow-diagram">
-    <div class="flow-node">
-      <div class="flow-node-icon">🏭</div>
-      <div class="flow-node-label">DCS / PLC</div>
-      <div class="flow-node-sub">Field Device</div>
-    </div>
-    <div class="flow-arrow">▶</div>
-    <div class="flow-node">
-      <div class="flow-node-icon">🔌</div>
-      <div class="flow-node-label">OPC / Interface</div>
-      <div class="flow-node-sub">OPCInt.exe / Connector</div>
-    </div>
-    <div class="flow-arrow">▶</div>
-    <div class="flow-node">
-      <div class="flow-node-icon">💾</div>
-      <div class="flow-node-label">PI Data Archive</div>
-      <div class="flow-node-sub">PI Tags</div>
-    </div>
-    <div class="flow-arrow">▶</div>
-    <div class="flow-node highlight">
-      <div class="flow-node-icon">🌿</div>
-      <div class="flow-node-label">PI Asset Framework</div>
-      <div class="flow-node-sub">Element → Attribute</div>
-    </div>
-    <div class="flow-arrow">▶</div>
-    <div class="flow-node highlight">
-      <div class="flow-node-icon">📊</div>
-      <div class="flow-node-label">PI Vision</div>
-      <div class="flow-node-sub">Trend Display</div>
-    </div>
+<main><div class="wrap">
+
+  <!-- TOC -->
+  <div class="toc reveal">
+    <div class="toc-title">📋 Table of Contents</div>
+    <ol>
+      <li><a href="#overview">Overview PI Vision</a></li>
+      <li><a href="#interface">Mengenal Interface PI Vision</a>
+        <ol class="sub">
+          <li><a href="#interface-nav">Navigasi Utama</a></li>
+          <li><a href="#interface-toolbar">Toolbar &amp; Panel</a></li>
+        </ol>
+      </li>
+      <li><a href="#display">Membuat Display &amp; Dashboard</a>
+        <ol class="sub">
+          <li><a href="#display-new">Buat Display Baru</a></li>
+          <li><a href="#display-symbols">Tambah &amp; Konfigurasi Symbol</a></li>
+          <li><a href="#display-link">Link Symbol ke PI Tag &amp; AF Attribute</a></li>
+          <li><a href="#display-layout">Layout &amp; Formatting</a></li>
+        </ol>
+      </li>
+      <li><a href="#symbols">Jenis Symbol &amp; Penggunaannya</a></li>
+      <li><a href="#multistate">Multi-State Symbol</a>
+        <ol class="sub">
+          <li><a href="#ms-konsep">Konsep Multi-State</a></li>
+          <li><a href="#ms-config">Konfigurasi Step-by-Step</a></li>
+          <li><a href="#ms-contoh">Contoh: Motor Status</a></li>
+        </ol>
+      </li>
+      <li><a href="#risklevel">Risk Level Visualization (Normal / Alert / Danger)</a>
+        <ol class="sub">
+          <li><a href="#rl-konsep">Konsep Risk Level</a></li>
+          <li><a href="#rl-enum">Enumeration Set di PI AF</a></li>
+          <li><a href="#rl-config">Konfigurasi di PI Vision</a></li>
+          <li><a href="#rl-gauge">Animated Gauge Widget</a></li>
+          <li><a href="#rl-wayang">Contoh: Vibrasi Wayang Windu</a></li>
+        </ol>
+      </li>
+      <li><a href="#dashboard">Membangun Dashboard Operasional</a>
+        <ol class="sub">
+          <li><a href="#db-vibration">Dashboard Vibrasi</a></li>
+          <li><a href="#db-process">Dashboard Proses ABB</a></li>
+          <li><a href="#db-overlay">Overlay Vibrasi + Proses</a></li>
+        </ol>
+      </li>
+      <li><a href="#permission">User Permission &amp; Security</a></li>
+      <li><a href="#embed">Embed PI Vision ke Aplikasi Lain</a></li>
+      <li><a href="#troubleshoot">Troubleshooting</a></li>
+    </ol>
   </div>
-</section>
 
-<!-- MAIN LAYOUT -->
-<div class="container">
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 01 — OVERVIEW -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="overview">
+    <div class="section-label">01 — Overview</div>
+    <h2>Apa itu PI Vision?</h2>
+    <p>PI Vision adalah <strong>web-based visualization tool</strong> dari AVEVA OSIsoft yang memungkinkan operator, engineer, dan manajemen untuk membuat dan melihat dashboard operasional secara real-time langsung dari browser — tanpa perlu install aplikasi klien apapun.</p>
+    <p>PI Vision berjalan di atas <strong>IIS (Internet Information Services)</strong> di Windows Server dan mengakses data dari PI Data Archive serta PI Asset Framework (PI AF) secara langsung.</p>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-title">// Table of Contents</div>
-    <a href="#m1" class="toc-item"><span class="toc-num">01</span><span class="toc-label">Cek Fondasi AF</span></a>
-    <a href="#m2" class="toc-item"><span class="toc-num">02</span><span class="toc-label">Buka PI Vision</span></a>
-    <a href="#m3" class="toc-item"><span class="toc-num">03</span><span class="toc-label">Search AF Data</span></a>
-    <a href="#m4" class="toc-item"><span class="toc-num">04</span><span class="toc-label">Buat Trend Symbol</span></a>
-    <a href="#m5" class="toc-item"><span class="toc-num">05</span><span class="toc-label">Konfigurasi Trend</span></a>
-    <a href="#m6" class="toc-item"><span class="toc-num">06</span><span class="toc-label">Set Time Range</span></a>
-    <a href="#m7" class="toc-item"><span class="toc-num">07</span><span class="toc-label">Monitor & Analisis</span></a>
-    <a href="#m8" class="toc-item"><span class="toc-num">08</span><span class="toc-label">Ad Hoc Trend</span></a>
-    <a href="#checklist" class="toc-item"><span class="toc-num">✓</span><span class="toc-label">Checklist</span></a>
-    <a href="#errors" class="toc-item"><span class="toc-num">!</span><span class="toc-label">Common Errors</span></a>
-  </aside>
+    <div class="card-grid three reveal">
+      <div class="card"><div class="card-icon">🌐</div><h4>Web-Based</h4><p>Akses dari browser mana saja — Chrome, Edge, Firefox. Tidak perlu install klien. Mendukung desktop, tablet, dan mobile.</p></div>
+      <div class="card"><div class="card-icon">⚡</div><h4>Real-Time</h4><p>Data di-refresh otomatis dari PI Data Archive. Interval refresh bisa dikonfigurasi per display (default 5 detik).</p></div>
+      <div class="card"><div class="card-icon">🎨</div><h4>No-Code Builder</h4><p>Drag-and-drop symbol builder. Tidak perlu coding untuk membuat dashboard operasional yang powerful.</p></div>
+      <div class="card"><div class="card-icon">🌳</div><h4>AF Integration</h4><p>Terintegrasi langsung dengan PI AF — browse asset hierarchy untuk pilih data, bukan harus ketik nama tag manual.</p></div>
+      <div class="card"><div class="card-icon">🔒</div><h4>Role-Based Access</h4><p>Permission per display dan per user/group. Operator hanya bisa lihat, Engineer bisa edit, Admin bisa manage semua.</p></div>
+      <div class="card"><div class="card-icon">🔗</div><h4>Embeddable</h4><p>Display bisa di-embed ke aplikasi lain, portal web, atau ditampilkan di monitor control room via URL langsung.</p></div>
+    </div>
 
-  <!-- CONTENT -->
-  <main class="content">
+    <div class="flow reveal">
+      <div class="flow-node src"><span class="fn-label">Data Source</span><span class="fn-name">PI Archive</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node af"><span class="fn-label">Context</span><span class="fn-name">PI AF</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">Server</span><span class="fn-name">IIS + PI Vision</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node af"><span class="fn-label">Browser</span><span class="fn-name">Display</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node src"><span class="fn-label">User</span><span class="fn-name">Operator / Engineer</span></div>
+    </div>
 
-    <!-- MODULE 1 -->
-    <div class="module" id="m1">
-      <div class="module-header">
-        <span class="module-num">MOD-01</span>
-        <span class="module-title">Pastikan Fondasi AF Sudah Siap</span>
-        <span class="module-badge badge-prereq">PREREQ</span>
+    <div class="callout info reveal">
+      <span class="ci">ℹ️</span>
+      <div class="ct"><strong>URL Default PI Vision</strong><br>
+      <code>https://PISRVCISDEMO/PIVision</code> atau <code>http://PISRVCISDEMO/PIVision</code><br>
+      Login menggunakan Windows credentials (domain account) yang sudah di-mapping ke PI Identity.</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 02 — INTERFACE -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="interface">
+    <div class="section-label">02 — Interface</div>
+    <h2>Mengenal Interface PI Vision</h2>
+
+    <h3 id="interface-nav">2.1 Navigasi Utama</h3>
+    <div class="arch-box reveal"><span class="hl">[ PI Vision — Layout Utama ]</span>
+
+┌─────────────────────────────────────────────────────────────────┐
+│  <span class="hl">PI Vision</span>  │  🔍 Search  │  📁 Browse  │  👤 User  │  ⚙️ Admin  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  <span class="hl2">[ HOME PAGE ]</span>                                                │
+│  ┌──────────────────┐  ┌──────────────────┐                    │
+│  │  📁 My Displays  │  │  📁 Shared        │                    │
+│  │  ─────────────── │  │  ─────────────── │                    │
+│  │  • Vibrasi STG1  │  │  • Plant Overview │                    │
+│  │  • Dashboard HWP │  │  • Alarm Summary  │                    │
+│  └──────────────────┘  └──────────────────┘                    │
+│                                                                 │
+│  <span class="hl3">[ ASSET BROWSER ]</span>    Sidebar kiri saat membuat/edit display   │
+│  FSO_SITE                                                       │
+│  └── GAS_COMPRESSION_UNIT                                       │
+│        ├── Compressor-01                                        │
+│        │     ├── Suction_Pressure  → drag ke display            │
+│        │     ├── Vibration_RMS     → drag ke display            │
+│        │     └── ...                                            │
+│        └── Compressor-02                                        │
+└─────────────────────────────────────────────────────────────────┘</div>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Area</th><th>Fungsi</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Home</strong></td><td>Halaman utama — daftar semua display</td><td>Ada folder My Displays dan Shared displays</td></tr>
+          <tr><td><strong>Asset Browser</strong></td><td>Sidebar browse PI AF hierarchy</td><td>Drag attribute dari sini ke display untuk link data</td></tr>
+          <tr><td><strong>Display Canvas</strong></td><td>Area kerja utama tempat symbol diletakkan</td><td>Mode View dan Mode Edit dibedakan</td></tr>
+          <tr><td><strong>Symbol Palette</strong></td><td>Daftar semua symbol yang bisa ditambahkan</td><td>Trend, Value, Gauge, Bar, Shape, Image, dll</td></tr>
+          <tr><td><strong>Format Panel</strong></td><td>Panel kanan untuk mengatur properti symbol</td><td>Muncul saat symbol dipilih di mode Edit</td></tr>
+          <tr><td><strong>Admin Panel</strong></td><td>Manajemen user, server, dan konfigurasi</td><td>Hanya terlihat oleh PI Vision Administrator</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="interface-toolbar">2.2 Mode View vs Mode Edit</h3>
+    <div class="card-grid two reveal">
+      <div class="card">
+        <div class="card-icon">👁️</div>
+        <h4>Mode View (Default)</h4>
+        <p>Tampilan operasional — data real-time, refresh otomatis, tidak ada toolbar edit. Klik kanan symbol untuk zoom, expand trend, atau copy link.</p>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Sebelum buka PI Vision, pastiin data di AF udah ada dan benar</div>
-        <ul class="steps">
-          <li>Buka <strong>PI System Explorer (PSE)</strong> dari Start Menu</li>
-          <li>Navigasi ke <strong>AF Database</strong> yang kamu pakai <em>(contoh: PlantSimulation)</em></li>
-          <li>Expand <strong>Elements</strong> → pilih asset target <em>(contoh: Pump_101)</em></li>
-          <li>Lihat tab <strong>Attributes</strong> → cek attribute yang mau ditampilkan, pastikan ada field <em>PI Point Data Reference</em></li>
-          <li>Klik kanan attribute → pilih <strong>"Preview"</strong> → konfirmasi data muncul dengan nilai valid</li>
-        </ul>
-        <div class="checkpoint">
-          <span class="checkpoint-icon">✅</span>
-          <span><strong>CHECKPOINT:</strong> Kalau preview kosong atau error, masalahnya ada di AF/tag mapping — BUKAN di PI Vision. Selesaikan dulu sebelum lanjut.</span>
-        </div>
+      <div class="card">
+        <div class="card-icon">✏️</div>
+        <h4>Mode Edit</h4>
+        <p>Masuk dengan klik tombol <strong>Edit</strong> di pojok kanan atas. Di sini bisa drag symbol, ubah ukuran, link data, konfigurasi Multi-State, dan atur layout.</p>
       </div>
     </div>
 
-    <!-- MODULE 2 -->
-    <div class="module" id="m2">
-      <div class="module-header">
-        <span class="module-num">MOD-02</span>
-        <span class="module-title">Buka PI Vision & Buat Display Baru</span>
-        <span class="module-badge badge-core">CORE</span>
+    <div class="callout tip reveal">
+      <span class="ci">💡</span>
+      <div class="ct"><strong>Keyboard Shortcut PI Vision</strong><br>
+      <code>Ctrl+Z</code> — Undo &nbsp;|&nbsp; <code>Ctrl+Y</code> — Redo &nbsp;|&nbsp; <code>Ctrl+S</code> — Save display &nbsp;|&nbsp; <code>Ctrl+A</code> — Select all &nbsp;|&nbsp; <code>Delete</code> — Hapus symbol terpilih &nbsp;|&nbsp; <code>F11</code> — Fullscreen</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 03 — MEMBUAT DISPLAY -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="display">
+    <div class="section-label">03 — Display Builder</div>
+    <h2>Membuat Display &amp; Dashboard</h2>
+
+    <h3 id="display-new">3.1 Membuat Display Baru dari Scratch</h3>
+
+    <div class="step-card reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Buka PI Vision &amp; Klik New Display</h4>
+        <p>Buka browser → <code>https://PISRVCISDEMO/PIVision</code> → Login → Klik tombol <strong>+ New Display</strong> di halaman Home.</p>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Setup kanvas kerja di PI Vision</div>
-        <ul class="steps">
-          <li>Buka browser → akses PI Vision: <em>http://&lt;servername&gt;/PIVision</em></li>
-          <li>Klik tombol <strong>"New Display"</strong> <em>(icon + atau dari menu utama)</em></li>
-          <li>Masuk ke <strong>Design Mode</strong> — klik icon pensil/edit di toolbar atas</li>
-          <li>Kasih nama display yang deskriptif → klik <strong>Save</strong> sebelum mulai nambah simbol</li>
-        </ul>
-        <div class="warning-box">
-          <span>⚠️</span>
-          <span><strong>PENTING:</strong> Design Mode HARUS aktif untuk bisa drag simbol ke display. Kalau drag nggak bisa, cek dulu apakah sudah dalam Design Mode.</span>
-        </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Set Canvas Size &amp; Background</h4>
+        <p>Klik area kosong canvas → panel kanan akan menampilkan <strong>Display Properties</strong>. Atur Width, Height (contoh: 1920×1080 untuk full HD monitor control room), dan warna background.</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Pilih Asset Context (Opsional tapi Disarankan)</h4>
+        <p>Klik <strong>Asset</strong> di toolbar atas → Browse AF hierarchy → pilih element yang akan jadi konteks utama display (misal: <code>Compressor-01</code>). Ini memungkinkan display dibuat generic dan bisa di-swap assetnya saat viewing.</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Tambahkan Symbol</h4>
+        <p>Klik <strong>Symbols</strong> di toolbar kiri → pilih jenis symbol (Trend, Value, Gauge, dll) → klik di canvas untuk menempatkannya. Atau drag attribute dari <strong>Asset Browser</strong> langsung ke canvas — PI Vision otomatis membuat symbol yang sesuai.</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Link Data ke Symbol</h4>
+        <p>Klik symbol di canvas → panel kanan tampilkan <strong>Data Sources</strong> → klik <strong>+ Add</strong> → search nama PI Tag atau browse AF attribute. Bisa juga drag dari Asset Browser ke symbol yang sudah ada.</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>Save &amp; Share Display</h4>
+        <p>Klik <strong>Save</strong> (Ctrl+S) → beri nama display → pilih lokasi penyimpanan: <strong>My Displays</strong> (hanya kamu) atau folder <strong>Shared</strong> (semua user bisa lihat). Set permission yang sesuai.</p>
       </div>
     </div>
 
-    <!-- MODULE 3 -->
-    <div class="module" id="m3">
-      <div class="module-header">
-        <span class="module-num">MOD-03</span>
-        <span class="module-title">Cari Data AF di Assets Pane</span>
-        <span class="module-badge badge-core">CORE</span>
+    <h3 id="display-symbols">3.2 Tips Konfigurasi Symbol</h3>
+    <div class="callout tip reveal">
+      <span class="ci">💡</span>
+      <div class="ct"><strong>Cara Tercepat Tambah Data:</strong> Di Asset Browser (sidebar kiri), navigate ke AF element → drag attribute langsung ke canvas. PI Vision otomatis menentukan symbol type yang paling cocok (angka = Value symbol, array time-series = Trend symbol, dll).</div>
+    </div>
+
+    <h3 id="display-link">3.3 Link ke PI Tag vs AF Attribute</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Sumber Data</th><th>Cara Link</th><th>Kelebihan</th><th>Kapan Pakai</th></tr></thead>
+        <tbody>
+          <tr><td><strong>PI Tag Langsung</strong></td><td>Ketik nama tag di data source field</td><td>Langsung, tidak perlu AF setup</td><td>Quick display, tag sudah pasti tidak berubah</td></tr>
+          <tr><td><strong>AF Attribute</strong></td><td>Browse dari Asset Browser</td><td>Context-aware, bisa swap asset</td><td>Display yang ingin dipakai ulang untuk banyak equipment</td></tr>
+          <tr><td><strong>Drag from Asset Browser</strong></td><td>Drag AF attribute ke canvas</td><td>Paling cepat, auto-select symbol type</td><td>Saat membangun display dari scratch</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="display-layout">3.4 Tips Layout &amp; Formatting</h3>
+    <ul class="list reveal">
+      <li>Gunakan <strong>Align tools</strong> (klik kanan → Align) untuk merapikan posisi symbol secara presisi</li>
+      <li>Gunakan <strong>Group</strong> (Ctrl+G) untuk mengelompokkan symbol yang berkaitan agar bisa dipindah bersama</li>
+      <li>Tambahkan <strong>Text label</strong> di atas setiap kelompok symbol untuk header section</li>
+      <li>Gunakan <strong>Shape/Rectangle</strong> dengan background color berbeda untuk membagi area display secara visual</li>
+      <li>Set <strong>Refresh Rate</strong> per display sesuai kebutuhan — dashboard vibrasi bisa 2 detik, overview plant cukup 10 detik</li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 04 — SYMBOLS -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="symbols">
+    <div class="section-label">04 — Symbol Library</div>
+    <h2>Jenis Symbol &amp; Penggunaannya</h2>
+    <p>PI Vision menyediakan berbagai jenis symbol built-in yang bisa langsung digunakan tanpa koding. Berikut symbol-symbol yang paling sering dipakai:</p>
+
+    <div class="symbol-grid reveal">
+      <div class="symbol-item"><div class="symbol-icon">📈</div><div class="symbol-name">Trend</div><div class="symbol-desc">Time-series chart. Bisa tampung multiple tag dalam satu chart. Mendukung range selector dan zoom.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">🔢</div><div class="symbol-name">Value</div><div class="symbol-desc">Tampilkan nilai numerik terkini. Mendukung format, unit, warna kondisional, dan label.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">🌡️</div><div class="symbol-name">Gauge</div><div class="symbol-desc">Gauge radial atau linear. Ideal untuk tampilkan nilai dalam konteks range min-max.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">📊</div><div class="symbol-name">Bar Chart</div><div class="symbol-desc">Batang horizontal atau vertikal. Cocok untuk perbandingan nilai antar equipment.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">🎯</div><div class="symbol-name">Bullet</div><div class="symbol-desc">Bullet chart — tampilkan nilai vs target vs range. Efisien secara ruang.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">🔵</div><div class="symbol-name">Status Indicator</div><div class="symbol-desc">Lingkaran/kotak yang warnanya berubah sesuai kondisi. Ideal untuk tampilkan ON/OFF, Normal/Alarm.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">📋</div><div class="symbol-name">Table</div><div class="symbol-desc">Tabel nilai banyak tag sekaligus. Cocok untuk summary page atau comparison.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">🖼️</div><div class="symbol-name">Image</div><div class="symbol-desc">Upload gambar P&ID, foto equipment, atau diagram pabrik sebagai background display.</div></div>
+      <div class="symbol-item"><div class="symbol-icon">🔗</div><div class="symbol-name">Link</div><div class="symbol-desc">Tombol/area klikable yang bisa navigate ke display lain atau URL eksternal.</div></div>
+    </div>
+
+    <h4>Symbol Trend — Konfigurasi Penting</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Setting</th><th>Fungsi</th><th>Rekomendasi</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Time Range</strong></td><td>Rentang waktu yang ditampilkan</td><td><code>*-8h</code> untuk shift, <code>*-24h</code> untuk daily overview</td></tr>
+          <tr><td><strong>Show Labels</strong></td><td>Tampilkan nama tag di legend</td><td>Aktifkan jika ada lebih dari 1 tag dalam trend</td></tr>
+          <tr><td><strong>Step/Interpolated</strong></td><td>Mode rendering garis trend</td><td>Interpolated untuk sensor analog, Step untuk digital</td></tr>
+          <tr><td><strong>Y-Axis Scale</strong></td><td>Range sumbu Y</td><td>Auto atau manual sesuai range engineering tag</td></tr>
+          <tr><td><strong>Reference Lines</strong></td><td>Garis horizontal threshold</td><td>Tambahkan garis di nilai alarm High/High-High</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 05 — MULTI-STATE -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="multistate">
+    <div class="section-label">05 — Multi-State</div>
+    <h2>Multi-State Symbol</h2>
+
+    <h3 id="ms-konsep">5.1 Konsep Multi-State</h3>
+    <p><strong>Multi-State</strong> adalah fitur PI Vision yang memungkinkan symbol <em>berubah tampilan</em> (warna, ukuran, ikon, teks) secara otomatis berdasarkan nilai data yang sedang dibaca. Ini adalah cara membuat display yang informatif — operator bisa langsung tahu status equipment hanya dari warna tanpa harus baca angka.</p>
+
+    <div class="card-grid two reveal">
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <h4>Visual State Mapping</h4>
+        <p>Setiap rentang nilai atau state tertentu dipetakan ke tampilan visual berbeda — warna latar, warna teks, ikon, atau animasi berkedip untuk kondisi kritis.</p>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Connect PI Vision ke AF Database dan temukan attribute target</div>
-        <ul class="steps">
-          <li>Di panel kiri, klik tab <strong>"Assets"</strong> — bukan tab "Tags"</li>
-          <li>Klik <strong>dropdown pilih AF Server</strong> → pilih server yang benar <em>(contoh: PISYSTEM)</em></li>
-          <li>Pilih <strong>AF Database</strong> yang berisi asset kamu <em>(contoh: PlantSimulation)</em></li>
-          <li>Browse tree: <em>Database → Element → Asset</em> sampai kelihatan daftar Attributes</li>
-          <li>Alternatif: gunakan <strong>Search bar</strong> di atas Assets pane → ketik nama attribute atau element</li>
-        </ul>
-        <div class="checkpoint">
-          <span class="checkpoint-icon">💡</span>
-          <span><strong>TIP:</strong> Kalau mau cari by PI Tag langsung tanpa struktur AF, pindah ke tab <em>"Tags"</em> dan search by tag name. Tapi untuk best practice, selalu gunakan AF attribute.</span>
-        </div>
+      <div class="card">
+        <div class="card-icon">🔢</div>
+        <h4>Bisa untuk Tag Numerik &amp; Digital</h4>
+        <p>Bekerja untuk tag Float (berdasarkan range nilai) maupun tag Digital (berdasarkan state text seperti Running/Stopped). Juga bisa berbasis AF attribute.</p>
       </div>
     </div>
 
-    <!-- MODULE 4 -->
-    <div class="module" id="m4">
-      <div class="module-header">
-        <span class="module-num">MOD-04</span>
-        <span class="module-title">Buat Trend Symbol</span>
-        <span class="module-badge badge-core">CORE</span>
+    <h3 id="ms-config">5.2 Konfigurasi Multi-State Step-by-Step</h3>
+
+    <ol class="steps reveal">
+      <li>Di Mode Edit, klik symbol yang ingin dikonfigurasi (Value, Status Indicator, atau Shape)</li>
+      <li>Di panel kanan, scroll ke bagian <strong>Format</strong> → klik <strong>Multi-State</strong></li>
+      <li>Klik <strong>+ Add State</strong> untuk menambah kondisi pertama</li>
+      <li>Pilih <strong>Data Source</strong> yang digunakan untuk evaluasi kondisi (bisa sama atau beda dengan data yang ditampilkan)</li>
+      <li>Tentukan kondisi: pilih operator (<code>=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>between</code>) dan nilai threshold</li>
+      <li>Pilih visual yang berubah: <strong>Fill Color</strong>, <strong>Text Color</strong>, <strong>Blink</strong> (kedip), atau <strong>Icon</strong></li>
+      <li>Ulangi untuk setiap state yang dibutuhkan (Normal, Alert, Danger)</li>
+      <li>Klik <strong>Done</strong> → Save display (Ctrl+S)</li>
+    </ol>
+
+    <h3 id="ms-contoh">5.3 Contoh: Motor Status (Digital Tag)</h3>
+    <p>Motor <code>WAWW.MOT101.RUN</code> bertipe Digital dengan state set <code>MotorState</code>. Konfigurasi Multi-State:</p>
+
+    <table class="ms-table reveal">
+      <thead><tr><th>Kondisi</th><th>Nilai Tag</th><th>Fill Color</th><th>Text</th><th>Blink</th></tr></thead>
+      <tbody>
+        <tr><td><span class="state-normal">NORMAL</span></td><td><code>Running</code></td><td style="background:#d1fae5; color:#065f46;">● Hijau (#00875a)</td><td>Running ✓</td><td>Tidak</td></tr>
+        <tr><td><span class="state-alert">ALERT</span></td><td><code>Stopped</code></td><td style="background:#fef3c7; color:#92400e;">● Kuning (#d97706)</td><td>Stopped ⚠</td><td>Tidak</td></tr>
+        <tr><td><span class="state-danger">DANGER</span></td><td><code>Fault</code></td><td style="background:#ffe4e6; color:#991b1b;">● Merah (#dc2626)</td><td>FAULT !</td><td>Ya (2 detik)</td></tr>
+      </tbody>
+    </table>
+
+    <pre class="reveal"><span class="cm">/* Multi-State config summary untuk motor status */</span>
+State 1: tag = <span class="str">"Running"</span>  → fill <span class="str">#00875a</span>, text <span class="str">"Running ✓"</span>,  blink <span class="kw">false</span>
+State 2: tag = <span class="str">"Stopped"</span>  → fill <span class="str">#d97706</span>, text <span class="str">"Stopped ⚠"</span>, blink <span class="kw">false</span>
+State 3: tag = <span class="str">"Fault"</span>    → fill <span class="str">#dc2626</span>, text <span class="str">"FAULT !"</span>,   blink <span class="kw">true</span>  (2s)
+
+<span class="cm">/* Untuk Valve Status */</span>
+State 1: tag = <span class="str">"Open"</span>    → fill <span class="str">#0066cc</span>, text <span class="str">"OPEN"</span>
+State 2: tag = <span class="str">"Closed"</span>  → fill <span class="str">#64748b</span>, text <span class="str">"CLOSED"</span>
+State 3: tag = <span class="str">"Partial"</span> → fill <span class="str">#d97706</span>, text <span class="str">"PARTIAL ⚠"</span></pre>
+
+    <div class="callout tip reveal">
+      <span class="ci">💡</span>
+      <div class="ct"><strong>Pro Tip — Multi-State untuk Numerik:</strong> Untuk tag Float32 seperti tekanan atau vibrasi, gunakan kondisi <code>between</code> untuk mendefinisikan range tiap zone. Contoh: Normal = 0–3 mm/s (hijau), Alert = 3–7 mm/s (kuning), Danger = &gt;7 mm/s (merah).</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 06 — RISK LEVEL -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="risklevel">
+    <div class="section-label">06 — Risk Level</div>
+    <h2>Risk Level Visualization</h2>
+    <h2 style="color:var(--accent2); font-size:18px; margin-top:-10px; margin-bottom:20px;">Normal / Alert / Danger</h2>
+
+    <h3 id="rl-konsep">6.1 Konsep Risk Level</h3>
+    <p>Risk Level visualization adalah penerapan Multi-State yang lebih terstruktur — menggunakan <strong>tiga zona standar industri</strong> yang dipetakan ke nilai threshold engineering. Ini sangat umum dipakai untuk parameter vibrasi, temperature, dan tekanan.</p>
+
+    <div class="risk-demo reveal">
+      <div class="risk-card normal">
+        <div class="rc-val">✅</div>
+        <div class="rc-label">Normal</div>
+        <div class="rc-range">RMS &lt; 3.0 mm/s</div>
+        <div class="rc-action" style="color:var(--normal);">Operasi normal, tidak perlu tindakan</div>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Drag attribute AF ke display sebagai grafik time-series</div>
-        <ul class="steps">
-          <li>Di <strong>Symbol Gallery</strong> (atas Assets pane), pastikan icon <em>Trend</em> terpilih — icon grafik garis, default pertama</li>
-          <li>Dari hasil search/browse di Assets pane, <strong>klik + drag</strong> attribute ke area display kosong</li>
-          <li>PI Vision otomatis insert <strong>Trend Symbol</strong> dengan trace pertama dari attribute itu</li>
-          <li>Untuk <strong>tambah trace ke-2, ke-3</strong>: drag attribute lain langsung ke dalam trend yang sudah ada</li>
-          <li>Resize trend dengan drag di sudut/tepi kotak — posisikan sesuai kebutuhan layout</li>
-        </ul>
-        <div class="checkpoint">
-          <span class="checkpoint-icon">✅</span>
-          <span><strong>HASIL:</strong> Satu Trend Symbol bisa isi beberapa attribute sekaligus (multi-trace). Ideal untuk compare beberapa parameter seperti temp, pressure, dan flow dalam satu grafik.</span>
-        </div>
+      <div class="risk-card alert">
+        <div class="rc-val">⚡</div>
+        <div class="rc-label">Alert</div>
+        <div class="rc-range">3.0 ≤ RMS &lt; 7.1 mm/s</div>
+        <div class="rc-action" style="color:var(--alert);">Pantau lebih ketat, jadwalkan inspeksi</div>
+      </div>
+      <div class="risk-card danger">
+        <div class="rc-val">🚨</div>
+        <div class="rc-label">Danger</div>
+        <div class="rc-range">RMS ≥ 7.1 mm/s</div>
+        <div class="rc-action" style="color:var(--danger);">Tindakan segera! Pertimbangkan shutdown</div>
       </div>
     </div>
 
-    <!-- MODULE 5 -->
-    <div class="module" id="m5">
-      <div class="module-header">
-        <span class="module-num">MOD-05</span>
-        <span class="module-title">Konfigurasi Trend</span>
-        <span class="module-badge badge-core">CORE</span>
+    <div class="callout info reveal">
+      <span class="ci">ℹ️</span>
+      <div class="ct"><strong>Referensi Threshold Vibrasi — ISO 10816</strong><br>
+      Threshold di atas mengacu pada standar ISO 10816 untuk mesin rotating. Nilai aktual untuk Wayang Windu bisa berbeda — selalu konfirmasi dengan datasheet equipment (VC-8000 / STI CMCP601) dan rekomendasi OEM.</div>
+    </div>
+
+    <h3 id="rl-enum">6.2 Membuat Enumeration Set di PI AF</h3>
+    <p>Sebelum dikonfigurasi di PI Vision, buat <strong>Enumeration Set</strong> di PI AF yang mendefinisikan tiga level risk. Ini memungkinkan AF Analytics menghitung risk level dan menyimpannya sebagai Digital state.</p>
+
+    <ol class="steps reveal">
+      <li>Buka <strong>PI System Explorer (PSE)</strong> → pilih AF Database <code>PLANT_DEMO</code></li>
+      <li>Klik menu <strong>Elements → Enumeration Sets → New Enumeration Set</strong></li>
+      <li>Beri nama: <code>VibrationRiskLevel</code></li>
+      <li>Tambahkan tiga entry: <code>0 = Normal</code>, <code>1 = Alert</code>, <code>2 = Danger</code></li>
+      <li>Klik <strong>Check In</strong> untuk menyimpan</li>
+    </ol>
+
+    <pre class="reveal"><span class="cm">/* Enumeration Set: VibrationRiskLevel */</span>
+<span class="num">0</span> → <span class="str">Normal</span>   <span class="cm">// RMS &lt; 3.0 mm/s</span>
+<span class="num">1</span> → <span class="str">Alert</span>    <span class="cm">// 3.0 ≤ RMS &lt; 7.1 mm/s</span>
+<span class="num">2</span> → <span class="str">Danger</span>   <span class="cm">// RMS ≥ 7.1 mm/s</span>
+
+<span class="cm">/* AF Analytics Expression untuk hitung risk level: */</span>
+<span class="kw">If</span> <span class="fn">TagVal</span>(<span class="str">'Vibration_RMS'</span>) >= <span class="num">7.1</span> <span class="kw">Then</span> <span class="str">'Danger'</span>
+<span class="kw">Else If</span> <span class="fn">TagVal</span>(<span class="str">'Vibration_RMS'</span>) >= <span class="num">3.0</span> <span class="kw">Then</span> <span class="str">'Alert'</span>
+<span class="kw">Else</span> <span class="str">'Normal'</span>
+
+<span class="cm">/* Output: PI Tag Digital dengan DigitalSet = VibrationRiskLevel */</span>
+<span class="cm">/* Contoh tag: WAWW.COMP01.VIB.RISKLEVEL (tipe: Digital) */</span></pre>
+
+    <h3 id="rl-config">6.3 Konfigurasi Risk Level di PI Vision</h3>
+    <p>Setelah PI Tag risk level dibuat dan AF Analytics berjalan, konfigurasi visualisasinya di PI Vision:</p>
+
+    <div class="step-card reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Tambahkan Status Indicator Symbol</h4>
+        <p>Di Mode Edit → Symbols → pilih <strong>Status Indicator</strong> (lingkaran atau kotak) → klik di canvas.</p>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Rapikan tampilan trend biar informatif dan mudah dibaca</div>
-        <ul class="steps">
-          <li>Klik kanan pada trend → pilih <strong>"Configure Trend"</strong> untuk buka panel konfigurasi</li>
-          <li>Set konfigurasi berikut sesuai kebutuhan:</li>
-        </ul>
-        <table class="config-table">
-          <thead>
-            <tr>
-              <th>Opsi</th>
-              <th>Rekomendasi</th>
-              <th>Keterangan</th>
-            </tr>
-          </thead>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Link ke Risk Level Tag</h4>
+        <p>Di panel kanan → Data Sources → Add → search tag <code>WAWW.COMP01.VIB.RISKLEVEL</code> (Digital tag output dari AF Analytics).</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Konfigurasi Multi-State</h4>
+        <p>Format → Multi-State → tambah 3 state:</p>
+        <table class="ms-table" style="margin-top:10px;">
+          <thead><tr><th>State</th><th>Kondisi</th><th>Fill Color</th><th>Text Color</th><th>Blink</th></tr></thead>
           <tbody>
-            <tr>
-              <td>Plot Title</td>
-              <td>Isi nama jelas</td>
-              <td>Contoh: "Lube Oil Temperature"</td>
-            </tr>
-            <tr>
-              <td>Time Range</td>
-              <td>Display time range</td>
-              <td>Sinkron dengan Time Bar display</td>
-            </tr>
-            <tr>
-              <td>Scale Type</td>
-              <td>Multiple / Single</td>
-              <td>Multiple jika unit beda, Single jika sama</td>
-            </tr>
-            <tr>
-              <td>Scale Range</td>
-              <td>Autorange of dynamic values</td>
-              <td>Otomatis fit ke nilai aktual</td>
-            </tr>
-            <tr>
-              <td>Trace Color</td>
-              <td>Bedain tiap trace</td>
-              <td>Hindari warna serupa dalam satu trend</td>
-            </tr>
-            <tr>
-              <td>Legend Label</td>
-              <td>Nama manusiawi</td>
-              <td>Ganti raw tag name jadi readable</td>
-            </tr>
+            <tr><td><span class="state-normal">Normal</span></td><td>tag = <code>Normal</code></td><td style="background:#d1fae5; color:#065f46;">● #00875a</td><td>#fff</td><td>Tidak</td></tr>
+            <tr><td><span class="state-alert">Alert</span></td><td>tag = <code>Alert</code></td><td style="background:#fef3c7; color:#92400e;">● #d97706</td><td>#fff</td><td>Tidak</td></tr>
+            <tr><td><span class="state-danger">Danger</span></td><td>tag = <code>Danger</code></td><td style="background:#ffe4e6; color:#991b1b;">● #dc2626</td><td>#fff</td><td>Ya</td></tr>
           </tbody>
         </table>
-        <ul class="steps" style="margin-top:16px;">
-          <li>Klik <strong>tanda panah atas-kanan (X)</strong> panel Configure Trend untuk menutup</li>
-          <li>Klik <strong>Save</strong> display</li>
-        </ul>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Tambahkan Value Symbol di Sebelahnya</h4>
+        <p>Tambah symbol <strong>Value</strong> di sebelah Status Indicator → link ke <code>WAWW.COMP01.VIB.RMS</code> → operator bisa sekaligus lihat warna status DAN angka aktualnya.</p>
       </div>
     </div>
 
-    <!-- MODULE 6 -->
-    <div class="module" id="m6">
-      <div class="module-header">
-        <span class="module-num">MOD-06</span>
-        <span class="module-title">Set Time Range Display</span>
-        <span class="module-badge badge-core">CORE</span>
+    <h3 id="rl-gauge">6.4 Animated Gauge Widget dengan Risk Zone</h3>
+    <p>Untuk tampilan yang lebih visual dan intuitif, gunakan <strong>Gauge symbol</strong> dengan zone color berbeda:</p>
+
+    <ol class="steps reveal">
+      <li>Tambah <strong>Gauge</strong> symbol → link ke <code>WAWW.COMP01.VIB.RMS</code></li>
+      <li>Di Format panel → set <strong>Minimum</strong>: 0, <strong>Maximum</strong>: 15 (mm/s)</li>
+      <li>Aktifkan <strong>Ranges</strong> → klik <strong>Add Range</strong></li>
+      <li>Range 1: Start=0, End=3.0, Color=<code>#00875a</code> (Normal)</li>
+      <li>Range 2: Start=3.0, End=7.1, Color=<code>#d97706</code> (Alert)</li>
+      <li>Range 3: Start=7.1, End=15, Color=<code>#dc2626</code> (Danger)</li>
+      <li>Aktifkan <strong>Show Value</strong> agar angka numerik juga tampil di tengah gauge</li>
+      <li>Aktifkan <strong>Multi-State</strong> pada gauge needle agar ikut berubah warna sesuai zone aktif</li>
+    </ol>
+
+    <div class="callout tip reveal">
+      <span class="ci">💡</span>
+      <div class="ct"><strong>Kombinasi yang Optimal untuk Dashboard Vibrasi:</strong> Gunakan tiga elemen berdampingan per equipment — (1) <strong>Gauge</strong> dengan zone color untuk kesan visual langsung, (2) <strong>Value</strong> untuk angka presisi, (3) <strong>Trend</strong> kecil untuk historis 8 jam terakhir. Operator mendapat semua informasi yang dibutuhkan dalam satu pandang.</div>
+    </div>
+
+    <h3 id="rl-wayang">6.5 Contoh Implementasi Wayang Windu — Vibrasi Kompressor</h3>
+
+    <div class="arch-box reveal"><span class="hl">[ PI Vision Display: STG1 — Compressor Vibration Monitor ]</span>
+
+┌─────────────────────────────────────────────────────────────────┐
+│  STG #1  │  Gas Compression  │  Compressor-01   │  🔴 DANGER   │
+├────────────────────────────┬────────────────────────────────────┤
+│                            │                                    │
+│   <span class="hl2">BEARING DE (Drive End)</span>    │   <span class="hl2">BEARING NDE (Non-Drive End)</span>      │
+│                            │                                    │
+│   Gauge ⟳  <span class="hl3">8.3 mm/s</span>       │   Gauge ⟳  <span class="hl2">2.1 mm/s</span>              │
+│   [●──────────────●─]      │   [●──●─────────────]             │
+│    0   3.0   7.1   15      │    0   3.0   7.1   15             │
+│   <span class="hl3">🔴 DANGER</span>               │   <span class="hl2">✅ NORMAL</span>                     │
+│                            │                                    │
+│   Risk: <span class="hl3">DANGER</span>            │   Risk: <span class="hl2">NORMAL</span>                 │
+│   1X: 7.9 mm/s @89Hz      │   1X: 1.8 mm/s @89Hz             │
+│   2X: 0.4 mm/s @178Hz     │   2X: 0.3 mm/s @178Hz            │
+│                            │                                    │
+├────────────────────────────┴────────────────────────────────────┤
+│  <span class="hl">Trend — RMS Vibration (8 jam terakhir)</span>                       │
+│  ──────────────────────────── 7.1 (Danger threshold)          │
+│  ↗↗↗↗↗↗↗↗↗↗                                                   │
+│  ──────────────────────────── 3.0 (Alert threshold)           │
+│  ─────────────────────────────────────────────────────────────│
+└─────────────────────────────────────────────────────────────────┘
+<span class="hl4">PI Tags digunakan:</span>
+  WAWW.COMP01.BRG.DE.RMS     WAWW.COMP01.BRG.DE.1X
+  WAWW.COMP01.BRG.NDE.RMS    WAWW.COMP01.BRG.NDE.1X
+  WAWW.COMP01.VIB.RISKLEVEL  (AF Analytics output)</div>
+
+    <div class="highlight-box orange reveal">
+      <h4>⚠️ Threshold Vibrasi — Konfirmasi dengan Tim Wayang Windu</h4>
+      <p>Nilai threshold di atas (3.0 / 7.1 mm/s) adalah nilai referensi ISO 10816. Nilai aktual untuk Compressor STG #1 dan HWP-A harus dikonfirmasi dengan SETPOINT CMS settings yang sudah dikonfigurasi di VC-8000 dan rekomendasi Star Energy / OEM equipment.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 07 — DASHBOARD -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="dashboard">
+    <div class="section-label">07 — Dashboard</div>
+    <h2>Membangun Dashboard Operasional</h2>
+
+    <h3 id="db-vibration">7.1 Dashboard Vibrasi STG #1</h3>
+    <p>Dashboard ini ditujukan untuk operator dan engineer yang memantau kondisi mesin rotating di Steam Turbine Generator unit 1.</p>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Section</th><th>Symbol</th><th>Data Source</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Header Status</strong></td><td>Value + Multi-State</td><td><code>WAWW.STG1.VIB.RISKLEVEL</code></td><td>Overall risk level seluruh STG1</td></tr>
+          <tr><td><strong>Bearing DE</strong></td><td>Gauge + Risk Zone</td><td><code>WAWW.STG1.BRG.DE.RMS</code></td><td>Vibrasi bearing drive end</td></tr>
+          <tr><td><strong>Bearing NDE</strong></td><td>Gauge + Risk Zone</td><td><code>WAWW.STG1.BRG.NDE.RMS</code></td><td>Vibrasi bearing non-drive end</td></tr>
+          <tr><td><strong>Thrust Bearing</strong></td><td>Gauge + Risk Zone</td><td><code>WAWW.STG1.THRUST.AXIAL</code></td><td>Axial displacement thrust bearing</td></tr>
+          <tr><td><strong>RMS Trend (8h)</strong></td><td>Trend (3 tags)</td><td>DE RMS + NDE RMS + Axial</td><td>Overlay semua bearing dalam 1 trend</td></tr>
+          <tr><td><strong>1X / 2X Table</strong></td><td>Table</td><td>1X amp + 2X amp per channel</td><td>Frequency domain summary</td></tr>
+          <tr><td><strong>Speed RPM</strong></td><td>Value</td><td><code>WAWW.STG1.SPEED.RPM</code></td><td>Kecepatan putar aktual</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="db-process">7.2 Dashboard Proses ABB</h3>
+    <p>Dashboard proses untuk monitoring kondisi operasi dari DCS ABB:</p>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Parameter</th><th>Symbol</th><th>PI Tag</th></tr></thead>
+        <tbody>
+          <tr><td>Tekanan Suction</td><td>Gauge + Multi-State</td><td><code>WAWW.COMP01.SUCT.PRESS</code></td></tr>
+          <tr><td>Tekanan Discharge</td><td>Gauge + Multi-State</td><td><code>WAWW.COMP01.DISC.PRESS</code></td></tr>
+          <tr><td>Temp Inlet</td><td>Value + Multi-State</td><td><code>WAWW.COMP01.TEMP.IN</code></td></tr>
+          <tr><td>Temp Outlet</td><td>Value + Multi-State</td><td><code>WAWW.COMP01.TEMP.OUT</code></td></tr>
+          <tr><td>Flow Rate</td><td>Trend + Value</td><td><code>WAWW.FIC101.PV</code></td></tr>
+          <tr><td>Motor Status</td><td>Status Indicator</td><td><code>WAWW.MOT101.RUN</code></td></tr>
+          <tr><td>Compression Ratio</td><td>Value (AF Formula)</td><td>AF Attribute: <code>Compression_Ratio</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="db-overlay">7.3 Overlay Vibrasi + Proses dalam Satu Display</h3>
+    <p>Ini adalah dashboard paling powerful — menampilkan data vibrasi dari SETPOINT dan data proses dari ABB dalam satu layar untuk analisis korelasi:</p>
+
+    <div class="step-card reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Bagi Canvas Menjadi Dua Area</h4>
+        <p>Gunakan Rectangle symbol sebagai background section. Bagian atas = vibrasi (background abu muda), bagian bawah = proses (background biru muda). Tambahkan label teks sebagai header tiap section.</p>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Kontrol window waktu yang ditampilkan di semua simbol</div>
-        <ul class="steps">
-          <li>Keluar dari Design Mode terlebih dahulu — klik icon <em>Monitor Operations</em></li>
-          <li>Lihat <strong>Time Bar</strong> di bagian bawah display</li>
-          <li>Klik dropdown waktu → pilih range preset: <em>Last 8 Hours, Last 1 Day,</em> dll</li>
-          <li>Untuk custom: klik langsung pada <strong>start time</strong> dan <strong>end time</strong> → edit manual</li>
-          <li>Klik tombol <strong>"Now"</strong> untuk kembali ke real-time mode dengan data live</li>
-        </ul>
-        <div class="checkpoint">
-          <span class="checkpoint-icon">💡</span>
-          <span><strong>NOTE:</strong> Mengubah Time Range di Time Bar akan update SEMUA trend yang dikonfigurasi dengan "Display time range". Trend dengan "Custom time range" tidak ikut berubah.</span>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Tambahkan Multi-Tag Trend</h4>
+        <p>Satu Trend symbol bisa menampung multiple tag. Buat satu trend besar yang menampilkan: <code>VIB.RMS</code> (axis kiri, mm/s) + <code>TEMP.IN</code> (axis kanan, °C) + <code>SUCT.PRESS</code> (axis kanan, barg). Operator bisa langsung korelasikan naik-turun vibrasi dengan kondisi proses.</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Set Dual Y-Axis</h4>
+        <p>Klik Trend → Format → di setiap data source, pilih apakah menggunakan <strong>Left Axis</strong> atau <strong>Right Axis</strong>. Vibrasi (mm/s) di kiri, suhu/tekanan di kanan. Set range axis masing-masing agar proporsional.</p>
+      </div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Tambahkan Reference Lines di Trend</h4>
+        <p>Di Trend → Format → Reference Lines → tambahkan garis horizontal di nilai 3.0 dan 7.1 mm/s (alert dan danger threshold vibrasi). Beri label dan warna sesuai.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 08 — PERMISSION -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="permission">
+    <div class="section-label">08 — Security</div>
+    <h2>User Permission &amp; Security</h2>
+    <p>PI Vision menggunakan <strong>Windows Authentication</strong> dan integrasi dengan <strong>PI Identity</strong> untuk mengontrol siapa yang bisa melihat dan mengedit display.</p>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Role</th><th>Hak Akses</th><th>Contoh User</th></tr></thead>
+        <tbody>
+          <tr><td><strong>PI Vision Administrator</strong></td><td>Full control — manage server, user, semua display</td><td>Admin PIMS, IT administrator</td></tr>
+          <tr><td><strong>PI Vision Creator</strong></td><td>Buat dan edit display milik sendiri + share ke folder public</td><td>Engineer, Implementor</td></tr>
+          <tr><td><strong>PI Vision Reader</strong></td><td>Hanya bisa melihat display yang di-share. Tidak bisa edit.</td><td>Operator lapangan, manajemen</td></tr>
+          <tr><td><strong>No Access</strong></td><td>Tidak bisa login ke PI Vision</td><td>User yang tidak terdaftar di PI Identity</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Cara Mengatur Permission Display</h4>
+    <ol class="steps reveal">
+      <li>Buka display yang ingin diatur → klik ikon <strong>⋯ (More)</strong> di pojok kanan atas</li>
+      <li>Pilih <strong>Security</strong> → panel permission muncul</li>
+      <li>Klik <strong>+ Add</strong> → cari Windows User atau Group (misalnya <code>DOMAIN\Operators</code>)</li>
+      <li>Pilih level: <strong>Read</strong> (hanya lihat) atau <strong>Write</strong> (bisa edit)</li>
+      <li>Klik <strong>Save</strong></li>
+    </ol>
+
+    <div class="callout warn reveal">
+      <span class="ci">⚠️</span>
+      <div class="ct"><strong>Akses Data Dikontrol PI Server, bukan PI Vision!</strong> PI Vision hanya mengontrol siapa yang bisa lihat/edit display. Apakah user tersebut bisa <em>membaca data</em> dari PI Archive diatur oleh PI Identity mapping dan tag security (<code>datasecurity</code> attribute) di PI Server. Dua layer keamanan ini independen.</div>
+    </div>
+
+    <h4>Konfigurasi di PI Vision Admin</h4>
+    <pre><span class="cm"># Akses PI Vision Admin (butuh role Administrator):</span>
+<span class="str">https://PISRVCISDEMO/PIVision/#/admin</span>
+
+<span class="cm"># Di admin panel, bisa:</span>
+<span class="cm"># - Tambah/hapus PI Server yang terhubung ke PI Vision</span>
+<span class="cm"># - Manage user roles (Reader/Creator/Administrator)</span>
+<span class="cm"># - Lihat daftar semua display dan siapa pemiliknya</span>
+<span class="cm"># - Konfigurasi timeout session dan refresh rate default</span></pre>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 09 — EMBED -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="embed">
+    <div class="section-label">09 — Embed &amp; URL</div>
+    <h2>Embed PI Vision ke Aplikasi Lain</h2>
+    <p>PI Vision display bisa di-embed ke portal web, intranet, atau ditampilkan di monitor control room menggunakan <strong>direct URL dengan parameter</strong>.</p>
+
+    <h4>Format URL PI Vision Display</h4>
+    <pre><span class="cm"># URL dasar sebuah display:</span>
+<span class="str">https://PISRVCISDEMO/PIVision/#/displays/{display_id}</span>
+
+<span class="cm"># URL dengan parameter tambahan:</span>
+<span class="str">https://PISRVCISDEMO/PIVision/#/displays/{id}?hidenav=true&fullscreen=true</span>
+
+<span class="cm"># URL dengan asset context (untuk display yang pakai AF):</span>
+<span class="str">https://PISRVCISDEMO/PIVision/#/displays/{id}?asset=\PISRVCISDEMO\PLANT_DEMO\FSO_SITE\GAS_COMPRESSION\Compressor-01</span>
+
+<span class="cm"># URL dengan time range custom:</span>
+<span class="str">https://PISRVCISDEMO/PIVision/#/displays/{id}?starttime=*-8h&endtime=*</span></pre>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Parameter URL</th><th>Fungsi</th><th>Nilai</th></tr></thead>
+        <tbody>
+          <tr><td><code>hidenav=true</code></td><td>Sembunyikan navigation bar atas</td><td>true / false</td></tr>
+          <tr><td><code>fullscreen=true</code></td><td>Tampilkan dalam mode fullscreen</td><td>true / false</td></tr>
+          <tr><td><code>asset=\path</code></td><td>Set AF asset context aktif</td><td>Path AF element lengkap</td></tr>
+          <tr><td><code>starttime</code></td><td>Start time range untuk trend</td><td>PI Time expression: <code>*-8h</code>, <code>y</code></td></tr>
+          <tr><td><code>endtime</code></td><td>End time range untuk trend</td><td>PI Time expression: <code>*</code> (sekarang)</td></tr>
+          <tr><td><code>refresh=30</code></td><td>Override refresh interval (detik)</td><td>Angka dalam detik</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Embed via iFrame (Portal Web / Intranet)</h4>
+    <pre><span class="cm">&lt;!-- Embed PI Vision display di halaman web internal --&gt;</span>
+&lt;<span class="kw">iframe</span>
+  <span class="fn">src</span>=<span class="str">"https://PISRVCISDEMO/PIVision/#/displays/42?hidenav=true&fullscreen=true"</span>
+  <span class="fn">width</span>=<span class="str">"1920"</span>
+  <span class="fn">height</span>=<span class="str">"1080"</span>
+  <span class="fn">frameborder</span>=<span class="str">"0"</span>
+  <span class="fn">allowfullscreen</span>
+&gt;&lt;/<span class="kw">iframe</span>&gt;</pre>
+
+    <div class="callout tip reveal">
+      <span class="ci">💡</span>
+      <div class="ct"><strong>Monitor Control Room (Kiosk Mode):</strong> Untuk menampilkan PI Vision di TV/monitor control room tanpa interaksi, buka browser dalam mode kiosk (<code>chrome.exe --kiosk URL</code>), aktifkan parameter <code>hidenav=true&fullscreen=true</code>, dan set Windows user yang auto-login ke account dengan PI Vision Read access.</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 10 — TROUBLESHOOT -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="troubleshoot">
+    <div class="section-label">10 — Troubleshooting</div>
+    <h2>Troubleshooting PI Vision</h2>
+
+    <!-- TS 1 -->
+    <div class="ts-item reveal">
+      <div class="ts-header">
+        <span class="ts-icon">⬜</span>
+        <span class="ts-title">PI Vision tidak bisa dibuka — halaman putih atau blank</span>
+        <span class="ts-tag">🔥 Paling Sering</span>
+      </div>
+      <div class="ts-body">
+        <div class="ts-section">
+          <div class="ts-label cause">⚠️ Penyebab</div>
+          <p style="font-size:14px; color:var(--text);">IIS mengalami masalah — bisa karena service crash, corrupt application pool, atau Windows update yang mengganggu konfigurasi IIS.</p>
+        </div>
+        <div class="ts-section">
+          <div class="ts-label sol">✅ Solusi Bertahap</div>
+          <ol class="steps">
+            <li>Reset IIS: buka Command Prompt as Administrator → <code>iisreset /noforce</code></li>
+            <li>Coba buka dari browser berbeda dan clear cache browser (<code>Ctrl+Shift+Del</code>)</li>
+            <li>Cek PI Vision Application Pool di IIS Manager — pastikan status <strong>Started</strong></li>
+            <li>Cek Windows Event Viewer → Application log untuk error spesifik terkait PIVision atau W3SVC</li>
+            <li>Jika error 500 atau corrupt: uninstall PI Vision → reinstall IIS → reinstall PI Vision</li>
+          </ol>
+        </div>
+        <pre><span class="cm"># Langkah 1 — Quick IIS reset:</span>
+<span class="kw">iisreset</span> /noforce
+
+<span class="cm"># Langkah 5 — Reinstall IIS jika corrupt:</span>
+<span class="fn">Get-WindowsFeature</span> <span class="str">"Web-*"</span> | <span class="fn">Where-Object</span> {<span class="kw">$_</span>.InstallState -eq <span class="str">"Installed"</span>} | <span class="fn">Uninstall-WindowsFeature</span>
+<span class="fn">Install-WindowsFeature</span> -Name Web-Server -IncludeManagementTools -IncludeAllSubFeature
+<span class="cm"># Lalu reinstall PI Vision dari installer</span></pre>
+      </div>
+    </div>
+
+    <!-- TS 2 -->
+    <div class="ts-item reveal">
+      <div class="ts-header">
+        <span class="ts-icon">🔴</span>
+        <span class="ts-title">Symbol menampilkan "No Data" atau "No Values" padahal tag ada datanya</span>
+        <span class="ts-tag">🔥 Sering</span>
+      </div>
+      <div class="ts-body">
+        <div class="ts-section">
+          <div class="ts-label cause">⚠️ Penyebab Umum</div>
+          <ul class="list" style="font-size:14px;">
+            <li>User tidak punya hak akses baca ke tag tersebut (PI data security)</li>
+            <li>Time range di display tidak ada datanya (misal minta data 5 tahun lalu tapi archive tidak ada)</li>
+            <li>PI Server connection dari PI Vision terputus</li>
+            <li>Tag baru dibuat tapi belum ada data masuk (<code>Pt Created</code>)</li>
+          </ul>
+        </div>
+        <div class="ts-section">
+          <div class="ts-label sol">✅ Diagnosa</div>
+          <ol class="steps">
+            <li>Cek di PI SMT apakah tag tersebut ada data di Snapshot — jika ada data di SMT tapi tidak di Vision, kemungkinan masalah permission.</li>
+            <li>Cek <code>datasecurity</code> atribut tag — pastikan user/identity yang dipakai PI Vision punya hak Read.</li>
+            <li>Cek PI Vision Admin → PI Server Connection → pastikan status Connected dan tidak ada error.</li>
+            <li>Adjust time range di display — coba set ke <code>*-1h</code> (1 jam terakhir) untuk test.</li>
+          </ol>
         </div>
       </div>
     </div>
 
-    <!-- MODULE 7 -->
-    <div class="module" id="m7">
-      <div class="module-header">
-        <span class="module-num">MOD-07</span>
-        <span class="module-title">Monitor & Analisis Trend (View Mode)</span>
-        <span class="module-badge badge-core">CORE</span>
+    <!-- TS 3 -->
+    <div class="ts-item reveal">
+      <div class="ts-header">
+        <span class="ts-icon">⚠️</span>
+        <span class="ts-title">Multi-State tidak bekerja — warna tidak berubah sesuai kondisi</span>
+        <span class="ts-tag">Konfigurasi</span>
       </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Gunakan fitur interaktif bawaan PI Vision untuk analisis data</div>
-        <ul class="steps">
-          <li>Klik <strong>"Monitor Operations"</strong> (icon mata) → keluar dari Design Mode ke View Mode</li>
-          <li><strong>Trend Cursor:</strong> klik area dalam trend → muncul garis vertikal dengan nilai + timestamp di tiap trace. Cursor otomatis sinkron ke semua trend di display</li>
-          <li><strong>Pan timeline:</strong> arahkan cursor ke bagian bawah trend → drag kiri/kanan untuk geser waktu maju/mundur</li>
-          <li><strong>Zoom in:</strong> klik + drag area dalam trend → trend zoom ke rentang waktu yang dipilih. Semua simbol di display ikut update</li>
-          <li><strong>Undo zoom:</strong> tekan <em>CTRL+Z</em> untuk kembali ke zoom sebelumnya</li>
-          <li>Klik <strong>"Now"</strong> di Time Bar untuk kembali ke tampilan real-time</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- MODULE 8 -->
-    <div class="module" id="m8">
-      <div class="module-header">
-        <span class="module-num">MOD-08</span>
-        <span class="module-title">Ad Hoc Trend (Analisis Cepat)</span>
-        <span class="module-badge badge-bonus">BONUS</span>
-      </div>
-      <div class="module-body">
-        <div class="module-goal">// TUJUAN: Buat trend cepat untuk investigasi tanpa perlu bikin display dulu</div>
-        <ul class="steps">
-          <li>Dari halaman utama PI Vision, klik <strong>"New"</strong> → pilih <strong>"Ad Hoc Trend"</strong></li>
-          <li>Search dan drag attribute langsung ke canvas ad hoc trend</li>
-          <li>Analisis data sesuai kebutuhan — semua fitur trend tersedia</li>
-          <li>Kalau mau simpan hasilnya: klik <strong>"Convert to Display"</strong> → simpan sebagai display permanen</li>
-          <li>Untuk share ke kolega: klik <strong>"Share"</strong> → copy URL yang dihasilkan</li>
-        </ul>
-        <div class="checkpoint">
-          <span class="checkpoint-icon">💡</span>
-          <span><strong>USE CASE:</strong> Ad Hoc Trend ideal buat investigasi cepat pas ada alarm atau anomali — langsung buka, drag beberapa tag, bandingkan, lalu close. Tidak perlu save jika hanya untuk analisis sementara.</span>
+      <div class="ts-body">
+        <div class="ts-section">
+          <div class="ts-label cause">⚠️ Penyebab</div>
+          <ul class="list" style="font-size:14px;">
+            <li>Kondisi Multi-State dievaluasi terhadap data source yang salah</li>
+            <li>Tipe operator salah — misalnya pakai <code>=</code> untuk nilai Float (harus pakai <code>between</code>)</li>
+            <li>Urutan state tidak benar — PI Vision mengevaluasi dari atas ke bawah, state pertama yang cocok yang dipakai</li>
+            <li>Untuk Digital tag: nilai kondisi harus persis nama state text-nya (case-sensitive!)</li>
+          </ul>
+        </div>
+        <div class="ts-section">
+          <div class="ts-label sol">✅ Solusi</div>
+          <ol class="steps">
+            <li>Klik symbol → Format → Multi-State → pastikan <strong>Data Source</strong> yang dipakai untuk evaluasi sudah benar.</li>
+            <li>Untuk tag Float: gunakan operator <code>between</code> dengan nilai min dan max yang tepat.</li>
+            <li>Untuk Digital tag: pastikan nilai kondisi adalah exact state name dari Digital State Set (<code>Running</code> bukan <code>running</code>).</li>
+            <li>Ubah urutan state — kondisi paling spesifik (misalnya Danger) taruh di posisi paling atas.</li>
+          </ol>
         </div>
       </div>
     </div>
 
-    <!-- CHECKLIST -->
-    <div class="checklist-section" id="checklist">
-      <div class="checklist-title">✓ Checklist Praktik</div>
-
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">01</span>
-        <span class="check-text">AF attribute sudah linked ke PI Tag dan ada datanya (verifikasi via Preview di PSE)</span>
+    <!-- TS 4 -->
+    <div class="ts-item reveal">
+      <div class="ts-header">
+        <span class="ts-icon">🐌</span>
+        <span class="ts-title">Display loading sangat lambat atau trend tidak muncul</span>
+        <span class="ts-tag">Performance</span>
       </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">02</span>
-        <span class="check-text">Bisa akses PI Vision dari browser tanpa error</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">03</span>
-        <span class="check-text">Berhasil buat display baru dan masuk ke Design Mode</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">04</span>
-        <span class="check-text">Browse AF di Assets pane dan menemukan attribute target</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">05</span>
-        <span class="check-text">Drag attribute → Trend Symbol muncul di display dengan trace data</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">06</span>
-        <span class="check-text">Tambah attribute ke-2 ke trend yang sama (multi-trace berhasil)</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">07</span>
-        <span class="check-text">Configure Trend: kasih judul, bedakan warna trace, set time range</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">08</span>
-        <span class="check-text">Exit Design Mode → trend cursor berfungsi dan bisa baca nilai di titik waktu tertentu</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">09</span>
-        <span class="check-text">Berhasil zoom in dan pan di trend timeline</span>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <span class="check-num">10</span>
-        <span class="check-text">Display tersimpan dan bisa dibuka kembali</span>
+      <div class="ts-body">
+        <div class="ts-section">
+          <div class="ts-label cause">⚠️ Penyebab</div>
+          <ul class="list" style="font-size:14px;">
+            <li>Time range terlalu panjang dengan terlalu banyak tag dalam satu trend (misal 1 tahun × 50 tag)</li>
+            <li>Terlalu banyak symbol dalam satu display (biasanya &gt;100 symbol)</li>
+            <li>IIS server resource kurang (RAM/CPU) — biasanya karena banyak user buka secara bersamaan</li>
+            <li>Refresh rate terlalu pendek (1 detik) dengan banyak data source</li>
+          </ul>
+        </div>
+        <div class="ts-section">
+          <div class="ts-label sol">✅ Solusi</div>
+          <ol class="steps">
+            <li>Batasi jumlah tag per Trend symbol maksimal 10–15 untuk performa optimal.</li>
+            <li>Gunakan mode <strong>Interpolated</strong> dengan interval lebih besar (misal 1 menit) untuk trend dengan range panjang.</li>
+            <li>Bagi display besar menjadi beberapa halaman yang lebih kecil dan hubungkan dengan Link symbol.</li>
+            <li>Naikkan refresh rate dari 2 detik ke 5 atau 10 detik untuk display overview yang tidak perlu update sangat cepat.</li>
+          </ol>
+        </div>
       </div>
     </div>
 
-    <!-- COMMON ERRORS -->
-    <div class="errors-section" id="errors">
-      <div class="checklist-title" style="color: var(--danger);">⚡ Common Errors & Fix</div>
+    <!-- TS 5 -->
+    <div class="ts-item reveal">
+      <div class="ts-header">
+        <span class="ts-icon">🔒</span>
+        <span class="ts-title">User tidak bisa login atau muncul "Unauthorized" saat buka display</span>
+        <span class="ts-tag">Permission</span>
+      </div>
+      <div class="ts-body">
+        <div class="ts-section">
+          <div class="ts-label sol">✅ Langkah Diagnosa</div>
+          <ol class="steps">
+            <li>Cek apakah user bisa login ke PI Vision sama sekali — jika tidak bisa, berarti Windows account belum di-assign ke PI Vision role. Hubungi PI Vision Administrator.</li>
+            <li>Jika bisa login tapi tidak bisa buka display tertentu: display tersebut private atau belum di-share. Minta pemilik display untuk share ke user/group yang sesuai.</li>
+            <li>Jika bisa buka display tapi data tidak muncul: periksa PI data security — user tidak punya hak baca ke PI tag yang ada di display tersebut.</li>
+          </ol>
+        </div>
+        <pre><span class="cm"># Cara cek PI Identity user dari PI SMT:</span>
+<span class="cm"># PI SMT → Security → Mappings → cari Windows account</span>
+<span class="cm"># Pastikan account di-map ke PIOperators atau higher</span>
 
-      <div class="error-item">
-        <span class="error-label">ERR-01</span>
-        <span class="error-cause"><strong>Trend kosong / flatline</strong> — PI Tag belum menerima data dari interface/OPC. Cek status OPCInt.exe atau Connector, dan verifikasi tag ada valuenya di PI SMT.</span>
-      </div>
-      <div class="error-item">
-        <span class="error-label">ERR-02</span>
-        <span class="error-cause"><strong>AF attribute preview error</strong> — Data Reference tidak benar. Masuk PSE → attribute → pastikan PI Tag name valid dan server-nya benar.</span>
-      </div>
-      <div class="error-item">
-        <span class="error-label">ERR-03</span>
-        <span class="error-cause"><strong>Tidak bisa drag simbol ke display</strong> — Belum masuk Design Mode. Klik icon pensil/edit di toolbar PI Vision terlebih dahulu.</span>
-      </div>
-      <div class="error-item">
-        <span class="error-label">ERR-04</span>
-        <span class="error-cause"><strong>AF Database tidak muncul di Assets pane</strong> — Pilih AF Server yang benar dulu dari dropdown. Kalau server tidak muncul, cek koneksi PI AF ke PI Vision.</span>
-      </div>
-      <div class="error-item">
-        <span class="error-label">ERR-05</span>
-        <span class="error-cause"><strong>Data muncul tapi nilai "No Data" / "Shutdown"</strong> — Kemungkinan time range display terlalu jauh ke masa lalu atau future. Set time range ke "Last 8 Hours" dan klik "Now".</span>
+<span class="cm"># Cara cek dari PI Vision Admin:</span>
+<span class="str">https://PISRVCISDEMO/PIVision/#/admin/users</span>
+<span class="cm"># Cari username → assign role Reader/Creator</span></pre>
       </div>
     </div>
 
-  </main>
-</div>
+    <!-- TS 6 -->
+    <div class="ts-item reveal">
+      <div class="ts-header">
+        <span class="ts-icon">📱</span>
+        <span class="ts-title">PI Vision tidak tampil dengan baik di tablet atau mobile</span>
+        <span class="ts-tag">Display</span>
+      </div>
+      <div class="ts-body">
+        <div class="ts-section">
+          <div class="ts-label sol">✅ Tips</div>
+          <ul class="list" style="font-size:14px;">
+            <li>Gunakan <strong>Responsive layout</strong> saat membuat display — hindari posisi fixed pixel yang terlalu presisi</li>
+            <li>Buat display terpisah khusus untuk mobile dengan canvas size <strong>375×812</strong> (iPhone) atau <strong>768×1024</strong> (iPad)</li>
+            <li>Kurangi jumlah symbol per display untuk layar kecil</li>
+            <li>Gunakan parameter URL <code>hidenav=true</code> untuk maksimalkan ruang layar</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">— End of Troubleshooting —</div>
+
+    <div class="callout tip reveal">
+      <span class="ci">📚</span>
+      <div class="ct"><strong>Referensi Resmi PI Vision</strong><br>
+      Dokumentasi lengkap: <code>docs.aveva.com/bundle/pi-vision</code><br>
+      PI Vision Admin Guide: <code>docs.aveva.com/bundle/pi-vision/page/admin-guide</code><br>
+      Customer Portal (butuh login): <code>customers.osisoft.com</code></div>
+    </div>
+  </section>
+
+</div></main>
 
 <footer>
-  <div>
-    <span class="footer-brand">PT. CISTECH ALPHA INDONESIA</span> // PI SYSTEM LAB
-  </div>
-  <div>README v1.0 · PI VISION 2024 · AVEVA OSISFT</div>
+  <p style="margin-bottom:6px;">PI Vision Technical README &nbsp;·&nbsp; Display, Multi-State, Risk Level &amp; Troubleshooting</p>
+  <p style="color:#94a3b8;">AVEVA OSIsoft &nbsp;·&nbsp; Wayang Windu PIMS &nbsp;·&nbsp; PT. Cistech Alpha Indonesia &nbsp;·&nbsp; April 2026</p>
 </footer>
 
 <script>
-function toggleCheck(item) {
-  const box = item.querySelector('.check-box');
-  const text = item.querySelector('.check-text');
-  box.classList.toggle('checked');
-  text.classList.toggle('done');
-}
-</script>
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
+  document.querySelectorAll('section[id]').forEach(sec => {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+          const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px' }).observe(sec);
+  });
+</script>
 </body>
 </html>
