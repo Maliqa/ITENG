@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI System README — Data Archive & Asset Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #ffffff;
+    --surface:   #f5f7fa;
+    --card:      #ffffff;
+    --border:    #e2e8f0;
+    --border2:   #cbd5e1;
+    --accent:    #0066cc;
+    --accent2:   #00875a;
+    --accent3:   #e05c00;
+    --text:      #1a2332;
+    --muted:     #64748b;
+    --code-bg:   #f0f4f8;
+    --code-text: #334155;
+    --tag-da:    #e8f4fd;
+    --tag-af:    #e8f7f0;
+    --tag-pi:    #fef3ec;
+    --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.06);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.8; overflow-x: hidden; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 28px; }
+
+  /* NAV */
+  .sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 10px 0; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+  .nav-inner { display: flex; gap: 2px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: 0 28px; align-items: center; }
+  .nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); margin-right: 10px; letter-spacing: .04em; }
+  .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 5px 9px; border-radius: 4px; color: var(--muted); text-decoration: none; transition: all .2s; white-space: nowrap; }
+  .nav-link:hover, .nav-link.active { color: var(--accent); background: var(--tag-da); font-weight: 600; }
+
+  /* HEADER */
+  header { padding: 70px 0 52px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 50%, #f5fdf9 100%); position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 80% 20%, rgba(0,102,204,.06) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(0,135,90,.05) 0%, transparent 50%); pointer-events: none; }
+  header .wrap { position: relative; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; animation: fadeUp .5s ease both; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+  .badge.da  { background: var(--tag-da); color: var(--accent);  border: 1px solid rgba(0,102,204,.2); }
+  .badge.af  { background: var(--tag-af); color: var(--accent2); border: 1px solid rgba(0,135,90,.2); }
+  .badge.gen { background: var(--tag-pi); color: var(--accent3); border: 1px solid rgba(224,92,0,.2); }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(30px, 5vw, 50px); font-weight: 800; line-height: 1.1; margin-bottom: 18px; color: var(--text); animation: fadeUp .5s .08s ease both; }
+  h1 .hi { color: var(--accent); } h1 .lo { color: var(--accent2); }
+  .subtitle { color: var(--muted); font-size: 15px; max-width: 580px; animation: fadeUp .5s .16s ease both; line-height: 1.6; }
+
+  /* TOC */
+  .toc { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 24px 28px; margin: 40px 0; animation: fadeUp .5s .24s ease both; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .toc > ol { padding-left: 0; list-style: none; counter-reset: toc; }
+  .toc > ol > li { counter-increment: toc; margin: 6px 0; }
+  .toc > ol > li::before { content: counter(toc, decimal-leading-zero) "."; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-right: 10px; }
+  .toc a { color: var(--text); text-decoration: none; font-size: 14px; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+  .toc .sub { margin: 4px 0 4px 28px; list-style: none; padding: 0; }
+  .toc .sub li { margin: 3px 0; font-size: 13px; color: var(--muted); }
+  .toc .sub li::before { content: "└ "; color: var(--border2); }
+
+  /* SECTIONS */
+  section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: none; }
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  h2 { font-family: 'Syne', sans-serif; font-size: clamp(22px, 3vw, 30px); font-weight: 700; margin-bottom: 16px; line-height: 1.2; color: var(--text); }
+  h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; margin: 40px 0 12px; color: var(--accent2); }
+  h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin: 28px 0 10px; color: var(--text); }
+  p { margin-bottom: 14px; color: var(--text); }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* CONCEPT BANNER */
+  .concept-banner { border-radius: 12px; padding: 28px 32px; margin: 28px 0; }
+  .concept-banner.da { background: linear-gradient(135deg, #e8f4fd, #dbeeff); border: 1px solid rgba(0,102,204,.15); }
+  .concept-banner.af { background: linear-gradient(135deg, #e8f7f0, #d1f5e5); border: 1px solid rgba(0,135,90,.15); }
+  .concept-banner.tag { background: linear-gradient(135deg, #fef3ec, #fde8d8); border: 1px solid rgba(224,92,0,.15); }
+  .concept-banner h3 { margin: 0 0 12px; font-size: 20px; }
+  .concept-banner.da h3 { color: var(--accent); }
+  .concept-banner.af h3 { color: var(--accent2); }
+  .concept-banner.tag h3 { color: var(--accent3); }
+  .concept-banner p { margin-bottom: 10px; font-size: 14.5px; color: #2d3748; }
+  .concept-banner p:last-child { margin-bottom: 0; }
+  .concept-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; display: block; opacity: .65; }
+  .concept-banner.da .concept-label { color: var(--accent); }
+  .concept-banner.af .concept-label { color: var(--accent2); }
+  .concept-banner.tag .concept-label { color: var(--accent3); }
+
+  /* ANALOGY */
+  .analogy { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+  .analogy-side { border-radius: 8px; padding: 18px 20px; border: 1px solid var(--border); }
+  .analogy-side.real { background: #fff9f0; border-color: rgba(224,92,0,.2); }
+  .analogy-side.pi   { background: #f0f7ff; border-color: rgba(0,102,204,.2); }
+  .analogy-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  .analogy-side.real .analogy-title { color: var(--accent3); }
+  .analogy-side.pi   .analogy-title { color: var(--accent); }
+  .analogy-side p { font-size: 13.5px; color: var(--text); margin: 0; }
+
+  /* CARDS */
+  .card-grid { display: grid; gap: 14px; margin: 20px 0; }
+  .card-grid.two   { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card-grid.three { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; box-shadow: var(--shadow); transition: box-shadow .2s, transform .2s, border-color .2s; }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--accent); }
+  .card-icon { font-size: 26px; margin-bottom: 10px; }
+  .card h4 { margin: 0 0 6px; color: var(--accent); font-size: 14px; }
+  .card p  { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* CONCEPT GRID */
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 20px 0; }
+  .concept-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow); border-top: 3px solid var(--accent); }
+  .concept-card.green  { border-top-color: var(--accent2); }
+  .concept-card.orange { border-top-color: var(--accent3); }
+  .concept-card .cc-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+  .concept-card .cc-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .concept-card p { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* CODE */
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent3); border-radius: 8px; padding: 18px 20px; overflow-x: auto; margin: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7; color: var(--code-text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--tag-da); color: var(--accent); padding: 2px 6px; border-radius: 4px; }
+  pre code { background: transparent; padding: 0; color: inherit; font-size: inherit; }
+  .cm  { color: #94a3b8; } .kw { color: #d97706; } .str { color: #059669; } .fn { color: #2563eb; } .num { color: #7c3aed; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { background: var(--surface); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--accent); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-size: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .callout.info  { background: var(--tag-da); border-left: 4px solid var(--accent); }
+  .callout.tip   { background: var(--tag-af); border-left: 4px solid var(--accent2); }
+  .callout.warn  { background: var(--tag-pi); border-left: 4px solid var(--accent3); }
+  .callout-icon  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-text  { flex: 1; color: var(--text); }
+  .callout strong { display: block; margin-bottom: 4px; color: var(--text); }
+
+  /* FLOW */
+  .flow { display: flex; flex-wrap: wrap; gap: 0; align-items: center; justify-content: center; margin: 28px 0; padding: 24px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); }
+  .flow-node { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 12px; font-family: 'JetBrains Mono', monospace; text-align: center; min-width: 108px; box-shadow: var(--shadow); transition: box-shadow .2s, border-color .2s; }
+  .flow-node:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
+  .flow-node .fn-label { color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px; }
+  .flow-node .fn-name  { color: var(--accent); font-weight: 700; font-size: 13px; }
+  .flow-arrow { color: var(--border2); font-size: 22px; padding: 0 6px; }
+  .flow-node.af  .fn-name { color: var(--accent2); }
+  .flow-node.src .fn-name { color: var(--accent3); }
+
+  /* ARCH BOX */
+  .arch-box { border: 1px solid var(--border); border-radius: 10px; padding: 22px; margin: 20px 0; background: #f8fafc; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; white-space: pre; overflow-x: auto; color: #475569; box-shadow: var(--shadow); }
+  .arch-box .hl  { color: var(--accent); font-weight: 700; }
+  .arch-box .hl2 { color: var(--accent2); font-weight: 700; }
+  .arch-box .hl3 { color: var(--accent3); font-weight: 700; }
+
+  /* STEPS */
+  ol.steps { padding-left: 0; list-style: none; counter-reset: steps; }
+  ol.steps li { counter-increment: steps; padding: 12px 12px 12px 50px; position: relative; margin: 6px 0; background: #fff; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; box-shadow: var(--shadow); }
+  ol.steps li::before { content: counter(steps); position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #fff; background: var(--accent); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 24px; }
+
+  /* LIST */
+  ul.list { padding-left: 0; list-style: none; }
+  ul.list li { padding: 5px 0 5px 22px; position: relative; font-size: 14px; }
+  ul.list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent3); }
+
+  /* FOOTER */
+  footer { padding: 40px 0; text-align: center; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; background: var(--surface); border-top: 1px solid var(--border); }
+
+  /* DIVIDER */
+  .divider { display: flex; align-items: center; gap: 12px; margin: 32px 0; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) { .analogy { grid-template-columns: 1fr; } .nav-logo { display: none; } }
+</style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <span class="nav-logo">PI SYS</span>
+    <a href="#konsep"         class="nav-link">Konsep</a>
+    <a href="#overview"       class="nav-link">Overview</a>
+    <a href="#data-archive"   class="nav-link">Data Archive</a>
+    <a href="#tags"           class="nav-link">PI Tags</a>
+    <a href="#pi-af"          class="nav-link">PI AF</a>
+    <a href="#interface"      class="nav-link">Interface</a>
+    <a href="#security"       class="nav-link">Security</a>
+    <a href="#api"            class="nav-link">API & SDK</a>
+    <a href="#best-practices" class="nav-link">Best Practices</a>
+    <a href="#troubleshoot"   class="nav-link">Troubleshoot</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <div class="badge-row">
+      <span class="badge da">PI Data Archive</span>
+      <span class="badge af">PI Asset Framework</span>
+      <span class="badge gen">AVEVA OSIsoft</span>
+      <span class="badge gen">Technical Reference 2024</span>
+    </div>
+    <h1><span class="hi">PI System</span><br>Technical <span class="lo">README</span></h1>
+    <p class="subtitle">Dokumentasi komprehensif PI Data Archive &amp; PI Asset Framework — konsep dasar, arsitektur, konfigurasi, keamanan, dan best practices untuk implementasi industrial.</p>
+  </div>
+</header>
+
+<main><div class="wrap">
+
+  <div class="toc reveal">
+    <div class="toc-title">📋 Table of Contents</div>
+    <ol>
+      <li><a href="#konsep">Konsep Dasar PI System (Wajib Baca)</a>
+        <ol class="sub">
+          <li><a href="#konsep-da">Apa itu PI Data Archive?</a></li>
+          <li><a href="#konsep-tags">Apa itu PI Tags / PI Points?</a></li>
+          <li><a href="#konsep-af">Apa itu PI Asset Framework?</a></li>
+        </ol>
+      </li>
+      <li><a href="#overview">Arsitektur PI System</a></li>
+      <li><a href="#data-archive">PI Data Archive — Detail Teknis</a>
+        <ol class="sub">
+          <li><a href="#da-arch">Subsistem &amp; Services</a></li>
+          <li><a href="#da-storage">Storage Architecture</a></li>
+          <li><a href="#da-compression">Compression &amp; Exception</a></li>
+          <li><a href="#da-backup">Backup &amp; Recovery</a></li>
+        </ol>
+      </li>
+      <li><a href="#tags">PI Tags — Detail Teknis</a>
+        <ol class="sub">
+          <li><a href="#tag-types">Point Types &amp; Data Types</a></li>
+          <li><a href="#tag-attributes">Tag Attributes Lengkap</a></li>
+          <li><a href="#tag-create">Cara Membuat Tags</a></li>
+        </ol>
+      </li>
+      <li><a href="#pi-af">PI Asset Framework — Detail Teknis</a>
+        <ol class="sub">
+          <li><a href="#af-hierarchy">Hierarchy Design</a></li>
+          <li><a href="#af-templates">Templates &amp; Data Reference</a></li>
+          <li><a href="#af-analytics">PI Analytics</a></li>
+        </ol>
+      </li>
+      <li><a href="#interface">PI Interfaces</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#api">PI Web API &amp; PI AF SDK</a></li>
+      <li><a href="#best-practices">Best Practices</a></li>
+      <li><a href="#troubleshoot">Troubleshooting</a></li>
+    </ol>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 00 — KONSEP DASAR -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="konsep">
+    <div class="section-label">00 — Konsep Dasar</div>
+    <h2>Konsep Dasar PI System</h2>
+    <p>Sebelum masuk ke konfigurasi teknis, penting untuk memahami <strong>apa sebenarnya fungsi setiap komponen</strong> di PI System dan bagaimana mereka saling berhubungan. Section ini menjelaskan konsep PI Data Archive, PI Tags, dan PI AF dengan bahasa yang mudah dipahami.</p>
+
+    <!-- KONSEP: PI DATA ARCHIVE -->
+    <div class="concept-banner da reveal" id="konsep-da">
+      <span class="concept-label">Konsep 01 — PI Data Archive</span>
+      <h3>Apa itu PI Data Archive?</h3>
+      <p>PI Data Archive adalah <strong>database khusus time-series</strong> — yaitu database yang dirancang dari awal untuk menyimpan data yang berubah seiring waktu (nilai + timestamp). Berbeda dengan database relasional seperti SQL Server yang menyimpan baris-kolom statis, PI Data Archive menyimpan jutaan deret waktu dari ribuan sensor secara bersamaan dengan efisiensi tinggi.</p>
+      <p>Bayangkan sebuah pabrik dengan 10.000 sensor, masing-masing mengirim data setiap 1 detik = <strong>10.000 nilai per detik = 864 juta data per hari</strong>. Database SQL biasa akan collapse dalam hitungan jam. PI Data Archive mampu menanganinya berkat dua mekanisme filter otomatis (Exception Reporting + Swinging Door Compression) yang mampu mereduksi data hingga 90% tanpa kehilangan akurasi.</p>
+      <p><strong>Fungsi utama:</strong> menerima data real-time dari lapangan (via PI Interface), menyimpannya dengan kompresi lossless, dan menyajikan kembali — baik nilai saat ini maupun historis bertahun-tahun — dalam milidetik.</p>
+    </div>
+
+    <div class="analogy reveal">
+      <div class="analogy-side real">
+        <div class="analogy-title">🏭 Dunia Nyata</div>
+        <p>Lemari arsip raksasa yang menyimpan rekaman pembacaan setiap alat ukur di pabrik — setiap menit, setiap hari, selama bertahun-tahun. Kamu bisa tanya: "Berapa tekanan kompresor 3 tahun lalu pada jam 2 siang?" dan dapat jawabannya dalam hitungan detik.</p>
+      </div>
+      <div class="analogy-side pi">
+        <div class="analogy-title">🖥️ PI Data Archive</div>
+        <p>Time-series database yang menyimpan nilai + timestamp dari setiap PI Tag. Dua layer: <strong>Snapshot</strong> (nilai terkini, di RAM) dan <strong>Archive</strong> (historis, di disk, file .arc). Data dikompres otomatis dengan algoritma Swinging Door.</p>
+      </div>
+    </div>
+
+    <h4>Alur Data Masuk ke PI Data Archive</h4>
+    <div class="flow reveal">
+      <div class="flow-node src"><span class="fn-label">1. Sumber</span><span class="fn-name">Sensor/DCS</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node src"><span class="fn-label">2. Kolektor</span><span class="fn-name">PI Interface</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">3. Filter 1</span><span class="fn-name">Exception</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">4. Nilai Kini</span><span class="fn-name">Snapshot</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">5. Filter 2</span><span class="fn-name">Swing Door</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">6. Simpan</span><span class="fn-name">Archive .arc</span></div>
+    </div>
+
+    <p><strong>Exception Reporting (Filter 1)</strong> — Data dari DCS hanya diteruskan ke Snapshot jika nilainya berubah lebih dari batas yang ditentukan (<code>excdev</code>). Kalau suhu stabil di 95°C, tidak perlu kirim 3.600 data yang sama dalam 1 jam.</p>
+    <p><strong>Swinging Door Compression (Filter 2)</strong> — Nilai di Snapshot hanya ditulis ke Archive permanen jika tidak bisa direkonstruksi secara linear dari dua titik sebelumnya (batas <code>compdev</code>). Inilah yang membuat PI bisa menghemat 90% storage tanpa kehilangan akurasi.</p>
+
+    <div class="callout info reveal">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-text">
+        <strong>PI Data Archive ≠ SQL Database</strong>
+        PI Data Archive bukan relational database — tidak ada JOIN tabel atau arbitrary SQL. PI punya query language sendiri (PI Time Expression) dan diakses via PI SDK, PI Web API, atau PI OLEDB. Kelebihannya: untuk data time-series, PI jauh lebih cepat dan efisien dari SQL Server mana pun.
+      </div>
+    </div>
+
+    <!-- KONSEP: PI TAGS -->
+    <div class="concept-banner tag reveal" id="konsep-tags">
+      <span class="concept-label">Konsep 02 — PI Tags / PI Points</span>
+      <h3>Apa itu PI Tags (PI Points)?</h3>
+      <p><strong>PI Tag</strong> (resminya disebut <em>PI Point</em>) adalah unit penyimpanan terkecil di PI Data Archive. Satu PI Tag = satu deret waktu (time series) dari satu variabel proses. Setiap kali sensor membaca nilai, data tersebut masuk ke PI Tag yang sesuai lengkap dengan timestamp-nya.</p>
+      <p>Analoginya: kalau PI Data Archive adalah sebuah buku besar berisi ribuan halaman, maka setiap PI Tag adalah satu halaman khusus yang mencatat satu hal — misalnya halaman "Suhu Kompresor-01 Inlet". Halaman itu berisi deretan baris: jam berapa, berapa derajat, sampai bertahun-tahun ke belakang.</p>
+      <p>Setiap PI Tag punya <strong>atribut metadata</strong> — nama unik, satuan engineering, tipe data, batas range, aturan kompresi, dan kontrol keamanan. Jumlah PI Tag yang bisa dibuat dibatasi oleh <strong>lisensi PI Server</strong> (misal: lisensi 10.000 tags = maksimal 10.000 deret waktu bersamaan).</p>
+    </div>
+
+    <div class="analogy reveal">
+      <div class="analogy-side real">
+        <div class="analogy-title">🌡️ Dunia Nyata</div>
+        <p>Setiap instrumen di pabrik (thermometer, pressure gauge, flow meter, vibration sensor) punya lembar log sendiri. Lembar itu punya nama (misal TI-101), satuan (°C), range (0–200), dan catatan pembacaan setiap menitnya.</p>
+      </div>
+      <div class="analogy-side pi">
+        <div class="analogy-title">🏷️ PI Tag</div>
+        <p>Satu PI Tag mewakili satu instrumen. Tag punya nama unik (<code>COMP01.SUCT.PRESS</code>), tipe data (Float32), satuan (<code>psig</code>), dan menyimpan seluruh historis nilai + timestamp dari instrumen tersebut.</p>
+      </div>
+    </div>
+
+    <h4>Tiga Kondisi Nilai PI Tag yang Perlu Dipahami</h4>
+    <div class="concept-grid reveal">
+      <div class="concept-card">
+        <span class="cc-label">Status Normal</span>
+        <div class="cc-title">Nilai Numerik</div>
+        <p>Tag menampilkan angka normal seperti <code>95.3 °C</code>. Artinya data mengalir normal dari sumber ke PI Archive — semuanya bekerja dengan baik.</p>
+      </div>
+      <div class="concept-card orange">
+        <span class="cc-label">System Digital States</span>
+        <div class="cc-title">Pt Created / Shutdown / Comm Fail</div>
+        <p><code>Pt Created</code> = tag baru, belum ada data. <code>Shutdown</code> = PI service mati. <code>Comm Fail</code> = koneksi ke sumber putus. <code>No Data</code> = tidak ada data dalam rentang waktu tersebut.</p>
+      </div>
+      <div class="concept-card green">
+        <span class="cc-label">Digital Tag</span>
+        <div class="cc-title">ON/OFF · Running/Stopped</div>
+        <p>Tag bertipe Digital menampilkan text state bukan angka — misal <code>Running</code>, <code>Stopped</code>, <code>Fault</code>, <code>Open</code>, <code>Closed</code> sesuai Digital State Set yang dikonfigurasi.</p>
+      </div>
+    </div>
+
+    <!-- KONSEP: PI AF -->
+    <div class="concept-banner af reveal" id="konsep-af">
+      <span class="concept-label">Konsep 03 — PI Asset Framework (PI AF)</span>
+      <h3>Apa itu PI Asset Framework?</h3>
+      <p>PI AF adalah <strong>layer konteks yang memberikan makna pada data PI</strong>. Tanpa PI AF, PI Data Archive hanya menyimpan ribuan tag dengan nama seperti <code>FIC-101</code>, <code>TIC-202</code> — angka-angka tanpa konteks, tanpa hubungan satu sama lain. Siapa yang tahu <code>FIC-101</code> itu milik unit mana? Mengukur apa? Apa batas normalnya?</p>
+      <p>PI AF menjawab semua pertanyaan itu dengan membangun <strong>model hierarkis aset pabrik secara digital</strong> — dari level Site, Area, Unit, Equipment, hingga Measurement — dan menghubungkan setiap node ke PI Tag yang sesuai. PI AF juga memungkinkan kalkulasi derived values, event tracking, dan notifikasi alarm.</p>
+      <p><strong>Konsep kunci:</strong> <em>Element</em> (objek fisik seperti Kompresor), <em>Template</em> (blueprint untuk semua objek sejenis), dan <em>Attribute</em> (properti dari objek, linked ke PI Tag). Hasilnya: satu "Compressor-01" di AF sudah punya semua datanya — suhu, tekanan, vibrasi — terorganisir rapi dan bisa diakses oleh siapa saja.</p>
+    </div>
+
+    <div class="analogy reveal">
+      <div class="analogy-side real">
+        <div class="analogy-title">🏗️ Pabrik Fisik</div>
+        <p>Pabrik punya struktur: Site → Area Produksi → Unit Kompresi → Kompresor-01 → Sensor Suhu Inlet. Setiap engineer langsung tahu data itu dari mana dan artinya apa.</p>
+      </div>
+      <div class="analogy-side pi">
+        <div class="analogy-title">🌳 PI AF Hierarchy</div>
+        <p>AF mereplikasi struktur itu secara digital: <code>FSO_SITE → GAS_COMP → Compressor-01 → Inlet_Temperature</code>. Attribute <code>Inlet_Temperature</code> linked ke PI Tag <code>COMP01.TEMP.IN</code> di Data Archive.</p>
+      </div>
+    </div>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-text">
+        <strong>Hubungan Ketiga Komponen Utama PI</strong>
+        <strong>PI Data Archive</strong> = Gudang penyimpanan data mentah.<br>
+        <strong>PI Tags</strong> = Rak-rak berlabel di gudang, masing-masing menyimpan satu jenis data time-series.<br>
+        <strong>PI AF</strong> = Peta dan katalog gudang — menjelaskan rak mana ada di zona mana, milik departemen apa, dan boleh diakses siapa.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 01 — OVERVIEW -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="overview">
+    <div class="section-label">01 — Overview</div>
+    <h2>Arsitektur PI System</h2>
+    <p>PI System adalah platform <strong>Operational Data Infrastructure (ODI)</strong> dari AVEVA OSIsoft yang mengumpulkan, menyimpan, menganalisis, dan memvisualisasikan data proses industri secara real-time dari berbagai sumber seperti DCS, SCADA, PLC, dan sensor.</p>
+
+    <div class="flow reveal">
+      <div class="flow-node src"><span class="fn-label">Sources</span><span class="fn-name">DCS / SCADA</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node src"><span class="fn-label">Interface</span><span class="fn-name">OPC DA/UA</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">Buffer</span><span class="fn-name">PI Buffer</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node"><span class="fn-label">Storage</span><span class="fn-name">Data Archive</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node af"><span class="fn-label">Context</span><span class="fn-name">PI AF</span></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node af"><span class="fn-label">Visualization</span><span class="fn-name">PI Vision</span></div>
+    </div>
+
+    <div class="card-grid two reveal">
+      <div class="card"><div class="card-icon">🗄️</div><h4>PI Data Archive</h4><p>Time-series database berperforma tinggi untuk menyimpan data proses industri dengan kompresi lossless. Engine utama PI System.</p></div>
+      <div class="card"><div class="card-icon">🌳</div><h4>PI Asset Framework</h4><p>Layer konteks yang membangun model aset hierarkis di atas data mentah PI, menghubungkan tag ke objek engineering bermakna.</p></div>
+      <div class="card"><div class="card-icon">🔌</div><h4>PI Interface</h4><p>Konektor antara sumber data lapangan (OPC, Modbus, DCS) dengan PI Data Archive. Mendukung 450+ protokol industri.</p></div>
+      <div class="card"><div class="card-icon">🌐</div><h4>PI Web API</h4><p>RESTful API untuk akses data PI dari aplikasi modern, web, dan cloud. Berbasis JSON / HAL+JSON di atas IIS.</p></div>
+      <div class="card"><div class="card-icon">👁️</div><h4>PI Vision</h4><p>Web-based visualization tool untuk membuat dashboard operasional real-time tanpa memerlukan install klien.</p></div>
+      <div class="card"><div class="card-icon">📊</div><h4>PI ProcessBook</h4><p>Desktop client klasik untuk membuat P&amp;ID displays, trend, dan totalizer. Digunakan operator di control room.</p></div>
+    </div>
+
+    <div class="arch-box reveal">┌────────────────────────────────────────────────────────────────┐
+│                    <span class="hl">PI SYSTEM ARCHITECTURE</span>                      │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│   <span class="hl3">[ Field Layer ]</span>           <span class="hl">[ Collection Layer ]</span>              │
+│   ┌──────────┐            ┌──────────────────┐                │
+│   │ DCS/SCADA├──OPC DA───▶│  PI Interface    │                │
+│   │ PLC      │            │  (OPCInt.exe)    │                │
+│   │ Vibration├──Setpoint─▶│                  │                │
+│   └──────────┘            └────────┬─────────┘                │
+│                                    │                          │
+│                           <span class="hl">[ Server Layer ]</span>                  │
+│                           ┌────────▼─────────┐                │
+│                           │  PI Buffer Sub   │                │
+│                           └────────┬─────────┘                │
+│                  ┌─────────────────▼─────────────────┐        │
+│                  │        <span class="hl">PI DATA ARCHIVE</span>           │        │
+│                  │  ┌──────────┐  ┌──────────────┐   │        │
+│                  │  │ Snapshot │  │ Archive Files │   │        │
+│                  │  │  (RAM)   │  │ (.arc / .ann) │   │        │
+│                  │  └──────────┘  └──────────────┘   │        │
+│                  └──────────────┬────────────────────┘        │
+│                  ┌──────────────▼────────────────────┐        │
+│                  │       <span class="hl2">PI ASSET FRAMEWORK</span>          │        │
+│                  │  AF Server  ── AF Database          │        │
+│                  │  Templates  ── Elements             │        │
+│                  │  Attributes ── Analytics            │        │
+│                  └──────────────┬────────────────────┘        │
+│           <span class="hl">[ Client Layer ]</span>         │                             │
+│   PI Vision          PI ProcessBook          PI Web API        │
+│   (Browser)          (Desktop)               (REST/JSON)       │
+└────────────────────────────────────────────────────────────────┘</div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 02 — PI DATA ARCHIVE DETAIL -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="data-archive">
+    <div class="section-label">02 — Core Component</div>
+    <h2>PI Data Archive — Detail Teknis</h2>
+    <p>PI Data Archive (dahulu disebut PI Server) adalah time-series database berperforma tinggi yang menjadi engine utama PI System, dirancang untuk menangani jutaan data point per detik.</p>
+
+    <h3 id="da-arch">2.1 Subsistem &amp; Windows Services</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Subsistem</th><th>Service Name</th><th>Fungsi</th><th>Port</th></tr></thead>
+        <tbody>
+          <tr><td><strong>PI API / Network</strong></td><td><code>pinetmgr</code></td><td>Network manager — entry point semua koneksi ke PI Server</td><td>5450</td></tr>
+          <tr><td><strong>PI Snapshot</strong></td><td><code>pisnapss</code></td><td>Menyimpan nilai terbaru (current value) setiap tag di memory (RAM)</td><td>—</td></tr>
+          <tr><td><strong>PI Archive</strong></td><td><code>piarchss</code></td><td>Menulis data dari Snapshot ke file .arc (historical storage)</td><td>—</td></tr>
+          <tr><td><strong>PI Events</strong></td><td><code>pieventss</code></td><td>Event queue dan notifikasi ketika ada data baru masuk</td><td>—</td></tr>
+          <tr><td><strong>PI License</strong></td><td><code>pilicmgr</code></td><td>Manajemen lisensi — mengontrol jumlah PI tag yang diizinkan</td><td>—</td></tr>
+          <tr><td><strong>PI Buffer</strong></td><td><code>PIBufss</code></td><td>Menyangga data sementara saat Archive tidak bisa diakses</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="da-storage">2.2 Storage Architecture</h3>
+    <div class="card-grid two reveal">
+      <div class="card"><div class="card-icon">📸</div><h4>Snapshot Database</h4><p>Menyimpan nilai terkini dari setiap PI tag. Tersimpan di RAM untuk akses ultra-cepat. Di-persist ke disk secara periodik. Service: <code>pisnapss</code>.</p></div>
+      <div class="card"><div class="card-icon">🗂️</div><h4>Archive Database</h4><p>Data historis dalam file <code>.arc</code> (data) + <code>.ann</code> (annotation). Satu file archive bisa menampung miliaran event. Service: <code>piarchss</code>.</p></div>
+    </div>
+
+    <pre><span class="cm"># Lokasi default archive files:</span>
+C:\ProgramData\OSIsoft\PI\dat\
+
+piarchive.arc     <span class="cm"># Primary archive — sedang aktif ditulis</span>
+piarchive.ann     <span class="cm"># Annotation file untuk archive di atas</span>
+piarch01.arc      <span class="cm"># Archive sebelumnya (sudah di-shift)</span>
+piarch01.ann
+piarch02.arc      <span class="cm"># Archive lebih lama, dst...</span>
+piarch02.ann</pre>
+
+    <div class="callout warn reveal">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-text">
+        <strong>Archive Sizing — Jangan Abaikan!</strong>
+        Archive terlalu kecil → shift terlalu sering → performa turun drastis.<br>
+        <code>Archive Size ≈ Tag Count × Data Rate × Retention (days) × 16 bytes / Compression Ratio</code>
+      </div>
+    </div>
+
+    <h3 id="da-compression">2.3 Compression &amp; Exception Reporting</h3>
+    <div class="card-grid two reveal">
+      <div class="card"><div class="card-icon">📉</div><h4>Exception Reporting</h4><p>Filter di sisi Interface. Data hanya dikirim ke Snapshot jika berubah &gt; <code>excdev</code> atau sudah melewati <code>excmax</code> detik. Menghemat bandwidth jaringan.</p></div>
+      <div class="card"><div class="card-icon">🗜️</div><h4>Swinging Door Compression</h4><p>Filter di sisi Archive. Data Snapshot hanya ditulis ke .arc jika tidak bisa diinterpolasi linear dari dua titik sebelumnya (batas <code>compdev</code>). Menghemat disk.</p></div>
+    </div>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-text">
+        <strong>Analogi Swinging Door:</strong> Bayangkan dua pintu berputar di setiap data point. Selama data baru masih dalam "ayunan" kedua pintu (bisa diprediksi linear), data tidak disimpan. Hanya ketika ayunan dipaksa menutup oleh deviasi signifikan, data baru ditulis ke archive.
+      </div>
+    </div>
+
+    <h3 id="da-backup">2.4 Backup &amp; Recovery</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Tipe Backup</th><th>Metode</th><th>Frekuensi</th><th>Yang Disimpan</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Archive Files</strong></td><td>Copy .arc + .ann (shifted archives)</td><td>Daily</td><td>Data historis per periode</td></tr>
+          <tr><td><strong>Snapshot</strong></td><td>PI SMT → Backup Snapshot</td><td>Weekly</td><td>Nilai terkini semua tag</td></tr>
+          <tr><td><strong>Tag Database</strong></td><td>PICONFIG export / PI Builder</td><td>Weekly</td><td>Semua atribut PI tag</td></tr>
+          <tr><td><strong>AF Database</strong></td><td>PSE → Export AF database</td><td>Weekly</td><td>Hierarchy, templates, analytics</td></tr>
+          <tr><td><strong>Full PI Backup</strong></td><td>PI SMT → Backup All</td><td>Monthly</td><td>Archive + Snapshot + Config</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><span class="cm"># PowerShell — Auto-backup archive files (shifted only)</span>
+<span class="kw">$src</span> = <span class="str">"C:\ProgramData\OSIsoft\PI\dat"</span>
+<span class="kw">$dst</span> = <span class="str">"D:\PI_Backup\$(Get-Date -f 'yyyy-MM-dd')"</span>
+<span class="fn">New-Item</span> -ItemType Directory -Force -Path <span class="kw">$dst</span>
+<span class="fn">Copy-Item</span> <span class="str">"$src\piarch*.arc"</span> -Destination <span class="kw">$dst</span>
+<span class="fn">Copy-Item</span> <span class="str">"$src\piarch*.ann"</span> -Destination <span class="kw">$dst</span>
+<span class="fn">Write-Host</span> <span class="str">"Backup selesai → $dst"</span></pre>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 03 — PI TAGS DETAIL -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="tags">
+    <div class="section-label">03 — PI Points</div>
+    <h2>PI Tags — Detail Teknis</h2>
+    <p>PI Tag (atau PI Point) adalah unit penyimpanan dasar di PI Data Archive — satu tag = satu time-series stream dari satu variabel proses. Jumlah tag dibatasi oleh lisensi PI Server.</p>
+
+    <h3 id="tag-types">3.1 Point Types &amp; Data Types</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Point Type</th><th>Kode</th><th>Ukuran</th><th>Deskripsi</th><th>Contoh Penggunaan</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Float32</strong></td><td><code>R</code></td><td>4 byte</td><td>Single-precision floating point (32-bit)</td><td>Temperature, Pressure, Flow — mayoritas sensor analog</td></tr>
+          <tr><td><strong>Float64</strong></td><td><code>L</code></td><td>8 byte</td><td>Double-precision floating point (64-bit)</td><td>Aliran massa presisi tinggi, custody transfer meter</td></tr>
+          <tr><td><strong>Int32</strong></td><td><code>I</code></td><td>4 byte</td><td>Integer 32-bit (bilangan bulat)</td><td>Counter, Step number, Status code integer</td></tr>
+          <tr><td><strong>Digital</strong></td><td><code>D</code></td><td>—</td><td>Nilai diskrit dari Digital State Set (text)</td><td>Valve (Open/Closed), Motor (Running/Stopped/Fault)</td></tr>
+          <tr><td><strong>String</strong></td><td><code>S</code></td><td>—</td><td>Text string variabel panjang</td><td>Alarm message, Recipe name, Operator note</td></tr>
+          <tr><td><strong>Blob</strong></td><td><code>B</code></td><td>—</td><td>Binary large object</td><td>Waveform data, vibration spectrum, image</td></tr>
+          <tr><td><strong>Timestamp</strong></td><td><code>T</code></td><td>8 byte</td><td>Nilai berupa datetime/timestamp</td><td>Batch start time, last maintenance date</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout info reveal">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-text">
+        <strong>Pilih Float32 untuk hampir semua sensor analog</strong>
+        Float32 cukup presisi untuk sensor industri (6–7 digit signifikan) dan lebih hemat storage dari Float64. Gunakan Float64 hanya jika membutuhkan presisi sangat tinggi seperti flow computer custody transfer.
+      </div>
+    </div>
+
+    <h4>Digital State Set</h4>
+    <p>Tag bertipe Digital harus dihubungkan ke sebuah <strong>Digital State Set</strong> — daftar teks yang mendefinisikan kemungkinan nilai tag tersebut:</p>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>State Set Name</th><th>State 0</th><th>State 1</th><th>State 2</th><th>Untuk</th></tr></thead>
+        <tbody>
+          <tr><td><code>MotorState</code></td><td>Stopped</td><td>Running</td><td>Fault</td><td>Motor, Compressor, Pump</td></tr>
+          <tr><td><code>ValveState</code></td><td>Closed</td><td>Open</td><td>Partial</td><td>Control Valve, Isolation Valve</td></tr>
+          <tr><td><code>OnOff</code></td><td>Off</td><td>On</td><td>—</td><td>Switch, Breaker</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="tag-attributes">3.2 PI Tag Attributes — Lengkap</h3>
+
+    <h4>Atribut Identitas &amp; Deskripsi</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Atribut</th><th>Fungsi</th><th>Contoh Value</th></tr></thead>
+        <tbody>
+          <tr><td><code>tag</code></td><td>Nama unik tag — identifier utama (case-insensitive)</td><td><code>COMP-01.SUCT.PRESS</code></td></tr>
+          <tr><td><code>descriptor</code></td><td>Deskripsi human-readable dari tag ini</td><td><code>Compressor 01 Suction Pressure</code></td></tr>
+          <tr><td><code>pointtype</code></td><td>Tipe data (R, L, I, D, S, B, T)</td><td><code>R</code></td></tr>
+          <tr><td><code>engunits</code></td><td>Satuan engineering</td><td><code>psig</code></td></tr>
+          <tr><td><code>zero</code></td><td>Nilai minimum range (untuk scaling &amp; compression)</td><td><code>0</code></td></tr>
+          <tr><td><code>span</code></td><td>Rentang nilai: max − zero (untuk scaling)</td><td><code>150</code> → max = 150 psig</td></tr>
+          <tr><td><code>instrumenttag</code></td><td>Tag name dari DCS/instrumen sumber (P&amp;ID tag)</td><td><code>FIC-101</code></td></tr>
+          <tr><td><code>pointsource</code></td><td>Kode sumber data (identifier interface)</td><td><code>L</code> (OPC)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Atribut Exception Reporting (Filter di Interface Node)</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Atribut</th><th>Fungsi</th><th>Default</th><th>Rekomendasi</th></tr></thead>
+        <tbody>
+          <tr><td><code>excdev</code></td><td>Perubahan minimum agar data dikirim ke Snapshot</td><td>1.0%</td><td>0.5–2% untuk sensor analog</td></tr>
+          <tr><td><code>excdevpercent</code></td><td>excdev dalam persen (1) atau nilai absolut (0)</td><td>1</td><td>1 (percent)</td></tr>
+          <tr><td><code>excmax</code></td><td>Waktu maks (detik) tanpa data — paksa kirim meski flat</td><td>600s</td><td>600 (10 menit)</td></tr>
+          <tr><td><code>excmin</code></td><td>Waktu min (detik) antara dua pengiriman — anti flood</td><td>0</td><td>5–10 detik</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Atribut Compression (Filter di Archive Server)</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Atribut</th><th>Fungsi</th><th>Default</th><th>Rekomendasi</th></tr></thead>
+        <tbody>
+          <tr><td><code>compressing</code></td><td>Aktifkan PI Compression (1=aktif, 0=nonaktif)</td><td>1</td><td>Selalu 1 (kecuali blob/waveform)</td></tr>
+          <tr><td><code>compdev</code></td><td>Batas simpangan agar data ditulis ke archive</td><td>0.1%</td><td>0.05–0.2% untuk sensor presisi</td></tr>
+          <tr><td><code>compdevpercent</code></td><td>compdev dalam persen (1) atau absolut (0)</td><td>1</td><td>1 (percent)</td></tr>
+          <tr><td><code>compmax</code></td><td>Waktu maks (detik) tanpa tulis archive — paksa tulis</td><td>28800s</td><td>28800 (8 jam)</td></tr>
+          <tr><td><code>compmin</code></td><td>Waktu min (detik) antara dua penulisan ke archive</td><td>0</td><td>0 (default cukup)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Atribut Lokasi &amp; Keamanan</h4>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Atribut</th><th>Fungsi</th><th>Contoh</th></tr></thead>
+        <tbody>
+          <tr><td><code>location1–5</code></td><td>Custom grouping fields bebas (Area, Unit, Equipment, Interface ID, Scan class)</td><td><code>location1=1</code> (Area Produksi)</td></tr>
+          <tr><td><code>datasecurity</code></td><td>ACL untuk baca/tulis data nilai tag</td><td><code>piadmin: A(r,w) | PIOperators: A(r)</code></td></tr>
+          <tr><td><code>ptsecurity</code></td><td>ACL untuk baca/tulis konfigurasi/atribut tag</td><td><code>piadmin: A(r,w) | PIEngineers: A(r,w)</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="tag-create">3.3 Cara Membuat PI Tags</h3>
+
+    <h4>Manual via PI SMT (Point Builder)</h4>
+    <ol class="steps reveal">
+      <li>Buka <strong>PI System Management Tool (PI SMT)</strong> → pilih PI Server</li>
+      <li>Navigasi ke <code>Points → Point Builder</code></li>
+      <li>Klik <strong>New</strong>, isi: <code>Tag Name</code>, <code>Point Type</code>, <code>Descriptor</code>, <code>Engineering Units</code></li>
+      <li>Set <code>Point Source</code> ke kode interface (contoh: <code>L</code> untuk OPC)</li>
+      <li>Isi <code>Instrument Tag</code> sesuai tagname di OPC server / DCS</li>
+      <li>Atur nilai <code>excdev</code>, <code>excmax</code>, <code>compdev</code>, <code>compmax</code> sesuai kebutuhan</li>
+      <li>Klik <strong>Apply</strong> — tag langsung aktif dan siap menerima data</li>
+    </ol>
+
+    <h4>Bulk via PICONFIG Script</h4>
+    <pre><span class="cm">! PICONFIG — bulk create PI tags</span>
+<span class="kw">@table</span>  <span class="fn">PIpoint</span>
+<span class="kw">@mode</span>   <span class="fn">create</span>
+<span class="kw">@istr</span>   tag, pointtype, descriptor, engunits, zero, span, compressing, compdev, excdev, excmax
+<span class="str">COMP01.SUCT.PRESS</span>, <span class="num">R</span>, <span class="str">Compressor-01 Suction Pressure</span>,   <span class="str">psig</span>, <span class="num">0</span>, <span class="num">150</span>, <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">COMP01.DISC.PRESS</span>, <span class="num">R</span>, <span class="str">Compressor-01 Discharge Pressure</span>, <span class="str">psig</span>, <span class="num">0</span>, <span class="num">300</span>, <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">COMP01.TEMP.IN</span>,   <span class="num">R</span>, <span class="str">Compressor-01 Inlet Temperature</span>,   <span class="str">degC</span>, <span class="num">0</span>, <span class="num">200</span>, <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">COMP01.VIB.RMS</span>,   <span class="num">R</span>, <span class="str">Compressor-01 Vibration RMS</span>,       <span class="str">mm/s</span>, <span class="num">0</span>, <span class="num">50</span>,  <span class="num">1</span>, <span class="num">0.1</span>, <span class="num">1.0</span>, <span class="num">600</span>
+<span class="str">COMP01.STATUS</span>,    <span class="num">D</span>, <span class="str">Compressor-01 Operating Status</span>,    <span class="str">—</span>,    <span class="num">0</span>, <span class="num">0</span>,   <span class="num">0</span>, <span class="num">0</span>,   <span class="num">0</span>,   <span class="num">600</span>
+<span class="kw">@endtable</span></pre>
+
+    <h4>Bulk via PI Builder (Excel Add-in) — Rekomendasi untuk Ribuan Tag</h4>
+    <pre><span class="cm"># PI Builder: export → edit di Excel → import kembali</span>
+<span class="cm"># 1. PI SMT → PI Builder → Export existing tags sebagai template Excel (.xlsx)</span>
+<span class="cm"># 2. Edit baris di Excel (setiap baris = satu tag), tambah baris baru</span>
+<span class="cm"># 3. PI Builder → Import → pilih file xlsx → Preview → Execute</span>
+<span class="cm">#</span>
+<span class="cm"># Keunggulan PI Builder dibanding PICONFIG:</span>
+<span class="cm"># ✓ Bisa handle 10.000+ tags sekaligus</span>
+<span class="cm"># ✓ Validasi error sebelum import</span>
+<span class="cm"># ✓ Bisa update atribut tag existing (bukan hanya create)</span>
+<span class="cm"># ✓ Interface Excel yang familiar</span></pre>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 04 — PI AF DETAIL -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="pi-af">
+    <div class="section-label">04 — Asset Framework</div>
+    <h2>PI Asset Framework — Detail Teknis</h2>
+    <p>PI AF membangun model hierarkis aset pabrik di atas PI Data Archive — memberikan konteks struktural pada ribuan tag yang tersimpan di Data Archive.</p>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Komponen</th><th>Definisi</th><th>Analogi</th></tr></thead>
+        <tbody>
+          <tr><td><strong>AF Server</strong></td><td>Server tempat AF database disimpan dan dijalankan</td><td>Database server</td></tr>
+          <tr><td><strong>AF Database</strong></td><td>Container utama — satu pabrik/site = satu database</td><td>Schema database</td></tr>
+          <tr><td><strong>Element</strong></td><td>Representasi objek fisik/logis: Site, Area, Unit, Equipment</td><td>Object / row</td></tr>
+          <tr><td><strong>Attribute</strong></td><td>Properti dari Element — linked ke PI Tag, formula, atau static value</td><td>Column / field</td></tr>
+          <tr><td><strong>Element Template</strong></td><td>Blueprint/class untuk mendefinisikan atribut yang diwarisi semua instance</td><td>Class / schema</td></tr>
+          <tr><td><strong>Event Frame</strong></td><td>Rentang waktu bertandatangan: Batch, Shutdown, Alarm period</td><td>Time-bounded log</td></tr>
+          <tr><td><strong>Analysis</strong></td><td>Kalkulasi real-time/scheduled — hasilnya bisa ditulis ke PI Tag baru</td><td>Calculated column</td></tr>
+          <tr><td><strong>Notification</strong></td><td>Alert berbasis kondisi AF — dikirim via email ke operator/engineer</td><td>Trigger + alert</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="af-hierarchy">4.1 Hierarchy Design</h3>
+    <div class="arch-box reveal"><span class="hl">[ AF Database: PLANT_DEMO ]</span>
+
+<span class="hl2">SITE</span>           → Lokasi fisik pabrik / platform
+  └── <span class="hl2">AREA</span>       → Zona produksi / fungsi proses
+        └── <span class="hl2">UNIT</span>   → Unit proses (Compression, Separation, Utility)
+              └── <span class="hl2">EQUIP</span>→ Equipment individual
+                    └── <span class="hl">ATTR</span> → Measurement / Property (linked ke PI Tag)
+
+<span class="hl3">Contoh Implementasi (FSO Petronas):</span>
+
+FSO_SITE
+├── PROCESS_AREA
+│     └── GAS_COMPRESSION_UNIT
+│           ├── <span class="hl">Compressor-01</span>         [Template: Compressor_Template]
+│           │     ├── Suction_Pressure   → PIPoint: <span class="hl">COMP01.SUCT.PRESS</span>
+│           │     ├── Discharge_Pressure → PIPoint: <span class="hl">COMP01.DISC.PRESS</span>
+│           │     ├── Inlet_Temperature  → PIPoint: <span class="hl">COMP01.TEMP.IN</span>
+│           │     ├── Vibration_RMS      → PIPoint: <span class="hl">COMP01.VIB.RMS</span>
+│           │     └── Compression_Ratio  → Formula: Discharge/Suction
+│           └── <span class="hl">Compressor-02</span>         [Template: Compressor_Template]
+│                 └── ... (atribut otomatis dari template)</div>
+
+    <h3 id="af-templates">4.2 Templates &amp; Data Reference</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Data Reference Type</th><th>Fungsi</th><th>Contoh</th></tr></thead>
+        <tbody>
+          <tr><td><strong>PI Point</strong></td><td>Link langsung ke PI Tag di Data Archive</td><td>Semua sensor real-time</td></tr>
+          <tr><td><strong>String Builder</strong></td><td>Tagname dinamis dengan substitution <code>%Element%</code></td><td><code>%Element%.SUCT.PRESS</code></td></tr>
+          <tr><td><strong>Formula</strong></td><td>Kalkulasi matematika dari attribute lain dalam element</td><td><code>'Discharge' / 'Suction'</code></td></tr>
+          <tr><td><strong>Table Lookup</strong></td><td>Ambil nilai dari AF Table (reference data statis)</td><td>Alarm setpoints, material properties</td></tr>
+          <tr><td><strong>None (Static)</strong></td><td>Nilai tetap yang di-input manual</td><td>Equipment spec: Max HP, Model</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre><span class="cm"># AF Element Template: Compressor_Template</span>
+Attribute Name        | Data Reference | Tag Template (String Builder)
+──────────────────────┼────────────────┼─────────────────────────────────
+<span class="fn">Suction_Pressure</span>     | PI Point       | <span class="str">%Element%.SUCT.PRESS</span>
+<span class="fn">Discharge_Pressure</span>   | PI Point       | <span class="str">%Element%.DISC.PRESS</span>
+<span class="fn">Inlet_Temperature</span>    | PI Point       | <span class="str">%Element%.TEMP.IN</span>
+<span class="fn">Vibration_RMS</span>        | PI Point       | <span class="str">%Element%.VIB.RMS</span>
+<span class="fn">Compression_Ratio</span>    | Formula        | <span class="str">'Discharge_Pressure' / 'Suction_Pressure'</span>
+<span class="fn">Max_Operating_Press</span>  | None (static)  | <span class="num">150</span> psig
+<span class="fn">Equipment_Model</span>      | None (static)  | <span class="str">Atlas Copco GA-90</span>
+
+<span class="cm"># Resolusi String Builder:</span>
+<span class="cm"># Element "COMP-01" → %Element% = "COMP-01" → tag: COMP-01.SUCT.PRESS</span>
+<span class="cm"># Element "COMP-02" → %Element% = "COMP-02" → tag: COMP-02.SUCT.PRESS</span>
+<span class="cm"># Satu template bisa dipakai untuk 50+ compressor sekaligus!</span></pre>
+
+    <div class="callout tip reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-text">
+        <strong>String Builder = Kunci Skalabilitas PI AF</strong>
+        Dengan <code>%Element%</code>, satu template bisa digunakan untuk COMP-01 sampai COMP-50 tanpa konfigurasi tambahan. Cukup buat element baru dengan nama yang sesuai konvensi, dan semua attribute langsung ter-link ke tag yang benar.
+      </div>
+    </div>
+
+    <h3 id="af-analytics">4.3 PI AF Analytics</h3>
+    <div class="card-grid three reveal">
+      <div class="card"><div class="card-icon">⚡</div><h4>Expression Analysis</h4><p>Rumus matematika dievaluasi real-time setiap ada data baru. Contoh: efisiensi, conversion, ratio.</p></div>
+      <div class="card"><div class="card-icon">📊</div><h4>Rollup Analysis</h4><p>Agregasi dari child ke parent: Total, Average, Min, Max. Ideal untuk KPI level site atau area.</p></div>
+      <div class="card"><div class="card-icon">🔔</div><h4>Event Frame Generator</h4><p>Buat Event Frame otomatis saat kondisi terpenuhi — misal suhu &gt; 120°C selama &gt; 5 menit berturut-turut.</p></div>
+    </div>
+
+    <pre><span class="cm">-- PI AF Analytics Expression Examples</span>
+
+<span class="cm">-- Compression Ratio</span>
+<span class="fn">TagVal</span>(<span class="str">'Discharge_Pressure'</span>) / <span class="fn">TagVal</span>(<span class="str">'Suction_Pressure'</span>)
+
+<span class="cm">-- Rata-rata suhu 1 jam terakhir</span>
+<span class="fn">TagAvg</span>(<span class="str">'Inlet_Temperature'</span>, <span class="str">'*-1h'</span>, <span class="str">'*'</span>)
+
+<span class="cm">-- Flag alarm overtemperature</span>
+<span class="kw">If</span> <span class="fn">TagVal</span>(<span class="str">'Inlet_Temperature'</span>) > <span class="num">120</span> <span class="kw">Then</span> <span class="num">1</span> <span class="kw">Else</span> <span class="num">0</span>
+
+<span class="cm">-- Total runtime bulan ini (dalam menit)</span>
+<span class="fn">TagTot</span>(<span class="str">'Operating_Status'</span>, <span class="str">'MonthStart'</span>, <span class="str">'*'</span>, <span class="num">0</span>, <span class="num">1</span>) / <span class="num">60</span></pre>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 05 — INTERFACE -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="interface">
+    <div class="section-label">05 — Data Collection</div>
+    <h2>PI Interfaces</h2>
+    <p>PI Interface adalah program yang mengambil data dari sumber lapangan dan mengirimkannya ke PI Data Archive. Bisa berjalan di PI Interface Node terpisah atau langsung di PI Server.</p>
+
+    <h3>5.1 PI OPC DA Interface (OPCInt.exe)</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Parameter</th><th>Deskripsi</th><th>Contoh</th></tr></thead>
+        <tbody>
+          <tr><td><code>/host</code></td><td>Nama PI Server target</td><td><code>PISRVCISDEMO</code></td></tr>
+          <tr><td><code>/id</code></td><td>Interface ID unik (1–255)</td><td><code>1</code></td></tr>
+          <tr><td><code>/opcserver</code></td><td>ProgID OPC server</td><td><code>Matrikon.OPC.Simulation</code></td></tr>
+          <tr><td><code>/s</code></td><td>Scan interval (detik)</td><td><code>5</code></td></tr>
+          <tr><td><code>/bf</code></td><td>Buffer failover aktif</td><td><code>1</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><span class="cm"># Startup command (dikonfigurasi via PI ICU)</span>
+<span class="kw">OPCInt.exe</span> /host=PISRVCISDEMO /id=1 /opcserver=Matrikon.OPC.Simulation /s=5 /bf=1
+
+<span class="cm"># Lokasi default:</span>
+<span class="str">C:\Program Files\PIPC\Interfaces\OPCInt\OPCInt.exe</span>
+
+<span class="cm"># Verifikasi service berjalan:</span>
+<span class="kw">Get-Service</span> <span class="str">"PI-OPCInt-1"</span></pre>
+
+    <h3>5.2 PI Buffer Subsystem (PIBufss)</h3>
+    <p>PIBufss menyimpan data sementara di disk lokal Interface Node ketika PI Data Archive tidak tersedia. Data di-replay otomatis saat koneksi pulih — <strong>zero data loss architecture</strong>.</p>
+
+    <div class="callout warn reveal">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-text">
+        <strong>DCOM Permission — Masalah Paling Umum OPC DA</strong>
+        OPC DA menggunakan COM/DCOM. Pastikan DCOM permission dikonfigurasi benar antara Interface Node dan OPC Server. Gunakan <code>dcomcnfg</code>. Firewall harus allow TCP 135 (RPC endpoint mapper) + dynamic ports.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 06 — SECURITY -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="security">
+    <div class="section-label">06 — Security</div>
+    <h2>Security — Identities, Mappings &amp; Trusts</h2>
+    <div class="card-grid three reveal">
+      <div class="card"><div class="card-icon">🪪</div><h4>PI Identity</h4><p>Grup keamanan internal PI (mirip Windows Group). Setiap Identity memiliki ACL yang mengontrol akses ke tag dan archive.</p></div>
+      <div class="card"><div class="card-icon">🔗</div><h4>PI Mapping</h4><p>Menghubungkan Windows User/Group ke PI Identity. Login Windows → mapped ke PI Identity → dapat hak akses PI yang sesuai.</p></div>
+      <div class="card"><div class="card-icon">🤝</div><h4>PI Trust</h4><p>Koneksi tanpa autentikasi untuk aplikasi legacy. Autentikasi berdasarkan IP address, hostname, dan nama aplikasi.</p></div>
+    </div>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>PI Identity</th><th>Hak Akses</th><th>Untuk</th></tr></thead>
+        <tbody>
+          <tr><td><code>piadmin</code></td><td>Full control (r,w,d,a)</td><td>Administrator PI System</td></tr>
+          <tr><td><code>PIEngineers</code></td><td>Read + Write tag config</td><td>Engineer, Integrator</td></tr>
+          <tr><td><code>PIOperators</code></td><td>Read only data</td><td>Operator lapangan</td></tr>
+          <tr><td><code>PIWorld</code></td><td>Read only (default semua user)</td><td>Semua user terautentikasi</td></tr>
+          <tr><td><code>PIInterfaces</code></td><td>Write data (tidak bisa ubah config)</td><td>Service account PI Interface</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre><span class="cm"># Format ACL — datasecurity / ptsecurity attribute:</span>
+<span class="cm"># A(r,w) = Allow read/write | D(r) = Deny read</span>
+<span class="str">piadmin: A(r,w,d,a) | PIEngineers: A(r,w) | PIOperators: A(r) | PIWorld: A(r)</span>
+
+<span class="cm"># PI Trust untuk OPC Interface (PI SMT → Security → Trusts):</span>
+Trust Name : OPCInterface_Trust
+NetMask    : 192.168.1.0
+AppName    : OPCInt
+PIIdentity : PIInterfaces</pre>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 07 — API & SDK -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="api">
+    <div class="section-label">07 — Integration</div>
+    <h2>PI Web API &amp; PI AF SDK</h2>
+
+    <h3>7.1 PI Web API</h3>
+    <p>RESTful API berbasis HTTP/JSON yang berjalan di atas IIS — memberikan akses ke Data Archive dan PI AF dari aplikasi modern, web, dan cloud.</p>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Method</th><th>Fungsi</th></tr></thead>
+        <tbody>
+          <tr><td><code>/piwebapi/points</code></td><td>GET</td><td>Search PI tags by name filter</td></tr>
+          <tr><td><code>/piwebapi/streams/{webId}/value</code></td><td>GET</td><td>Current value (snapshot)</td></tr>
+          <tr><td><code>/piwebapi/streams/{webId}/recorded</code></td><td>GET</td><td>Historical recorded data</td></tr>
+          <tr><td><code>/piwebapi/streams/{webId}/interpolated</code></td><td>GET</td><td>Interpolated pada interval tertentu</td></tr>
+          <tr><td><code>/piwebapi/elements/{webId}/attributes</code></td><td>GET</td><td>AF attributes dari suatu element</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><span class="kw">import</span> requests
+
+BASE = <span class="str">"https://PISRVCISDEMO/piwebapi"</span>
+AUTH = (<span class="str">"piadmin"</span>, <span class="str">"password"</span>)
+
+<span class="cm"># Current value</span>
+web_id = <span class="str">"P0-abcXYZ..."</span>
+resp = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/streams/{web_id}/value"</span>, auth=AUTH, verify=<span class="kw">False</span>)
+val = resp.<span class="fn">json</span>()
+<span class="fn">print</span>(<span class="str">f"{val['Timestamp']}: {val['Value']} {val['UnitsAbbreviation']}"</span>)
+
+<span class="cm"># Historis 1 jam terakhir</span>
+resp = requests.<span class="fn">get</span>(<span class="str">f"{BASE}/streams/{web_id}/recorded"</span>,
+    params={<span class="str">"startTime"</span>: <span class="str">"*-1h"</span>, <span class="str">"endTime"</span>: <span class="str">"*"</span>}, auth=AUTH, verify=<span class="kw">False</span>)
+<span class="kw">for</span> item <span class="kw">in</span> resp.<span class="fn">json</span>()[<span class="str">"Items"</span>]:
+    <span class="fn">print</span>(<span class="str">f"{item['Timestamp']}: {item['Value']}"</span>)</pre>
+
+    <h3>7.2 PI AF SDK via Python (pythonnet)</h3>
+    <pre><span class="kw">import</span> clr, sys
+sys.path.<span class="fn">append</span>(<span class="str">r"C:\Program Files (x86)\PIPC\AF\PublicAssemblies\4.0"</span>)
+clr.<span class="fn">AddReference</span>(<span class="str">"OSIsoft.AFSDK"</span>)
+<span class="kw">from</span> OSIsoft.AF <span class="kw">import</span> PISystems
+<span class="kw">from</span> OSIsoft.AF.PI <span class="kw">import</span> PIServer
+
+pi = PIServer(<span class="str">"PISRVCISDEMO"</span>); pi.<span class="fn">Connect</span>()
+tag = pi.DataArchive.<span class="fn">FindPIPoint</span>(<span class="str">"COMP01.SUCT.PRESS"</span>)
+<span class="fn">print</span>(tag.<span class="fn">CurrentValue</span>().Value)
+
+af = <span class="fn">PISystems</span>()[<span class="str">"PISRVCISDEMO"</span>].Databases[<span class="str">"PLANT_DEMO"</span>]
+comp01 = af.Elements[<span class="str">"FSO_SITE"</span>].Elements[<span class="str">"GAS_COMPRESSION_UNIT"</span>].Elements[<span class="str">"Compressor-01"</span>]
+<span class="fn">print</span>(comp01.Attributes[<span class="str">"Inlet_Temperature"</span>].<span class="fn">GetValue</span>().Value)</pre>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 08 — BEST PRACTICES -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="best-practices">
+    <div class="section-label">08 — Guidelines</div>
+    <h2>Best Practices</h2>
+
+    <h3>8.1 Tag Naming Convention</h3>
+    <div class="callout tip reveal">
+      <span class="callout-icon">📝</span>
+      <div class="callout-text">
+        <strong>Format Rekomendasi:</strong> <code>SITE-EQUIP-NUM.PARAMETER</code><br>
+        Contoh: <code>FSO-COMP-01.SUCT.PRESS</code>, <code>TAL-SEP-02.LVL.OIL</code><br>
+        Gunakan titik (.) sebagai pemisah hierarki — konvensi paling umum di industri migas.
+      </div>
+    </div>
+    <ul class="list reveal">
+      <li>Gunakan <strong>ALL CAPS konsisten</strong> untuk semua tag name</li>
+      <li>Sertakan <strong>site prefix</strong> untuk deployment multi-site</li>
+      <li>Gunakan <strong>singkatan standar</strong>: TEMP, PRESS, FLOW, LVL, VIB, SPD, CURR, POWR</li>
+      <li>Hindari spasi dan karakter khusus (hanya titik dan underscore yang aman)</li>
+      <li>Dokumentasikan naming convention di PI Tag Dictionary sebelum implementasi dimulai</li>
+    </ul>
+
+    <h3>8.2 AF Design Principles</h3>
+    <ul class="list reveal">
+      <li>Maksimal <strong>6–8 level kedalaman</strong> hierarchy untuk performa query yang optimal</li>
+      <li>Selalu gunakan <strong>Element Templates</strong> — jangan buat atribut manual berulang</li>
+      <li><strong>Check In</strong> setiap selesai session editing — perubahan belum tersimpan sampai di-check-in</li>
+      <li>Satu AF Database per site / per plant yang logically independent</li>
+      <li>Test semua analytics di mode <strong>Preview</strong> sebelum diaktifkan ke production</li>
+    </ul>
+
+    <h3>8.3 Performance Tuning</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Area</th><th>Gejala</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td>Compression</td><td>Storage tumbuh terlalu cepat</td><td>Naikkan <code>compdev</code> atau <code>excdev</code></td></tr>
+          <tr><td>Compression</td><td>Data kurang akurat</td><td>Turunkan <code>compdev</code>, turunkan <code>excmax</code></td></tr>
+          <tr><td>Archive</td><td>Archive sering shift (thrashing)</td><td>Besarkan ukuran archive file, tambah archive</td></tr>
+          <tr><td>Query</td><td>Historis query lambat</td><td>Gunakan <code>interpolated</code> + interval besar untuk range panjang</td></tr>
+          <tr><td>AF</td><td>Hierarchy load lambat di PSE</td><td>Kurangi kedalaman, batasi child elements per node</td></tr>
+          <tr><td>Interface</td><td>Data lag tinggi</td><td>Turunkan scan interval, cek jaringan dan buffer status</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SECTION 09 — TROUBLESHOOT -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="troubleshoot">
+    <div class="section-label">09 — Troubleshooting</div>
+    <h2>Troubleshooting Guide</h2>
+
+    <h3>9.1 PI Data Archive Issues</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Gejala</th><th>Penyebab</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td>Tag: <code>Pt Created</code></td><td>Tag baru, belum ada data masuk</td><td>Cek interface running, cek Trust config</td></tr>
+          <tr><td>Tag: <code>Shutdown</code></td><td>PI service mati</td><td><code>net start piarchss</code>, cek semua PI services</td></tr>
+          <tr><td>Tag: <code>Comm Fail</code></td><td>Koneksi ke sumber data putus</td><td>Cek OPC server, cek jaringan, lihat interface log</td></tr>
+          <tr><td>Data tidak masuk archive</td><td>Compression ketat / buffer penuh</td><td>Cek compdev, cek PIBufss + disk space</td></tr>
+          <tr><td>Archive penuh</td><td>Tidak ada archive baru dibuat</td><td>Buat archive baru via PI SMT, aktifkan auto-archive</td></tr>
+          <tr><td>Tidak bisa connect ke PI</td><td>Service <code>pinetmgr</code> mati</td><td><code>net start pinetmgr</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><span class="cm"># Cek status semua PI services</span>
+<span class="kw">Get-Service</span> <span class="str">"pi*"</span> | <span class="fn">Select-Object</span> Name, Status | <span class="fn">Format-Table</span>
+
+<span class="cm"># Restart PI services dengan urutan benar:</span>
+<span class="kw">Stop-Service</span>  <span class="str">"piarchss"</span>,<span class="str">"pisnapss"</span>,<span class="str">"pieventss"</span>,<span class="str">"pinetmgr"</span> -Force
+Start-Sleep <span class="num">3</span>
+<span class="kw">Start-Service</span> <span class="str">"pinetmgr"</span>; Start-Sleep <span class="num">2</span>
+<span class="kw">Start-Service</span> <span class="str">"piarchss"</span>,<span class="str">"pisnapss"</span>,<span class="str">"pieventss"</span></pre>
+
+    <h3>9.2 PI AF Issues</h3>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Gejala</th><th>Penyebab</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td>Attribute tidak ada di PSE</td><td>Template belum di-apply ke element</td><td>Right-click element → Apply Template</td></tr>
+          <tr><td>Attribute nilai <code>No Data</code></td><td>Tagname di String Builder tidak match</td><td>Cek naming, test via PSE → Attribute → Test Value</td></tr>
+          <tr><td>Check In gagal</td><td>Konflik edit / AF Server tidak reachable</td><td>Undo all changes, reconnect AF server</td></tr>
+          <tr><td>Analytics tidak berjalan</td><td>PI Analysis service tidak running</td><td><code>net start PIAnalysis</code></td></tr>
+          <tr><td>PSE tidak bisa connect</td><td>AFService mati di AF Server</td><td><code>net start AFService</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>9.3 PI Vision — IIS Issues</h3>
+    <pre><span class="cm"># Quick fix:</span>
+<span class="kw">iisreset</span> /noforce
+
+<span class="cm"># Jika IIS corrupt (blank page, icon tidak muncul):</span>
+<span class="cm"># 1. Uninstall PI Vision</span>
+<span class="cm"># 2. Remove IIS:</span>
+<span class="kw">Get-WindowsFeature</span> <span class="str">"Web-*"</span> | <span class="fn">Where-Object</span> {<span class="kw">$_</span>.InstallState -eq <span class="str">"Installed"</span>} | <span class="fn">Uninstall-WindowsFeature</span>
+<span class="cm"># 3. Reinstall IIS:</span>
+<span class="fn">Install-WindowsFeature</span> -Name Web-Server -IncludeManagementTools -IncludeAllSubFeature
+<span class="cm"># 4. Reinstall PI Vision</span></pre>
+
+    <div class="divider">— End of Document —</div>
+    <div class="callout info reveal">
+      <span class="callout-icon">📚</span>
+      <div class="callout-text">
+        <strong>Referensi Resmi AVEVA OSIsoft</strong>
+        Customer Portal: <code>customers.osisoft.com</code> &nbsp;|&nbsp;
+        PI Server Docs: <code>docs.aveva.com/bundle/pi-server</code> &nbsp;|&nbsp;
+        PI AF SDK: <code>docs.aveva.com/bundle/af-sdk</code>
+      </div>
+    </div>
+  </section>
+
+</div></main>
+
+<footer>
+  <p style="margin-bottom:6px;">PI System Technical README &nbsp;·&nbsp; PI Data Archive &amp; PI Asset Framework</p>
+  <p style="color:#94a3b8;">AVEVA OSIsoft &nbsp;·&nbsp; PISRVCISDEMO &nbsp;·&nbsp; PT. Cistech Alpha Indonesia</p>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  document.querySelectorAll('section[id]').forEach(sec => {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+          const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px' }).observe(sec);
+  });
+</script>
+</body>
+</html>
