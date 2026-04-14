@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PI Storage Calculator — Wayang Windu (From Disk)</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<title>PI Storage Calculator — Wayang Windu</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      #ffffff;
   --surface: #f5f7fa;
   --card:    #ffffff;
   --border:  #e2e8f0;
@@ -22,193 +21,180 @@
   --comb-lt: #fef3ec;
   --text:    #1a2332;
   --muted:   #64748b;
-  --danger:  #dc2626;
-  --warn:    #d97706;
   --ok:      #16a34a;
-  --shadow:  0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.06);
+  --warn:    #d97706;
+  --danger:  #dc2626;
+  --shadow:  0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
 /* ── NAV ── */
-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:11px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.06)}
-.nav-inner{display:flex;align-items:center;gap:6px;max-width:1120px;margin:0 auto;padding:0 24px;flex-wrap:wrap}
-.nav-logo{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--abb);margin-right:8px;letter-spacing:.04em}
-.ntag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
-.ntag.a{background:var(--abb-lt);color:var(--abb);border:1px solid rgba(0,102,204,.2)}
-.ntag.v{background:var(--vc-lt);color:var(--vc);border:1px solid rgba(0,135,90,.2)}
-.ntag.c{background:var(--comb-lt);color:var(--comb);border:1px solid rgba(224,92,0,.2)}
-.calc-all-btn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:7px 18px;border-radius:7px;border:none;background:var(--abb);color:#fff;cursor:pointer;margin-left:auto;transition:all .2s;letter-spacing:.05em;text-transform:uppercase}
-.calc-all-btn:hover{background:#0052a3;transform:translateY(-1px)}
+nav { background: rgba(255,255,255,.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 11px 0; position: sticky; top: 0; z-index: 200; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+.nav-inner { display: flex; align-items: center; gap: 6px; max-width: 1120px; margin: 0 auto; padding: 0 24px; flex-wrap: wrap; }
+.nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--abb); margin-right: 8px; letter-spacing: .04em; }
+.ntag { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.ntag.a { background: var(--abb-lt); color: var(--abb); border: 1px solid rgba(0,102,204,.2); }
+.ntag.v { background: var(--vc-lt);  color: var(--vc);  border: 1px solid rgba(0,135,90,.2); }
+.ntag.c { background: var(--comb-lt);color: var(--comb); border: 1px solid rgba(224,92,0,.2); }
+.calc-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 7px 18px; border-radius: 7px; border: none; background: var(--abb); color: #fff; cursor: pointer; margin-left: auto; transition: all .2s; letter-spacing: .05em; text-transform: uppercase; }
+.calc-btn:hover { background: #0052a3; transform: translateY(-1px); }
 
 /* ── HEADER ── */
-header{background:linear-gradient(135deg,#f0f7ff,#e8f4fd 45%,#f0fdf4 100%);padding:44px 0 0;border-bottom:2px solid var(--border)}
-.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
-.b-a{background:var(--abb-lt);color:var(--abb);border:1px solid rgba(0,102,204,.2)}
-.b-v{background:var(--vc-lt);color:var(--vc);border:1px solid rgba(0,135,90,.2)}
-.b-c{background:var(--comb-lt);color:var(--comb);border:1px solid rgba(224,92,0,.2)}
-h1{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:800;line-height:1.1;color:var(--text);margin-bottom:10px}
-h1 .hi{color:var(--abb)} h1 .lo{color:var(--vc)}
-.subtitle{color:var(--muted);font-size:14px;max-width:660px;line-height:1.6;margin-bottom:24px}
+header { background: linear-gradient(135deg, #f0f7ff, #e8f4fd 45%, #f0fdf4 100%); padding: 44px 0 0; border-bottom: 2px solid var(--border); }
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.ba { background: var(--abb-lt); color: var(--abb); border: 1px solid rgba(0,102,204,.2); }
+.bv { background: var(--vc-lt);  color: var(--vc);  border: 1px solid rgba(0,135,90,.2); }
+.bc { background: var(--comb-lt);color: var(--comb); border: 1px solid rgba(224,92,0,.2); }
+h1 { font-family: 'Syne', sans-serif; font-size: clamp(24px,4vw,40px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 10px; }
+h1 .hi { color: var(--abb); } h1 .lo { color: var(--vc); }
+.subtitle { color: var(--muted); font-size: 14px; max-width: 680px; line-height: 1.65; margin-bottom: 24px; }
 
-/* ── FLOW INDICATOR ── */
-.flow-strip{background:var(--text);padding:14px 24px;margin-top:0;display:flex;align-items:center;gap:0;overflow-x:auto}
-.fs-node{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#94a3b8;white-space:nowrap;padding:0 4px}
-.fs-node.active{color:#fff;background:var(--abb);padding:4px 10px;border-radius:4px}
-.fs-node.active.vc{background:var(--vc)}
-.fs-arrow{color:#475569;font-size:14px;padding:0 6px;flex-shrink:0}
-.fs-node.bold{color:#e2e8f0;font-weight:700}
+/* ── FLOW STRIP ── */
+.flow-strip { background: var(--text); padding: 13px 24px; display: flex; align-items: center; gap: 0; overflow-x: auto; flex-wrap: nowrap; }
+.fsn { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: #64748b; white-space: nowrap; padding: 0 4px; }
+.fsn.hi { color: #e2e8f0; font-weight: 700; }
+.fsn.act { color: #fff; background: var(--abb); padding: 4px 10px; border-radius: 4px; }
+.fsn.act.v { background: var(--vc); }
+.fsa { color: #334155; font-size: 13px; padding: 0 5px; flex-shrink: 0; }
 
 /* ── TABS ── */
-.src-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--card);padding:0 24px}
-.stab{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;padding:13px 24px;border:none;background:transparent;cursor:pointer;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:8px}
-.stab .dot{width:8px;height:8px;border-radius:50%}
-.stab.active-abb{color:var(--abb);border-bottom-color:var(--abb)}
-.stab.active-vc{color:var(--vc);border-bottom-color:var(--vc)}
-.stab.active-comb{color:var(--comb);border-bottom-color:var(--comb)}
+.src-tabs { display: flex; border-bottom: 2px solid var(--border); background: var(--card); padding: 0 24px; }
+.stab { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; padding: 12px 24px; border: none; background: transparent; cursor: pointer; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+.stab .dot { width: 8px; height: 8px; border-radius: 50%; }
+.stab.aa { color: var(--abb); border-bottom-color: var(--abb); }
+.stab.av { color: var(--vc);  border-bottom-color: var(--vc); }
+.stab.ac { color: var(--comb);border-bottom-color: var(--comb); }
 
-/* ── PANELS ── */
-.tab-pane{display:none;padding:28px 0}
-.tab-pane.show{display:block}
-.src-strip{border-radius:12px;padding:16px 20px;margin-bottom:22px;display:flex;align-items:center;gap:14px}
-.src-strip.a{background:var(--abb-lt);border:1px solid var(--abb-md)}
-.src-strip.v{background:var(--vc-lt);border:1px solid var(--vc-md)}
-.src-strip.c{background:var(--comb-lt);border:1px solid rgba(224,92,0,.2)}
-.ss-icon{font-size:24px}
-.ss-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
-.a .ss-title{color:var(--abb)} .v .ss-title{color:var(--vc)} .c .ss-title{color:var(--comb)}
-.ss-sub{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+/* ── PANES ── */
+.pane { display: none; padding: 28px 0; }
+.pane.show { display: block; }
+
+/* ── SOURCE STRIP ── */
+.src-strip { border-radius: 12px; padding: 15px 20px; margin-bottom: 22px; display: flex; align-items: center; gap: 14px; }
+.ss-a { background: var(--abb-lt); border: 1px solid var(--abb-md); }
+.ss-v { background: var(--vc-lt);  border: 1px solid var(--vc-md); }
+.ss-c { background: var(--comb-lt);border: 1px solid rgba(224,92,0,.2); }
+.ss-icon { font-size: 24px; }
+.ss-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.ss-a .ss-title { color: var(--abb); } .ss-v .ss-title { color: var(--vc); } .ss-c .ss-title { color: var(--comb); }
+.ss-sub { font-size: 11.5px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
 
 /* ── GRID ── */
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-@media(max-width:820px){.mgrid{grid-template-columns:1fr}}
+.mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media(max-width: 820px) { .mgrid { grid-template-columns: 1fr; } }
 
-/* ── CARDS ── */
-.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-.ph{padding:15px 20px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.ph-icon{font-size:18px}
-.ph-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
-.ph-sub{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:1px}
-.pb{padding:18px 20px}
-
-/* ── DISK VISUAL ── */
-.disk-visual{border-radius:12px;padding:20px;margin-bottom:18px;position:relative}
-.disk-visual.a{background:linear-gradient(135deg,var(--abb-lt),#f0f7ff);border:2px solid var(--abb-md)}
-.disk-visual.v{background:linear-gradient(135deg,var(--vc-lt),#f0fdf4);border:2px solid var(--vc-md)}
-.dv-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.dv-icon{font-size:24px}
-.dv-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
-.a .dv-title{color:var(--abb)} .v .dv-title{color:var(--vc)}
-.dv-sub{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
-.disk-bar-wrap{margin-bottom:10px}
-.disk-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:5px}
-.disk-track{height:22px;background:var(--border);border-radius:6px;overflow:hidden;position:relative;display:flex}
-.disk-used{height:100%;border-radius:6px 0 0 6px;background:#94a3b8;display:flex;align-items:center;justify-content:center}
-.disk-used span{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;padding:0 4px}
-.disk-pi{height:100%;background:var(--abb);display:flex;align-items:center;justify-content:center;transition:width .6s ease}
-.disk-pi.vc{background:var(--vc)}
-.disk-pi span{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;padding:0 4px}
-.disk-free{height:100%;background:var(--border);border-radius:0 6px 6px 0;flex:1}
-.disk-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
-.dl-item{display:flex;align-items:center;gap:5px}
-.dl-dot{width:10px;height:10px;border-radius:2px}
+/* ── PANEL ── */
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.ph { padding: 14px 20px 11px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.ph-icon { font-size: 17px; }
+.ph-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+.ph-sub { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+.pb { padding: 18px 20px; }
 
 /* ── FORM ── */
-.fsec{margin-bottom:16px}
-.fsec-hdr{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--abb);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border)}
-.fsec-hdr.v{color:var(--vc)}
-.field{margin-bottom:11px}
-label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
-.fhint{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;display:block;margin-bottom:4px}
-input[type=number],select{width:100%;padding:8px 12px;border:1px solid var(--border2);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);transition:border-color .2s,box-shadow .2s;outline:none}
-input[type=number]:focus{border-color:var(--abb);box-shadow:0 0 0 3px rgba(0,102,204,.1)}
-input.vf:focus{border-color:var(--vc);box-shadow:0 0 0 3px rgba(0,135,90,.1)}
-.rrow{display:flex;align-items:center;gap:10px}
-.rrow input[type=range]{flex:1;height:5px;accent-color:var(--abb)}
-.rrow input.vr{accent-color:var(--vc)}
-.rval{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--abb);min-width:50px;text-align:right}
-.rval.v{color:var(--vc)}
-.utag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:var(--abb-lt);color:var(--abb);font-weight:600}
-.utag.v{background:var(--vc-lt);color:var(--vc)}
+.fsec { margin-bottom: 20px; }
+.fsec-hdr { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--abb); margin-bottom: 12px; padding-bottom: 5px; border-bottom: 1.5px solid var(--abb-md); display: flex; align-items: center; gap: 6px; }
+.fsec-hdr.v { color: var(--vc); border-bottom-color: var(--vc-md); }
+.fsec-hdr .step-num { background: var(--abb); color: #fff; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.fsec-hdr.v .step-num { background: var(--vc); }
+.field { margin-bottom: 12px; }
+label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.fhint { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; display: block; margin-bottom: 4px; line-height: 1.5; }
+.fhint .asbuilt { color: var(--abb); font-weight: 600; }
+.fhint .asbuilt.v { color: var(--vc); }
+input[type=number], select { width: 100%; padding: 8px 12px; border: 1px solid var(--border2); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--surface); outline: none; transition: border-color .2s, box-shadow .2s; }
+input[type=number]:focus { border-color: var(--abb); box-shadow: 0 0 0 3px rgba(0,102,204,.1); }
+input.vf:focus { border-color: var(--vc); box-shadow: 0 0 0 3px rgba(0,135,90,.1); }
+.rrow { display: flex; align-items: center; gap: 10px; }
+.rrow input[type=range] { flex: 1; height: 5px; accent-color: var(--abb); cursor: pointer; }
+.rrow input.vr { accent-color: var(--vc); }
+.rval { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--abb); min-width: 52px; text-align: right; }
+.rval.v { color: var(--vc); }
+.utag { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: var(--abb-lt); color: var(--abb); font-weight: 600; }
+.utag.v { background: var(--vc-lt); color: var(--vc); }
+
+/* ── DISK VISUAL ── */
+.disk-visual { border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+.dv-a { background: linear-gradient(135deg, var(--abb-lt), #f0f7ff); border: 1.5px solid var(--abb-md); }
+.dv-v { background: linear-gradient(135deg, var(--vc-lt), #f0fdf4);  border: 1.5px solid var(--vc-md); }
+.dv-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.dv-hdr-icon { font-size: 22px; }
+.dv-hdr-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+.dv-a .dv-hdr-title { color: var(--abb); } .dv-v .dv-hdr-title { color: var(--vc); }
+.dv-hdr-sub { font-size: 10.5px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.dv-bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+.dv-track { height: 24px; background: var(--border); border-radius: 6px; overflow: hidden; display: flex; }
+.dv-seg-used { height: 100%; background: #94a3b8; display: flex; align-items: center; justify-content: center; transition: width .5s ease; }
+.dv-seg-used span { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; color: #fff; padding: 0 4px; white-space: nowrap; }
+.dv-seg-pi { height: 100%; background: var(--abb); display: flex; align-items: center; justify-content: center; transition: width .5s ease; }
+.dv-seg-pi.v { background: var(--vc); }
+.dv-seg-pi span { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; color: #fff; padding: 0 4px; white-space: nowrap; }
+.dv-seg-reserve { height: 100%; background: #fde68a; display: flex; align-items: center; justify-content: center; transition: width .5s ease; }
+.dv-seg-reserve span { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; color: #92400e; padding: 0 4px; white-space: nowrap; }
+.dv-seg-free { height: 100%; background: var(--border); flex: 1; }
+.dv-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-top: 8px; }
+.dv-legend-item { display: flex; align-items: center; gap: 5px; }
+.dv-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
 /* ── RESULT CARDS ── */
-.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.rcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;text-align:center}
-.rcard.primary-a{background:var(--abb-lt);border-color:var(--abb-md)}
-.rcard.primary-v{background:var(--vc-lt);border-color:var(--vc-md)}
-.rcard.highlight{border:2px solid var(--comb);background:var(--comb-lt)}
-.rlabel{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.rval-big{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1}
-.rval-big.a{color:var(--abb)}
-.rval-big.v{color:var(--vc)}
-.rval-big.c{color:var(--comb)}
-.rval-big.ok{color:var(--ok)}
-.rval-big.warn{color:var(--warn)}
-.rval-big.danger{color:var(--danger)}
-.runit{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px}
+.rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.rcard { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; text-align: center; }
+.rcard.pa { background: var(--abb-lt); border-color: var(--abb-md); }
+.rcard.pv { background: var(--vc-lt);  border-color: var(--vc-md); }
+.rcard.hl { border: 2px solid var(--comb); background: var(--comb-lt); }
+.rlabel { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.rbig { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1; }
+.rbig.a { color: var(--abb); } .rbig.v { color: var(--vc); } .rbig.c { color: var(--comb); }
+.rbig.ok { color: var(--ok); } .rbig.warn { color: var(--warn); } .rbig.danger { color: var(--danger); }
+.runit { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; }
 
 /* ── BREAKDOWN TABLE ── */
-.btable-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin:12px 0}
-.btable-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
-.btable-wrap th{background:var(--text);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:8px 14px;text-align:left}
-.th-a{background:var(--abb) !important}
-.th-v{background:var(--vc) !important}
-.th-c{background:var(--comb) !important}
-.btable-wrap td{padding:8px 14px;border-bottom:1px solid var(--border);vertical-align:top}
-.btable-wrap tr:last-child td{border-bottom:none}
-.btable-wrap tr:hover td{background:#f8fafc}
-.btable-wrap td:first-child{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
-.btable-wrap td:last-child{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-align:right}
-.row-hi td{background:var(--abb-lt) !important;font-weight:700}
-.row-hi.v td{background:var(--vc-lt) !important}
-.row-hi.c td{background:var(--comb-lt) !important}
+.btw { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin: 12px 0; }
+.btw table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.btw th { color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 9px 14px; text-align: left; }
+.th-a { background: var(--abb); } .th-v { background: var(--vc); } .th-c { background: var(--comb); }
+.btw td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.btw tr:last-child td { border-bottom: none; }
+.btw tr:hover td { background: #f8fafc; }
+.btw td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.btw td:last-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; text-align: right; }
+.rha td { background: var(--abb-lt) !important; font-weight: 700; }
+.rhv td { background: var(--vc-lt)  !important; font-weight: 700; }
+.rhc td { background: var(--comb-lt)!important; font-weight: 700; }
 
 /* ── CALLOUT ── */
-.callout{border-radius:9px;padding:13px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;font-size:13.5px}
-.callout.ok{background:#f0fdf4;border-left:4px solid var(--ok)}
-.callout.warn{background:#fff7ed;border-left:4px solid var(--warn)}
-.callout.danger{background:#fef2f2;border-left:4px solid var(--danger)}
-.callout.info-a{background:var(--abb-lt);border-left:4px solid var(--abb)}
-.callout.info-v{background:var(--vc-lt);border-left:4px solid var(--vc)}
-.callout.info-c{background:var(--comb-lt);border-left:4px solid var(--comb)}
-.ci{font-size:16px;flex-shrink:0;margin-top:1px}
-.ct{flex:1;color:var(--text);line-height:1.6}
-.ct strong{display:block;margin-bottom:2px;font-size:12px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
-
-/* ── TIMELINE BAR ── */
-.timeline-wrap{margin:14px 0}
-.tl-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between}
-.tl-track{height:28px;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;display:flex}
-.tl-seg{height:100%;display:flex;align-items:center;justify-content:center;transition:width .6s ease}
-.tl-seg span{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;padding:0 5px}
-.tl-seg.used{background:#94a3b8}
-.tl-seg.pi-a{background:var(--abb)}
-.tl-seg.pi-v{background:var(--vc)}
-.tl-seg.safe{background:#bbf7d0}
-.tl-seg.warn{background:#fde68a}
-.tl-seg.free{background:var(--border);flex:1}
+.callout { border-radius: 9px; padding: 13px 16px; margin: 12px 0; display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+.callout.ok     { background: #f0fdf4; border-left: 4px solid var(--ok); }
+.callout.warn   { background: #fff7ed; border-left: 4px solid var(--warn); }
+.callout.danger { background: #fef2f2; border-left: 4px solid var(--danger); }
+.callout.ia     { background: var(--abb-lt); border-left: 4px solid var(--abb); }
+.callout.iv     { background: var(--vc-lt);  border-left: 4px solid var(--vc); }
+.callout.ic     { background: var(--comb-lt);border-left: 4px solid var(--comb); }
+.ci { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.ct { flex: 1; color: var(--text); line-height: 1.65; }
+.ct strong { display: block; margin-bottom: 2px; font-size: 11px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .04em; }
 
 /* ── COMBINED ── */
-.comb-hero{background:linear-gradient(135deg,var(--abb-lt),var(--vc-lt));border:1px solid var(--border2);border-radius:14px;padding:22px;margin-bottom:20px}
-.ch-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.ch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.ch-card{background:#fff;border-radius:10px;padding:14px 16px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow)}
-.ch-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1;margin-bottom:4px}
-.ch-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-.ch-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.comb-hero { background: linear-gradient(135deg, var(--abb-lt), var(--vc-lt)); border: 1px solid var(--border2); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+.ch-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 16px; }
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.ch-card { background: #fff; border-radius: 10px; padding: 14px 16px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.ch-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.ch-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.ch-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
 /* ── EXPORT ── */
-.exprow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.ebtn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:7px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.04em}
-.ebtn:hover{border-color:var(--abb);color:var(--abb);background:var(--abb-lt)}
-.ebtn.v:hover{border-color:var(--vc);color:var(--vc);background:var(--vc-lt)}
+.exprow { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.ebtn { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 7px; border: 1px solid var(--border2); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .2s; text-transform: uppercase; letter-spacing: .04em; }
+.ebtn:hover { border-color: var(--abb); color: var(--abb); background: var(--abb-lt); }
+.ebtn.v:hover { border-color: var(--vc); color: var(--vc); background: var(--vc-lt); }
 
 /* ── FOOTER ── */
-footer{padding:26px 0;text-align:center;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;border-top:1px solid var(--border);background:var(--card);margin-top:40px}
+footer { padding: 28px 0; text-align: center; color: var(--muted); font-size: 11.5px; font-family: 'JetBrains Mono', monospace; border-top: 1px solid var(--border); background: var(--card); margin-top: 40px; line-height: 1.8; }
 </style>
 </head>
 <body>
@@ -216,11 +202,11 @@ footer{padding:26px 0;text-align:center;color:var(--muted);font-size:12px;font-f
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <span class="nav-logo">PI STORAGE</span>
+    <span class="nav-logo">PI STORAGE CALC</span>
     <span class="ntag a">SCADA01 · ABB</span>
     <span class="ntag v">SCADA02 · VC-8000</span>
     <span class="ntag c">Combined</span>
-    <button class="calc-all-btn" onclick="calcAll()">⟳ Hitung Semua</button>
+    <button class="calc-btn" onclick="calcAll()">⟳ Hitung Semua</button>
   </div>
 </nav>
 
@@ -228,51 +214,53 @@ footer{padding:26px 0;text-align:center;color:var(--muted);font-size:12px;font-f
 <header>
   <div class="wrap">
     <div class="badge-row">
-      <span class="badge b-a">IDWWDW25SCADA01 · D:\ 207 GB</span>
-      <span class="badge b-v">IDWWDW25SCADA02 · ~3,600 GB</span>
-      <span class="badge b-c">Dual Source · Wayang Windu PIMS</span>
+      <span class="badge ba">IDWWDW25SCADA01 · Drive D: 207 GB</span>
+      <span class="badge bv">IDWWDW25SCADA02 · ~3,600 GB</span>
+      <span class="badge bc">Dual Source · Wayang Windu PIMS · Rev.00</span>
     </div>
     <h1><span class="hi">PI Storage</span> <span class="lo">Calculator</span></h1>
     <p class="subtitle">
-      Kalkulasi dimulai dari <strong>kapasitas disk yang tersedia</strong> → hitung berapa lama
-      storage bertahan dan berapa tag yang bisa ditampung.
-      Dua server dihitung terpisah sesuai as-built: <strong>ABB OPC (SCADA01)</strong>
-      dan <strong>VC-8000 SETPOINT (SCADA02)</strong>.
+      Kalkulasi dimulai dari <strong>kapasitas disk yang tersedia</strong> di masing-masing server,
+      dikurangi OS + existing used + reserve, lalu dibagi dengan net data rate harian (setelah
+      Exception filter + Swingdoor compression + overhead) → menghasilkan <strong>estimasi retensi</strong>
+      dan <strong>maksimum tag</strong> yang bisa ditampung.
     </p>
   </div>
 
   <!-- Flow strip -->
   <div class="flow-strip">
-    <div class="fs-node bold">START FROM ↓</div>
-    <div class="fs-arrow">›</div>
-    <div class="fs-node active">💾 DISK CAPACITY</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node">OS + Existing Used</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node">Reserve %</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node bold">= AVAILABLE FOR PI</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node">÷ (Tags × Rate × BPE)</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node">÷ Exception filter</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node">÷ Swingdoor comp</div>
-    <div class="fs-arrow">→</div>
-    <div class="fs-node active vc">📅 = RETENTION (hari/tahun)</div>
+    <div class="fsn hi">START:</div>
+    <div class="fsa">›</div>
+    <div class="fsn act">💾 DISK TOTAL</div>
+    <div class="fsa">→</div>
+    <div class="fsn">– OS/Used</div>
+    <div class="fsa">→</div>
+    <div class="fsn">– Reserve%</div>
+    <div class="fsa">→</div>
+    <div class="fsn hi">= AVAILABLE</div>
+    <div class="fsa">→</div>
+    <div class="fsn">÷ [Tags × (86400/scan) × BPE]</div>
+    <div class="fsa">→</div>
+    <div class="fsn">× (1−Exc%)</div>
+    <div class="fsa">→</div>
+    <div class="fsn">÷ CompRatio</div>
+    <div class="fsa">→</div>
+    <div class="fsn">× (1+Overhead%)</div>
+    <div class="fsa">→</div>
+    <div class="fsn act v">📅 RETENSI (hari)</div>
   </div>
 
-  <!-- Source tabs -->
+  <!-- Tabs -->
   <div class="src-tabs">
-    <button class="stab active-abb" id="tab-btn-abb" onclick="switchTab('abb')">
+    <button class="stab aa" id="tb-abb" onclick="switchTab('abb')">
       <span class="dot" style="background:var(--abb)"></span>ABB DCS
-      <span style="font-size:10px;opacity:.65;font-weight:400">SCADA01</span>
+      <span style="font-size:10px;opacity:.6;font-weight:400">SCADA01</span>
     </button>
-    <button class="stab" id="tab-btn-vc" onclick="switchTab('vc')">
+    <button class="stab" id="tb-vc" onclick="switchTab('vc')">
       <span class="dot" style="background:var(--vc)"></span>VC-8000 SETPOINT
-      <span style="font-size:10px;opacity:.65;font-weight:400">SCADA02</span>
+      <span style="font-size:10px;opacity:.6;font-weight:400">SCADA02</span>
     </button>
-    <button class="stab" id="tab-btn-comb" onclick="switchTab('comb')">
+    <button class="stab" id="tb-comb" onclick="switchTab('comb')">
       <span class="dot" style="background:var(--comb)"></span>Combined
     </button>
   </div>
@@ -280,963 +268,1063 @@ footer{padding:26px 0;text-align:center;color:var(--muted);font-size:12px;font-f
 
 <main><div class="wrap">
 
-<!-- ══════════════════════════
-     TAB ABB
-══════════════════════════ -->
-<div id="pane-abb" class="tab-pane show">
-<div class="src-strip a">
-  <div class="ss-icon">🔌</div>
-  <div>
-    <div class="ss-title">ABB DCS — OPC DA → PI Archive</div>
-    <div class="ss-sub">Server: IDWWDW25SCADA01 · IP: 172.18.1.11 · PointSource: ABB-OPC · 215 tags aktif · piarchss.exe</div>
-  </div>
-</div>
-
-<div class="mgrid">
-
-  <!-- INPUT ABB -->
-  <div class="panel">
-    <div class="ph"><span class="ph-icon">💾</span>
-      <div><div class="ph-title">Disk & Storage — SCADA01</div>
-           <div class="ph-sub">Mulai dari kapasitas drive D: di IDWWDW25SCADA01</div></div>
-    </div>
-    <div class="pb">
-
-      <div class="fsec">
-        <div class="fsec-hdr">Step 1 — Disk Capacity (Drive D:)</div>
-        <div class="field">
-          <label>Total kapasitas Drive D <span class="utag">GB</span></label>
-          <span class="fhint">As-built: 207 GB (Dell R760XS 2×3.84TB RAID1 → Drive D dialokasikan 207 GB untuk PI)</span>
-          <input type="number" id="a_disk_total" value="207" min="10" max="100000" oninput="calcABB()">
-        </div>
-        <div class="field">
-          <label>Sudah terpakai saat ini <span class="utag">GB</span></label>
-          <span class="fhint">As-built: 10 GB terpakai (OS + PI install + archive aktif 5.9%)</span>
-          <input type="number" id="a_disk_used" value="10" min="0" max="100000" oninput="calcABB()">
-        </div>
-        <div class="field">
-          <label>Reserve / buffer <span class="utag">%</span></label>
-          <span class="fhint">Ruang cadangan — jangan pakai 100% disk. Rekomendasi: 15–20%</span>
-          <div class="rrow">
-            <input type="range" id="a_reserve" min="5" max="40" value="15" oninput="syncR('a_reserve','a_reserve_v','%');calcABB()">
-            <span class="rval" id="a_reserve_v">15%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fsec">
-        <div class="fsec-hdr">Step 2 — Archive File Config</div>
-        <div class="field">
-          <label>Archive file size <span class="utag">MB</span></label>
-          <span class="fhint">As-built: 10,240 MB per .arc file di D:\PI\arc</span>
-          <input type="number" id="a_arcsize" value="10240" min="512" max="51200" oninput="calcABB()">
-        </div>
-        <div class="field">
-          <label>Overhead (index, metadata, OS) <span class="utag">%</span></label>
-          <span class="fhint">Rekomendasi: 20%</span>
-          <div class="rrow">
-            <input type="range" id="a_ovhd" min="5" max="40" value="20" oninput="syncR('a_ovhd','a_ovhd_v','%');calcABB()">
-            <span class="rval" id="a_ovhd_v">20%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fsec">
-        <div class="fsec-hdr">Step 3 — Tag & Data Rate</div>
-        <div class="field">
-          <label>Jumlah tag ABB aktif <span class="utag">tags</span></label>
-          <span class="fhint">Current as-built: 215 tags (ABB-OPC pointsource)</span>
-          <input type="number" id="a_tags" value="215" min="1" max="6000" oninput="calcABB()">
-        </div>
-        <div class="field">
-          <label>Scan rate / data rate interface <span class="utag">detik</span></label>
-          <span class="fhint">Interval OPCInt membaca OPC DA. Tipikal: 1 detik</span>
-          <div class="rrow">
-            <input type="range" id="a_scan" min="1" max="60" value="1" oninput="syncR('a_scan','a_scan_v',' det');calcABB()">
-            <span class="rval" id="a_scan_v">1 det</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Bytes per event <span class="utag">bytes</span></label>
-          <span class="fhint">PI Archive standard: 16 bytes (timestamp 8B + value 4B + quality 4B)</span>
-          <input type="number" id="a_bpe" value="16" min="8" max="64" oninput="calcABB()">
-        </div>
-      </div>
-
-      <div class="fsec">
-        <div class="fsec-hdr">Step 4 — Exception & Swingdoor Filter</div>
-        <div class="field">
-          <label>Exception reduction <span class="utag">%</span></label>
-          <span class="fhint">Berapa % raw scan di-drop oleh ExcDev=0.1. Tipikal analog ABB: 85–95%</span>
-          <div class="rrow">
-            <input type="range" id="a_exc" min="50" max="99" value="90" oninput="syncR('a_exc','a_exc_v','%');calcABB()">
-            <span class="rval" id="a_exc_v">90%</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Swingdoor compression ratio <span class="utag">x</span></label>
-          <span class="fhint">Analog tipikal (compdev=0.2): 5–10x. Tag ABB Wayang Windu: compressing=Off per default, tapi bisa diaktifkan</span>
-          <div class="rrow">
-            <input type="range" id="a_comp" min="1" max="20" step="0.5" value="1" oninput="syncR('a_comp','a_comp_v','x');calcABB()">
-            <span class="rval" id="a_comp_v">1x</span>
-          </div>
-        </div>
-      </div>
-
+<!-- ══════════════════ TAB ABB ══════════════════ -->
+<div id="pane-abb" class="pane show">
+  <div class="src-strip ss-a">
+    <div class="ss-icon">🔌</div>
+    <div>
+      <div class="ss-title">ABB DCS — OPC DA → PI Archive</div>
+      <div class="ss-sub">Server: IDWWDW25SCADA01 · IP: 172.18.1.11 · PointSource: ABB-OPC · piarchss.exe · D:\PI\arc</div>
     </div>
   </div>
 
-  <!-- RESULT ABB -->
-  <div>
+  <div class="mgrid">
+
+    <!-- INPUT ABB -->
     <div class="panel">
-      <div class="ph" style="background:var(--abb-lt)">
-        <span class="ph-icon">📊</span>
-        <div><div class="ph-title" style="color:var(--abb)">Hasil — SCADA01 (ABB)</div>
-             <div class="ph-sub">Dari disk → berapa lama & berapa tag</div></div>
+      <div class="ph">
+        <span class="ph-icon">⚙️</span>
+        <div>
+          <div class="ph-title">Input Parameter — SCADA01</div>
+          <div class="ph-sub">4 step · default = as-built Project Report Rev.00</div>
+        </div>
       </div>
       <div class="pb">
 
-        <!-- Disk visual -->
-        <div class="disk-visual a" id="a_disk_viz">
-          <div class="dv-header">
-            <span class="dv-icon">💾</span>
-            <div>
-              <div class="dv-title a">Drive D: — IDWWDW25SCADA01</div>
-              <div class="dv-sub">D:\PI\arc · <span id="a_dv_total">207</span> GB total</div>
+        <!-- Step 1 -->
+        <div class="fsec">
+          <div class="fsec-hdr"><span class="step-num">1</span>Disk Capacity — Drive D:</div>
+          <div class="field">
+            <label>Total kapasitas Drive D <span class="utag">GB</span></label>
+            <span class="fhint">As-built: <span class="asbuilt">207 GB</span> — Dell R760XS 2×3.84TB RAID1, Drive D dialokasikan untuk PI Archive</span>
+            <input type="number" id="a_disk_total" value="207" min="10" max="100000" oninput="calcABB()">
+          </div>
+          <div class="field">
+            <label>Sudah terpakai (OS + PI install + archive aktif) <span class="utag">GB</span></label>
+            <span class="fhint">As-built: <span class="asbuilt">10 GB</span> — OS + PI 3.4.460.29 + archive PISERVER_2026-01-28.arc (5.9% dari 10 GB = ~0.6 GB data)</span>
+            <input type="number" id="a_disk_used" value="10" min="0" max="100000" oninput="calcABB()">
+          </div>
+          <div class="field">
+            <label>Reserve / buffer disk <span class="utag">%</span></label>
+            <span class="fhint">Ruang cadangan — hindari disk 100% penuh. Rekomendasi: <span class="asbuilt">15%</span></span>
+            <div class="rrow">
+              <input type="range" id="a_reserve" min="5" max="40" value="15" oninput="sr('a_reserve','a_rv','%');calcABB()">
+              <span class="rval" id="a_rv">15%</span>
             </div>
           </div>
-          <div class="disk-bar-wrap">
-            <div class="disk-bar-labels">
+        </div>
+
+        <!-- Step 2 -->
+        <div class="fsec">
+          <div class="fsec-hdr"><span class="step-num">2</span>Archive Config & Overhead</div>
+          <div class="field">
+            <label>Ukuran archive file <span class="utag">MB</span></label>
+            <span class="fhint">As-built: <span class="asbuilt">10,240 MB</span> per file .arc di D:\PI\arc</span>
+            <input type="number" id="a_arcsize" value="10240" min="512" max="51200" oninput="calcABB()">
+          </div>
+          <div class="field">
+            <label>Overhead (index .idx, metadata, OS buffer) <span class="utag">%</span></label>
+            <span class="fhint">Index PI, annotation file, OS filesystem overhead. Rekomendasi: <span class="asbuilt">20%</span></span>
+            <div class="rrow">
+              <input type="range" id="a_ovhd" min="5" max="50" value="20" oninput="sr('a_ovhd','a_ov','%');calcABB()">
+              <span class="rval" id="a_ov">20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="fsec">
+          <div class="fsec-hdr"><span class="step-num">3</span>Tag & Data Rate — ABB OPC DA</div>
+          <div class="field">
+            <label>Jumlah tag aktif <span class="utag">tags</span></label>
+            <span class="fhint">As-built: <span class="asbuilt">215 tags</span> (ABB-OPC, Float32, Location1=1, Location3=1, Location4=1)</span>
+            <input type="number" id="a_tags" value="215" min="1" max="6000" oninput="calcABB()">
+          </div>
+          <div class="field">
+            <label>Scan rate OPCInt <span class="utag">detik/scan</span></label>
+            <span class="fhint">As-built: <span class="asbuilt">1 detik</span> — OPCInt membaca OPC DA setiap 1 detik</span>
+            <div class="rrow">
+              <input type="range" id="a_scan" min="1" max="60" value="1" oninput="sr('a_scan','a_sc',' det');calcABB()">
+              <span class="rval" id="a_sc">1 det</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Bytes per event <span class="utag">bytes</span></label>
+            <span class="fhint">PI Archive: <span class="asbuilt">16 bytes</span> = timestamp (8B) + Float32 value (4B) + quality (4B)</span>
+            <input type="number" id="a_bpe" value="16" min="8" max="64" oninput="calcABB()">
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="fsec">
+          <div class="fsec-hdr"><span class="step-num">4</span>Exception & Swingdoor Filter</div>
+          <div class="field">
+            <label>Exception reduction <span class="utag">%</span></label>
+            <span class="fhint">% raw scan yang di-drop oleh ExcDev=0.1. Sensor analog ABB stabil → tipikal <span class="asbuilt">90%</span> di-drop (hanya 10% lolos)</span>
+            <div class="rrow">
+              <input type="range" id="a_exc" min="50" max="99" value="90" oninput="sr('a_exc','a_ex','%');calcABB()">
+              <span class="rval" id="a_ex">90%</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Swingdoor compression ratio <span class="utag">x</span></label>
+            <span class="fhint">As-built ABB: <span class="asbuilt">compressing=Off (1x)</span>. Jika diaktifkan (compdev=0.2), analog tipikal 5–10x</span>
+            <div class="rrow">
+              <input type="range" id="a_comp" min="1" max="20" step="0.5" value="1" oninput="sr('a_comp','a_co','x');calcABB()">
+              <span class="rval" id="a_co">1x</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /input panel -->
+
+    <!-- RESULT ABB -->
+    <div>
+      <div class="panel">
+        <div class="ph" style="background:var(--abb-lt)">
+          <span class="ph-icon">📊</span>
+          <div>
+            <div class="ph-title" style="color:var(--abb)">Hasil Kalkulasi — SCADA01</div>
+            <div class="ph-sub">Dari disk tersedia → retensi & max tags</div>
+          </div>
+        </div>
+        <div class="pb">
+
+          <!-- Disk visual -->
+          <div class="disk-visual dv-a">
+            <div class="dv-hdr">
+              <span class="dv-hdr-icon">💾</span>
+              <div>
+                <div class="dv-hdr-title">Drive D: — IDWWDW25SCADA01</div>
+                <div class="dv-hdr-sub">D:\PI\arc · Total: <span id="a_dv_total">207</span> GB</div>
+              </div>
+            </div>
+            <div class="dv-bar-labels">
               <span>0 GB</span>
-              <span id="a_dv_label">—</span>
-              <span id="a_dv_total2">207 GB</span>
+              <span id="a_dv_mid">—</span>
+              <span id="a_dv_end">207 GB</span>
             </div>
-            <div class="disk-track">
-              <div class="disk-used" id="a_seg_used" style="width:4.8%"><span>OS+PI</span></div>
-              <div class="disk-pi"   id="a_seg_pi"   style="width:0%"><span id="a_seg_pi_lbl">PI</span></div>
-              <div class="disk-free" id="a_seg_free"></div>
+            <div class="dv-track">
+              <div class="dv-seg-used"    id="a_seg_used"    style="width:4.8%"><span>OS+PI</span></div>
+              <div class="dv-seg-pi"      id="a_seg_pi"      style="width:0%"><span id="a_seg_pi_lbl">PI</span></div>
+              <div class="dv-seg-reserve" id="a_seg_reserve" style="width:15%"><span>Res</span></div>
+              <div class="dv-seg-free"    id="a_seg_free"></div>
+            </div>
+            <div class="dv-legend">
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:#94a3b8"></div><span>OS + used</span></div>
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:var(--abb)"></div><span>PI Archive data</span></div>
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:#fde68a"></div><span>Reserve</span></div>
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:var(--border)"></div><span>Free</span></div>
             </div>
           </div>
-          <div class="disk-legend">
-            <div class="dl-item"><div class="dl-dot" style="background:#94a3b8"></div><span>OS + existing used</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:var(--abb)"></div><span>PI Archive (kalkulasi)</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:var(--border)"></div><span>Free (reserve)</span></div>
-          </div>
-        </div>
 
-        <!-- Result cards -->
-        <div class="rgrid">
-          <div class="rcard primary-a">
-            <div class="rlabel">Available for PI</div>
-            <div class="rval-big a" id="a_res_avail">—</div>
-            <div class="runit">GB setelah OS + reserve</div>
+          <!-- Result cards -->
+          <div class="rgrid">
+            <div class="rcard pa">
+              <div class="rlabel">Available for PI</div>
+              <div class="rbig a" id="a_r_avail">—</div>
+              <div class="runit">GB (disk − used − reserve)</div>
+            </div>
+            <div class="rcard pa">
+              <div class="rlabel">Archive Files</div>
+              <div class="rbig a" id="a_r_arcfiles">—</div>
+              <div class="runit">file .arc × <span id="a_arc_lbl">10</span> GB</div>
+            </div>
+            <div class="rcard hl">
+              <div class="rlabel">⏱ Retensi (<span id="a_tags_lbl">215</span> tags)</div>
+              <div class="rbig c" id="a_r_retention">—</div>
+              <div class="runit" id="a_r_ret_unit">tahun</div>
+            </div>
+            <div class="rcard hl">
+              <div class="rlabel">📦 Max Tags (5 tahun)</div>
+              <div class="rbig c" id="a_r_maxtags">—</div>
+              <div class="runit">tags bisa ditampung</div>
+            </div>
           </div>
-          <div class="rcard primary-a">
-            <div class="rlabel">Archive Files</div>
-            <div class="rval-big a" id="a_res_arcfiles">—</div>
-            <div class="runit">file .arc × <span id="a_arcsize_lbl">10</span> GB</div>
-          </div>
-          <div class="rcard highlight">
-            <div class="rlabel">⏱ Retensi (215 tags)</div>
-            <div class="rval-big c" id="a_res_retention">—</div>
-            <div class="runit" id="a_res_ret_unit">tahun</div>
-          </div>
-          <div class="rcard highlight">
-            <div class="rlabel">📦 Max Tags</div>
-            <div class="rval-big c" id="a_res_maxtags">—</div>
-            <div class="runit">tags untuk 5 tahun</div>
-          </div>
-        </div>
 
-        <!-- Timeline bar -->
-        <div class="timeline-wrap">
-          <div class="tl-label">
-            <span>Timeline penggunaan storage</span>
-            <span id="a_tl_label">—</span>
+          <!-- Callout status -->
+          <div id="a_callout" class="callout ia">
+            <span class="ci">ℹ️</span>
+            <div class="ct" id="a_callout_msg">Klik Hitung untuk kalkulasi.</div>
           </div>
-          <div class="tl-track">
-            <div class="tl-seg used" id="a_tl_used" style="width:4.8%"><span>Used</span></div>
-            <div class="tl-seg pi-a" id="a_tl_pi"   style="width:0%"><span id="a_tl_pi_lbl">PI</span></div>
-            <div class="tl-seg free" id="a_tl_free"></div>
+
+          <!-- Breakdown -->
+          <div class="btw">
+            <table>
+              <thead>
+                <tr>
+                  <th class="th-a">Tahap Kalkulasi (From Disk)</th>
+                  <th class="th-a" style="text-align:right">Nilai</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>① Disk total (Drive D:)</td>                           <td id="a_t1">—</td></tr>
+                <tr><td>② – OS + PI install + archive aktif</td>               <td id="a_t2">—</td></tr>
+                <tr><td>③ – Reserve (<span id="a_res_lbl">15</span>%)</td>     <td id="a_t3">—</td></tr>
+                <tr class="rha"><td>④ = Available for PI</td>                  <td id="a_t4" style="color:var(--abb)">—</td></tr>
+                <tr><td>⑤ Raw rate/hari (215 tags × 86400 × 16B)</td>          <td id="a_t5">—</td></tr>
+                <tr><td>⑥ Setelah Exception (<span id="a_exc_lbl">90</span>% drop → <span id="a_exc_pass">10</span>% lolos)</td><td id="a_t6">—</td></tr>
+                <tr><td>⑦ Setelah Swingdoor (÷ <span id="a_comp_lbl">1</span>x)</td><td id="a_t7">—</td></tr>
+                <tr><td>⑧ + Overhead (<span id="a_ovhd_lbl">20</span>%) → net rate/hari</td><td id="a_t8">—</td></tr>
+                <tr class="rha"><td>⑨ Net rate/hari/tag</td>                   <td id="a_t9" style="color:var(--abb)">—</td></tr>
+                <tr class="rha"><td>📅 Retensi = Available ÷ Net rate/hari</td><td id="a_t10" style="color:var(--comb)">—</td></tr>
+                <tr class="rha"><td>📦 Max tags = Available ÷ (Net/tag × 1825 hari)</td><td id="a_t11" style="color:var(--comb)">—</td></tr>
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        <!-- Status callout -->
-        <div id="a_callout" class="callout info-a">
-          <span class="ci">ℹ️</span>
-          <div class="ct" id="a_callout_msg">Klik Hitung untuk hasil.</div>
-        </div>
-
-        <!-- Breakdown table -->
-        <div class="btable-wrap">
-          <table>
-            <thead><tr><th class="th-a">Tahap Kalkulasi</th><th class="th-a" style="text-align:right">Nilai</th></tr></thead>
-            <tbody>
-              <tr><td>1. Disk total</td><td id="a_t1">—</td></tr>
-              <tr><td>2. – OS & existing used</td><td id="a_t2">—</td></tr>
-              <tr><td>3. – Reserve (<span id="a_res_pct_lbl">15</span>%)</td><td id="a_t3">—</td></tr>
-              <tr class="row-hi"><td>4. = Available untuk PI</td><td id="a_t4" style="color:var(--abb)">—</td></tr>
-              <tr><td>5. Raw rate (scan × tags × BPE)</td><td id="a_t5">—</td></tr>
-              <tr><td>6. Setelah Exception (<span id="a_exc_lbl">90</span>% drop)</td><td id="a_t6">—</td></tr>
-              <tr><td>7. Setelah Swingdoor (<span id="a_comp_lbl">1</span>x comp)</td><td id="a_t7">—</td></tr>
-              <tr><td>8. + Overhead (<span id="a_ovhd_lbl">20</span>%)</td><td id="a_t8">—</td></tr>
-              <tr class="row-hi"><td>9. Net per hari per tag</td><td id="a_t9" style="color:var(--abb)">—</td></tr>
-              <tr class="row-hi"><td>📅 Retensi (215 tags)</td><td id="a_t10" style="color:var(--comb)">—</td></tr>
-              <tr class="row-hi"><td>📦 Max tags (5 tahun)</td><td id="a_t11" style="color:var(--comb)">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="exprow">
-          <button class="ebtn" onclick="copyABB()">📋 Copy</button>
-          <button class="ebtn" onclick="window.print()">🖨️ Print</button>
+          <div class="exprow">
+            <button class="ebtn" onclick="copyABB()">📋 Copy Summary</button>
+            <button class="ebtn" onclick="window.print()">🖨️ Print</button>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div><!-- /mgrid -->
+    </div><!-- /result -->
+
+  </div><!-- /mgrid -->
 </div><!-- /pane-abb -->
 
 
-<!-- ══════════════════════════
-     TAB VC-8000
-══════════════════════════ -->
-<div id="pane-vc" class="tab-pane">
-<div class="src-strip v">
-  <div class="ss-icon">📳</div>
-  <div>
-    <div class="ss-title">VC-8000 SETPOINT Connector → AF Database Vibration</div>
-    <div class="ss-sub">Server: IDWWDW25SCADA02 · IP: 172.18.1.12 · AF DB: Vibration · 225 tags · UNIT#1 · v8.6.240.0</div>
-  </div>
-</div>
-
-<div class="mgrid">
-
-  <!-- INPUT VC -->
-  <div class="panel">
-    <div class="ph"><span class="ph-icon">💾</span>
-      <div><div class="ph-title">Disk & Storage — SCADA02</div>
-           <div class="ph-sub">Mulai dari kapasitas drive di IDWWDW25SCADA02</div></div>
-    </div>
-    <div class="pb">
-
-      <div class="fsec">
-        <div class="fsec-hdr vc">Step 1 — Disk Capacity (SCADA02)</div>
-        <div class="field">
-          <label>Total kapasitas Drive PI data <span class="utag v">GB</span></label>
-          <span class="fhint">Dell R760XS 2×3.84TB RAID1 → usable ~3,600 GB. PI data dialokasikan ke drive ini</span>
-          <input class="vf" type="number" id="v_disk_total" value="3600" min="10" max="100000" oninput="calcVC()">
-        </div>
-        <div class="field">
-          <label>Sudah terpakai saat ini <span class="utag v">GB</span></label>
-          <span class="fhint">OS + SETPOINT install + data existing. Estimasi: 50–100 GB</span>
-          <input class="vf" type="number" id="v_disk_used" value="80" min="0" max="100000" oninput="calcVC()">
-        </div>
-        <div class="field">
-          <label>Reserve / buffer <span class="utag v">%</span></label>
-          <span class="fhint">Rekomendasi: 15–20%</span>
-          <div class="rrow">
-            <input type="range" class="vr" id="v_reserve" min="5" max="40" value="15" oninput="syncR('v_reserve','v_reserve_v','%');calcVC()">
-            <span class="rval v" id="v_reserve_v">15%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fsec">
-        <div class="fsec-hdr vc">Step 2 — Overhead</div>
-        <div class="field">
-          <label>Overhead (index, AF metadata, OS) <span class="utag v">%</span></label>
-          <span class="fhint">VC-8000 lebih tinggi karena waveform data + AF index. Rekomendasi: 25%</span>
-          <div class="rrow">
-            <input type="range" class="vr" id="v_ovhd" min="5" max="50" value="25" oninput="syncR('v_ovhd','v_ovhd_v','%');calcVC()">
-            <span class="rval v" id="v_ovhd_v">25%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fsec">
-        <div class="fsec-hdr vc">Step 3 — Scalar Tags (Direct, Amplitude, Phase, Gap)</div>
-        <div class="field">
-          <label>Jumlah scalar tags aktif <span class="utag v">tags</span></label>
-          <span class="fhint">Current: ~181 scalar (UNIT#1.3/4/5.Direct, nXAmplitude, nXPhase, Gap, Speed + diagnostics)</span>
-          <input class="vf" type="number" id="v_scalar_tags" value="181" min="1" max="5000" oninput="calcVC()">
-        </div>
-        <div class="field">
-          <label>Sample rate VC-8000 <span class="utag v">Hz</span></label>
-          <span class="fhint">VC-8000 mengukur secara kontinyu. RMS/1X/2X update rate: tipikal 1 Hz (tiap detik)</span>
-          <div class="rrow">
-            <input type="range" class="vr" id="v_rate" min="1" max="100" value="1" oninput="syncR('v_rate','v_rate_v',' Hz');calcVC()">
-            <span class="rval v" id="v_rate_v">1 Hz</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Bytes per scalar event <span class="utag v">bytes</span></label>
-          <span class="fhint">Standard PI: 16 bytes/event</span>
-          <input class="vf" type="number" id="v_bpe" value="16" min="8" max="64" oninput="calcVC()">
-        </div>
-        <div class="field">
-          <label>Exception reduction scalar <span class="utag v">%</span></label>
-          <span class="fhint">SETPOINT excmax=3600s, excmin=10s. Vibrasi RMS berubah terus, exception lebih rendah: ~60–80%</span>
-          <div class="rrow">
-            <input type="range" class="vr" id="v_exc" min="30" max="95" value="70" oninput="syncR('v_exc','v_exc_v','%');calcVC()">
-            <span class="rval v" id="v_exc_v">70%</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Swingdoor compression scalar <span class="utag v">x</span></label>
-          <span class="fhint">SETPOINT compressing=1. Vibrasi berfluktuasi, kompresi moderat: 3–6x</span>
-          <div class="rrow">
-            <input type="range" class="vr" id="v_comp" min="1" max="15" step="0.5" value="4" oninput="syncR('v_comp','v_comp_v','x');calcVC()">
-            <span class="rval v" id="v_comp_v">4x</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fsec">
-        <div class="fsec-hdr vc">Step 4 — Waveform / Snapshot Tags</div>
-        <div class="field">
-          <label>Jumlah waveform tags <span class="utag v">tags</span></label>
-          <span class="fhint">Async/Sync Waveform, Interestingness (UNIT#1.3.x.Async Waveform.99 dll). Current: ~44 tags</span>
-          <input class="vf" type="number" id="v_wave_tags" value="44" min="0" max="500" oninput="calcVC()">
-        </div>
-        <div class="field">
-          <label>Waveform capture rate <span class="utag v">per hari</span></label>
-          <span class="fhint">Triggered capture (bukan kontinyu). Tipikal: 24–240 captures/hari</span>
-          <div class="rrow">
-            <input type="range" class="vr" id="v_wave_rate" min="1" max="500" value="48" oninput="syncR('v_wave_rate','v_wave_rate_v','/hari');calcVC()">
-            <span class="rval v" id="v_wave_rate_v">48/hari</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Bytes per waveform capture <span class="utag v">bytes</span></label>
-          <span class="fhint">Array float32. Tipikal 1,024–4,096 bytes per capture tergantung sample count</span>
-          <input class="vf" type="number" id="v_wave_bpe" value="2048" min="64" max="65536" oninput="calcVC()">
-        </div>
-      </div>
-
+<!-- ══════════════════ TAB VC-8000 ══════════════════ -->
+<div id="pane-vc" class="pane">
+  <div class="src-strip ss-v">
+    <div class="ss-icon">📳</div>
+    <div>
+      <div class="ss-title">VC-8000 SETPOINT Connector → AF Database Vibration</div>
+      <div class="ss-sub">Server: IDWWDW25SCADA02 · IP: 172.18.1.12 · AF DB: Vibration · UNIT#1 · SETPOINT v8.6.240.0</div>
     </div>
   </div>
 
-  <!-- RESULT VC -->
-  <div>
+  <div class="mgrid">
+
+    <!-- INPUT VC -->
     <div class="panel">
-      <div class="ph" style="background:var(--vc-lt)">
-        <span class="ph-icon">📊</span>
-        <div><div class="ph-title" style="color:var(--vc)">Hasil — SCADA02 (VC-8000)</div>
-             <div class="ph-sub">Dari disk → retensi & max tags</div></div>
+      <div class="ph">
+        <span class="ph-icon">⚙️</span>
+        <div>
+          <div class="ph-title">Input Parameter — SCADA02</div>
+          <div class="ph-sub">4 step · scalar + waveform tags · default = as-built</div>
+        </div>
       </div>
       <div class="pb">
 
-        <!-- Disk visual -->
-        <div class="disk-visual v">
-          <div class="dv-header">
-            <span class="dv-icon">💾</span>
-            <div>
-              <div class="dv-title v">Drive SCADA02 — IDWWDW25SCADA02</div>
-              <div class="dv-sub">AF Database: Vibration · <span id="v_dv_total">3,600</span> GB total</div>
+        <!-- Step 1 -->
+        <div class="fsec">
+          <div class="fsec-hdr v"><span class="step-num">1</span>Disk Capacity — SCADA02</div>
+          <div class="field">
+            <label>Total kapasitas drive PI data <span class="utag v">GB</span></label>
+            <span class="fhint">As-built: <span class="asbuilt v">~3,600 GB</span> — Dell R760XS 2×3.84TB RAID1 usable (~3,840 GB raw → ~3,600 GB usable setelah RAID1 + filesystem)</span>
+            <input class="vf" type="number" id="v_disk_total" value="3600" min="10" max="100000" oninput="calcVC()">
+          </div>
+          <div class="field">
+            <label>Sudah terpakai (OS + SETPOINT install + data existing) <span class="utag v">GB</span></label>
+            <span class="fhint">Estimasi: <span class="asbuilt v">~80 GB</span> — Windows Server 2025 + SETPOINT v8.6.240.0 + PI Vision + SQL Express. Report tidak mencantumkan eksplisit.</span>
+            <input class="vf" type="number" id="v_disk_used" value="80" min="0" max="100000" oninput="calcVC()">
+          </div>
+          <div class="field">
+            <label>Reserve / buffer disk <span class="utag v">%</span></label>
+            <span class="fhint">Rekomendasi: <span class="asbuilt v">15%</span></span>
+            <div class="rrow">
+              <input type="range" class="vr" id="v_reserve" min="5" max="40" value="15" oninput="sr('v_reserve','v_rv','%');calcVC()">
+              <span class="rval v" id="v_rv">15%</span>
             </div>
           </div>
-          <div class="disk-bar-wrap">
-            <div class="disk-bar-labels">
+        </div>
+
+        <!-- Step 2 -->
+        <div class="fsec">
+          <div class="fsec-hdr v"><span class="step-num">2</span>Overhead — SCADA02</div>
+          <div class="field">
+            <label>Overhead (AF index, waveform metadata, OS buffer) <span class="utag v">%</span></label>
+            <span class="fhint">VC-8000 lebih tinggi dari ABB karena AF element tree, waveform array index, SQL Express metadata. Rekomendasi: <span class="asbuilt v">25%</span></span>
+            <div class="rrow">
+              <input type="range" class="vr" id="v_ovhd" min="5" max="50" value="25" oninput="sr('v_ovhd','v_ov','%');calcVC()">
+              <span class="rval v" id="v_ov">25%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="fsec">
+          <div class="fsec-hdr v"><span class="step-num">3</span>Scalar Tags — Direct, Amplitude, Phase, Gap, Speed</div>
+          <div class="field">
+            <label>Jumlah scalar tags aktif <span class="utag v">tags</span></label>
+            <span class="fhint">As-built: <span class="asbuilt v">~181 tags</span> — UNIT#1: Turbine (1X/1Y/2X/2Y Direct+Amp+Phase+Gap), Generator (3X/3Y/4X/4Y), Axial, HWP-A X/Y, Speed + diagnostics</span>
+            <input class="vf" type="number" id="v_stags" value="181" min="1" max="5000" oninput="calcVC()">
+          </div>
+          <div class="field">
+            <label>Sample rate VC-8000 <span class="utag v">Hz</span></label>
+            <span class="fhint">As-built: <span class="asbuilt v">1 Hz</span> — VC-8000 update scalar values setiap 1 detik (RMS, 1X amplitude, phase, gap)</span>
+            <div class="rrow">
+              <input type="range" class="vr" id="v_rate" min="1" max="100" value="1" oninput="sr('v_rate','v_ra',' Hz');calcVC()">
+              <span class="rval v" id="v_ra">1 Hz</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Bytes per scalar event <span class="utag v">bytes</span></label>
+            <span class="fhint">PI standard: <span class="asbuilt v">16 bytes</span>/event</span>
+            <input class="vf" type="number" id="v_bpe" value="16" min="8" max="64" oninput="calcVC()">
+          </div>
+          <div class="field">
+            <label>Exception reduction scalar <span class="utag v">%</span></label>
+            <span class="fhint">SETPOINT excmax=3600s, excmin=10s. Vibrasi berfluktuasi terus → exception lebih kecil dari ABB. Estimasi: <span class="asbuilt v">70%</span> di-drop</span>
+            <div class="rrow">
+              <input type="range" class="vr" id="v_exc" min="30" max="95" value="70" oninput="sr('v_exc','v_ex','%');calcVC()">
+              <span class="rval v" id="v_ex">70%</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Swingdoor compression scalar <span class="utag v">x</span></label>
+            <span class="fhint">As-built SETPOINT: <span class="asbuilt v">compressing=1 (aktif)</span>. Vibrasi berfluktuasi, kompresi moderat. Tipikal: <span class="asbuilt v">4x</span></span>
+            <div class="rrow">
+              <input type="range" class="vr" id="v_comp" min="1" max="15" step="0.5" value="4" oninput="sr('v_comp','v_co','x');calcVC()">
+              <span class="rval v" id="v_co">4x</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="fsec">
+          <div class="fsec-hdr v"><span class="step-num">4</span>Waveform Tags — Async/Sync Waveform</div>
+          <div class="field">
+            <label>Jumlah waveform tags <span class="utag v">tags</span></label>
+            <span class="fhint">As-built: <span class="asbuilt v">~44 tags</span> — UNIT#1.3.x.Async Waveform.99, Sync Waveform, Interestingness per channel</span>
+            <input class="vf" type="number" id="v_wtags" value="44" min="0" max="500" oninput="calcVC()">
+          </div>
+          <div class="field">
+            <label>Capture rate waveform <span class="utag v">capture/hari</span></label>
+            <span class="fhint">Triggered (bukan kontinyu) — dipicu event/alarm. Tipikal: <span class="asbuilt v">48 capture/hari</span> (~1 capture per 30 menit)</span>
+            <div class="rrow">
+              <input type="range" class="vr" id="v_wrate" min="1" max="500" value="48" oninput="sr('v_wrate','v_wr','/hari');calcVC()">
+              <span class="rval v" id="v_wr">48/hari</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Bytes per waveform capture <span class="utag v">bytes</span></label>
+            <span class="fhint">Array float32 per capture. Tipikal: <span class="asbuilt v">2,048 bytes</span> (512 sample × 4 bytes)</span>
+            <input class="vf" type="number" id="v_wbpe" value="2048" min="64" max="65536" oninput="calcVC()">
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /input VC -->
+
+    <!-- RESULT VC -->
+    <div>
+      <div class="panel">
+        <div class="ph" style="background:var(--vc-lt)">
+          <span class="ph-icon">📊</span>
+          <div>
+            <div class="ph-title" style="color:var(--vc)">Hasil Kalkulasi — SCADA02</div>
+            <div class="ph-sub">Dari disk tersedia → retensi & max tags</div>
+          </div>
+        </div>
+        <div class="pb">
+
+          <!-- Disk visual -->
+          <div class="disk-visual dv-v">
+            <div class="dv-hdr">
+              <span class="dv-hdr-icon">💾</span>
+              <div>
+                <div class="dv-hdr-title">Drive SCADA02 — IDWWDW25SCADA02</div>
+                <div class="dv-hdr-sub">AF DB: Vibration · Total: <span id="v_dv_total">3,600</span> GB</div>
+              </div>
+            </div>
+            <div class="dv-bar-labels">
               <span>0 GB</span>
-              <span id="v_dv_label">—</span>
-              <span id="v_dv_total2">3,600 GB</span>
+              <span id="v_dv_mid">—</span>
+              <span id="v_dv_end">3,600 GB</span>
             </div>
-            <div class="disk-track">
-              <div class="disk-used" id="v_seg_used" style="width:2.2%"><span>OS</span></div>
-              <div class="disk-pi vc" id="v_seg_pi" style="width:0%"><span id="v_seg_pi_lbl">VC</span></div>
-              <div class="disk-free"></div>
+            <div class="dv-track">
+              <div class="dv-seg-used"    id="v_seg_used"    style="width:2.2%"><span>OS</span></div>
+              <div class="dv-seg-pi v"    id="v_seg_pi"      style="width:0%"><span id="v_seg_pi_lbl">VC</span></div>
+              <div class="dv-seg-reserve" id="v_seg_reserve" style="width:15%"><span>Res</span></div>
+              <div class="dv-seg-free"></div>
+            </div>
+            <div class="dv-legend">
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:#94a3b8"></div><span>OS + used</span></div>
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:var(--vc)"></div><span>VC-8000 data (scalar+wave)</span></div>
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:#fde68a"></div><span>Reserve</span></div>
+              <div class="dv-legend-item"><div class="dv-legend-dot" style="background:var(--border)"></div><span>Free</span></div>
             </div>
           </div>
-          <div class="disk-legend">
-            <div class="dl-item"><div class="dl-dot" style="background:#94a3b8"></div><span>OS + existing</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:var(--vc)"></div><span>VC-8000 data (kalkulasi)</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:var(--border)"></div><span>Free (reserve)</span></div>
-          </div>
-        </div>
 
-        <!-- Result cards -->
-        <div class="rgrid">
-          <div class="rcard primary-v">
-            <div class="rlabel">Available for PI</div>
-            <div class="rval-big v" id="v_res_avail">—</div>
-            <div class="runit">GB setelah OS + reserve</div>
+          <!-- Result cards -->
+          <div class="rgrid">
+            <div class="rcard pv">
+              <div class="rlabel">Available for PI</div>
+              <div class="rbig v" id="v_r_avail">—</div>
+              <div class="runit">GB (disk − used − reserve)</div>
+            </div>
+            <div class="rcard pv">
+              <div class="rlabel">Net Rate/hari</div>
+              <div class="rbig v" id="v_r_rate">—</div>
+              <div class="runit">MB/hari (scalar + waveform)</div>
+            </div>
+            <div class="rcard hl">
+              <div class="rlabel">⏱ Retensi (<span id="v_tags_lbl">225</span> tags)</div>
+              <div class="rbig c" id="v_r_retention">—</div>
+              <div class="runit" id="v_r_ret_unit">tahun</div>
+            </div>
+            <div class="rcard hl">
+              <div class="rlabel">📦 Max Scalar Tags (5 thn)</div>
+              <div class="rbig c" id="v_r_maxtags">—</div>
+              <div class="runit">tags scalar bisa ditampung</div>
+            </div>
           </div>
-          <div class="rcard primary-v">
-            <div class="rlabel">Rate per hari</div>
-            <div class="rval-big v" id="v_res_rate">—</div>
-            <div class="runit">GB/hari (scalar+wave)</div>
-          </div>
-          <div class="rcard highlight">
-            <div class="rlabel">⏱ Retensi (<span id="v_tags_total_lbl">225</span> tags)</div>
-            <div class="rval-big c" id="v_res_retention">—</div>
-            <div class="runit" id="v_res_ret_unit">tahun</div>
-          </div>
-          <div class="rcard highlight">
-            <div class="rlabel">📦 Max Scalar Tags</div>
-            <div class="rval-big c" id="v_res_maxtags">—</div>
-            <div class="runit">untuk 5 tahun retensi</div>
-          </div>
-        </div>
 
-        <!-- Timeline -->
-        <div class="timeline-wrap">
-          <div class="tl-label">
-            <span>Timeline utilisasi storage</span>
-            <span id="v_tl_label">—</span>
+          <!-- Callout -->
+          <div id="v_callout" class="callout iv">
+            <span class="ci">ℹ️</span>
+            <div class="ct" id="v_callout_msg">Klik Hitung untuk kalkulasi.</div>
           </div>
-          <div class="tl-track">
-            <div class="tl-seg used" id="v_tl_used" style="width:2.2%"><span>Used</span></div>
-            <div class="tl-seg pi-v" id="v_tl_pi" style="width:0%"><span id="v_tl_pi_lbl">VC</span></div>
-            <div class="tl-seg free"></div>
+
+          <!-- Breakdown -->
+          <div class="btw">
+            <table>
+              <thead>
+                <tr>
+                  <th class="th-v">Tahap Kalkulasi (From Disk)</th>
+                  <th class="th-v" style="text-align:right">Nilai</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>① Disk total SCADA02</td>                                <td id="v_t1">—</td></tr>
+                <tr><td>② – OS + SETPOINT + PI Vision</td>                       <td id="v_t2">—</td></tr>
+                <tr><td>③ – Reserve (<span id="v_res_lbl">15</span>%)</td>       <td id="v_t3">—</td></tr>
+                <tr class="rhv"><td>④ = Available for PI</td>                    <td id="v_t4" style="color:var(--vc)">—</td></tr>
+                <tr><td>⑤ Scalar raw rate/hari (181 tags × 86400 × 16B)</td>     <td id="v_t5">—</td></tr>
+                <tr><td>⑥ Setelah Exception (<span id="v_exc_lbl">70</span>% drop)</td><td id="v_t6">—</td></tr>
+                <tr><td>⑦ Setelah Swingdoor (÷ <span id="v_comp_lbl">4</span>x)</td>  <td id="v_t7">—</td></tr>
+                <tr><td>⑧ Waveform rate/hari (44 tags × 48 cap × 2048B)</td>     <td id="v_t8">—</td></tr>
+                <tr><td>⑨ Subtotal scalar + waveform</td>                         <td id="v_t9">—</td></tr>
+                <tr class="rhv"><td>⑩ + Overhead (<span id="v_ovhd_lbl">25</span>%) → net rate/hari</td><td id="v_t10" style="color:var(--vc)">—</td></tr>
+                <tr class="rhv"><td>📅 Retensi = Available ÷ Net rate/hari</td>  <td id="v_t11" style="color:var(--comb)">—</td></tr>
+                <tr class="rhv"><td>📦 Max scalar tags = (Available − WaveFixed) ÷ (Net scalar/tag × 1825)</td><td id="v_t12" style="color:var(--comb)">—</td></tr>
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        <!-- Callout -->
-        <div id="v_callout" class="callout info-v">
-          <span class="ci">ℹ️</span>
-          <div class="ct" id="v_callout_msg">Klik Hitung untuk hasil.</div>
-        </div>
-
-        <!-- Breakdown table -->
-        <div class="btable-wrap">
-          <table>
-            <thead><tr><th class="th-v">Tahap Kalkulasi</th><th class="th-v" style="text-align:right">Nilai</th></tr></thead>
-            <tbody>
-              <tr><td>1. Disk total SCADA02</td><td id="v_t1">—</td></tr>
-              <tr><td>2. – OS & existing used</td><td id="v_t2">—</td></tr>
-              <tr><td>3. – Reserve (<span id="v_res_pct_lbl">15</span>%)</td><td id="v_t3">—</td></tr>
-              <tr class="row-hi v"><td>4. = Available untuk PI</td><td id="v_t4" style="color:var(--vc)">—</td></tr>
-              <tr><td>5. Scalar raw rate/hari</td><td id="v_t5">—</td></tr>
-              <tr><td>6. Setelah exception (<span id="v_exc_lbl">70</span>% drop)</td><td id="v_t6">—</td></tr>
-              <tr><td>7. Setelah compression (<span id="v_comp_lbl">4</span>x)</td><td id="v_t7">—</td></tr>
-              <tr><td>8. Waveform raw rate/hari</td><td id="v_t8">—</td></tr>
-              <tr><td>9. Total rate/hari + overhead</td><td id="v_t9">—</td></tr>
-              <tr class="row-hi v"><td>📅 Retensi (scalar+wave)</td><td id="v_t10" style="color:var(--comb)">—</td></tr>
-              <tr class="row-hi v"><td>📦 Max scalar tags (5 thn)</td><td id="v_t11" style="color:var(--comb)">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="exprow">
-          <button class="ebtn v" onclick="copyVC()">📋 Copy</button>
-          <button class="ebtn v" onclick="window.print()">🖨️ Print</button>
+          <div class="exprow">
+            <button class="ebtn v" onclick="copyVC()">📋 Copy Summary</button>
+            <button class="ebtn v" onclick="window.print()">🖨️ Print</button>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div><!-- /mgrid -->
+    </div><!-- /result VC -->
+
+  </div><!-- /mgrid -->
 </div><!-- /pane-vc -->
 
 
-<!-- ══════════════════════════
-     TAB COMBINED
-══════════════════════════ -->
-<div id="pane-comb" class="tab-pane">
-<div class="src-strip c">
-  <div class="ss-icon">🏭</div>
-  <div>
-    <div class="ss-title">Combined — PIMS Wayang Windu</div>
-    <div class="ss-sub">ABB (SCADA01) + VC-8000 SETPOINT (SCADA02) · Star Energy Geothermal · PT. Cistech Alpha Indonesia</div>
-  </div>
-</div>
-
-<!-- Combined hero -->
-<div class="comb-hero">
-  <div class="ch-title">🏭 Ringkasan Kedua Server</div>
-  <div class="ch-grid">
-    <div class="ch-card">
-      <div class="ch-val" style="color:var(--abb)" id="c_abb_avail">—</div>
-      <div class="ch-label">ABB Available</div>
-      <div class="ch-sub">GB untuk PI · SCADA01</div>
-    </div>
-    <div class="ch-card">
-      <div class="ch-val" style="color:var(--abb)" id="c_abb_ret">—</div>
-      <div class="ch-label">ABB Retensi</div>
-      <div class="ch-sub">tahun dengan 215 tags</div>
-    </div>
-    <div class="ch-card">
-      <div class="ch-val" style="color:var(--vc)" id="c_vc_avail">—</div>
-      <div class="ch-label">VC-8000 Available</div>
-      <div class="ch-sub">GB untuk PI · SCADA02</div>
-    </div>
-    <div class="ch-card">
-      <div class="ch-val" style="color:var(--vc)" id="c_vc_ret">—</div>
-      <div class="ch-label">VC-8000 Retensi</div>
-      <div class="ch-sub">tahun dengan 225 tags</div>
+<!-- ══════════════════ TAB COMBINED ══════════════════ -->
+<div id="pane-comb" class="pane">
+  <div class="src-strip ss-c">
+    <div class="ss-icon">🏭</div>
+    <div>
+      <div class="ss-title">Combined — PIMS Wayang Windu</div>
+      <div class="ss-sub">ABB (SCADA01) + VC-8000 SETPOINT (SCADA02) · Star Energy Geothermal · PT. Cistech Alpha Indonesia · Rev.00</div>
     </div>
   </div>
-</div>
 
-<!-- Detail table combined -->
-<div class="mgrid">
-  <div class="panel">
-    <div class="ph" style="background:var(--abb-lt)">
-      <span class="ph-icon">🔌</span>
-      <div><div class="ph-title" style="color:var(--abb)">Detail ABB — SCADA01</div>
-           <div class="ph-sub">piarchss.exe · D:\PI\arc · Drive D: 207 GB</div></div>
-    </div>
-    <div class="pb">
-      <div class="btable-wrap">
-        <table>
-          <thead><tr><th class="th-a">Parameter</th><th class="th-a" style="text-align:right">Nilai</th></tr></thead>
-          <tbody>
-            <tr><td>Disk total (Drive D:)</td><td id="ca_disk">207 GB</td></tr>
-            <tr><td>OS + used saat ini</td><td id="ca_used">10 GB</td></tr>
-            <tr><td>Reserve</td><td id="ca_res">—</td></tr>
-            <tr class="row-hi"><td>Available untuk PI</td><td id="ca_avail" style="color:var(--abb)">—</td></tr>
-            <tr><td>Rate/hari (post filter)</td><td id="ca_rate">—</td></tr>
-            <tr class="row-hi"><td>Retensi (215 tags)</td><td id="ca_ret" style="color:var(--comb)">—</td></tr>
-            <tr class="row-hi"><td>Max tags (5 tahun)</td><td id="ca_max" style="color:var(--comb)">—</td></tr>
-            <tr><td>Archive files capacity</td><td id="ca_arc">—</td></tr>
-            <tr><td>Assessment</td><td id="ca_assess">—</td></tr>
-          </tbody>
-        </table>
+  <!-- Hero summary -->
+  <div class="comb-hero">
+    <div class="ch-title">🏭 Ringkasan Kedua Server</div>
+    <div class="ch-grid">
+      <div class="ch-card">
+        <div class="ch-val" style="color:var(--abb)" id="c_abb_avail">—</div>
+        <div class="ch-label">ABB Available</div>
+        <div class="ch-sub">GB · Drive D: SCADA01</div>
+      </div>
+      <div class="ch-card">
+        <div class="ch-val" style="color:var(--abb)" id="c_abb_ret">—</div>
+        <div class="ch-label">ABB Retensi</div>
+        <div class="ch-sub">tahun · 215 tags</div>
+      </div>
+      <div class="ch-card">
+        <div class="ch-val" style="color:var(--vc)" id="c_vc_avail">—</div>
+        <div class="ch-label">VC-8000 Available</div>
+        <div class="ch-sub">GB · SCADA02</div>
+      </div>
+      <div class="ch-card">
+        <div class="ch-val" style="color:var(--vc)" id="c_vc_ret">—</div>
+        <div class="ch-label">VC-8000 Retensi</div>
+        <div class="ch-sub">tahun · 225 tags</div>
       </div>
     </div>
   </div>
 
-  <div class="panel">
-    <div class="ph" style="background:var(--vc-lt)">
-      <span class="ph-icon">📳</span>
-      <div><div class="ph-title" style="color:var(--vc)">Detail VC-8000 — SCADA02</div>
-           <div class="ph-sub">SETPOINT Connector · AF DB: Vibration · ~3,600 GB</div></div>
+  <!-- Detail tabel combined -->
+  <div class="mgrid">
+    <div class="panel">
+      <div class="ph" style="background:var(--abb-lt)">
+        <span class="ph-icon">🔌</span>
+        <div>
+          <div class="ph-title" style="color:var(--abb)">Detail ABB — SCADA01</div>
+          <div class="ph-sub">piarchss.exe · D:\PI\arc · Drive D: 207 GB</div>
+        </div>
+      </div>
+      <div class="pb">
+        <div class="btw">
+          <table>
+            <thead><tr><th class="th-a">Parameter</th><th class="th-a" style="text-align:right">Nilai</th></tr></thead>
+            <tbody>
+              <tr><td>Disk total</td>              <td id="ca_disk">—</td></tr>
+              <tr><td>OS + used</td>               <td id="ca_used">—</td></tr>
+              <tr><td>Reserve</td>                 <td id="ca_res">—</td></tr>
+              <tr class="rha"><td>Available for PI</td><td id="ca_avail" style="color:var(--abb)">—</td></tr>
+              <tr><td>Net rate/hari</td>            <td id="ca_rate">—</td></tr>
+              <tr><td>Exception drop</td>          <td id="ca_exc">—</td></tr>
+              <tr><td>Swingdoor ratio</td>         <td id="ca_comp">—</td></tr>
+              <tr><td>Overhead</td>                <td id="ca_ovhd">—</td></tr>
+              <tr class="rha"><td>Retensi (215 tags)</td><td id="ca_ret" style="color:var(--comb)">—</td></tr>
+              <tr class="rha"><td>Max tags (5 tahun)</td><td id="ca_max" style="color:var(--comb)">—</td></tr>
+              <tr><td>Archive files</td>           <td id="ca_arc">—</td></tr>
+              <tr><td>Assessment</td>              <td id="ca_assess">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="pb">
-      <div class="btable-wrap">
-        <table>
-          <thead><tr><th class="th-v">Parameter</th><th class="th-v" style="text-align:right">Nilai</th></tr></thead>
-          <tbody>
-            <tr><td>Disk total (SCADA02)</td><td id="cv_disk">3,600 GB</td></tr>
-            <tr><td>OS + used saat ini</td><td id="cv_used">80 GB</td></tr>
-            <tr><td>Reserve</td><td id="cv_res">—</td></tr>
-            <tr class="row-hi v"><td>Available untuk PI</td><td id="cv_avail" style="color:var(--vc)">—</td></tr>
-            <tr><td>Scalar rate/hari</td><td id="cv_rate_s">—</td></tr>
-            <tr><td>Waveform rate/hari</td><td id="cv_rate_w">—</td></tr>
-            <tr class="row-hi v"><td>Retensi (scalar+wave)</td><td id="cv_ret" style="color:var(--comb)">—</td></tr>
-            <tr class="row-hi v"><td>Max scalar tags (5 thn)</td><td id="cv_max" style="color:var(--comb)">—</td></tr>
-            <tr><td>Assessment</td><td id="cv_assess">—</td></tr>
-          </tbody>
-        </table>
+
+    <div class="panel">
+      <div class="ph" style="background:var(--vc-lt)">
+        <span class="ph-icon">📳</span>
+        <div>
+          <div class="ph-title" style="color:var(--vc)">Detail VC-8000 — SCADA02</div>
+          <div class="ph-sub">SETPOINT v8.6.240.0 · AF DB: Vibration · ~3,600 GB</div>
+        </div>
+      </div>
+      <div class="pb">
+        <div class="btw">
+          <table>
+            <thead><tr><th class="th-v">Parameter</th><th class="th-v" style="text-align:right">Nilai</th></tr></thead>
+            <tbody>
+              <tr><td>Disk total</td>                    <td id="cv_disk">—</td></tr>
+              <tr><td>OS + used</td>                     <td id="cv_used">—</td></tr>
+              <tr><td>Reserve</td>                       <td id="cv_res">—</td></tr>
+              <tr class="rhv"><td>Available for PI</td>  <td id="cv_avail" style="color:var(--vc)">—</td></tr>
+              <tr><td>Scalar rate/hari (post-filter)</td><td id="cv_rate_s">—</td></tr>
+              <tr><td>Waveform rate/hari</td>            <td id="cv_rate_w">—</td></tr>
+              <tr><td>Net rate/hari (incl. overhead)</td><td id="cv_rate_net">—</td></tr>
+              <tr class="rhv"><td>Retensi (scalar+wave)</td><td id="cv_ret" style="color:var(--comb)">—</td></tr>
+              <tr class="rhv"><td>Max scalar tags (5 thn)</td><td id="cv_max" style="color:var(--comb)">—</td></tr>
+              <tr><td>Assessment</td>                   <td id="cv_assess">—</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Recommendations -->
-<div class="panel" style="margin-top:16px">
-  <div class="ph">
-    <span class="ph-icon">💡</span>
-    <div><div class="ph-title">Rekomendasi</div>
-         <div class="ph-sub">Berdasarkan as-built Project Report Rev.00 · PT. Cistech Alpha Indonesia</div></div>
-  </div>
-  <div class="pb" id="c_recs">
-    <div class="callout info-c">
-      <span class="ci">📋</span>
-      <div class="ct">Klik Hitung Semua untuk mendapatkan rekomendasi.</div>
+  <!-- Rekomendasi -->
+  <div class="panel" style="margin-top:16px">
+    <div class="ph">
+      <span class="ph-icon">💡</span>
+      <div>
+        <div class="ph-title">Rekomendasi & Assessment</div>
+        <div class="ph-sub">Berdasarkan as-built Project Report Rev.00 · 13-Mar-2026 · PT. Cistech Alpha Indonesia</div>
+      </div>
+    </div>
+    <div class="pb" id="c_recs">
+      <div class="callout ic"><span class="ci">📋</span><div class="ct">Klik <strong>Hitung Semua</strong> untuk rekomendasi.</div></div>
     </div>
   </div>
-</div>
 
-<div class="exprow" style="margin-top:14px">
-  <button class="ebtn" onclick="copyAll()">📋 Copy Full Report</button>
-  <button class="ebtn" onclick="window.print()">🖨️ Print</button>
-</div>
+  <div class="exprow" style="margin-top:14px">
+    <button class="ebtn" onclick="copyAll()">📋 Copy Full Report</button>
+    <button class="ebtn" onclick="window.print()">🖨️ Print</button>
+  </div>
 </div><!-- /pane-comb -->
 
 </div></main>
 
 <footer>
   <p>PI Storage Calculator — From Disk · Dual Source: ABB DCS + VC-8000 SETPOINT</p>
-  <p style="margin-top:4px;color:#94a3b8">Wayang Windu PIMS · IDWWDW25SCADA01 + IDWWDW25SCADA02 · PT. Cistech Alpha Indonesia</p>
+  <p>Wayang Windu PIMS · IDWWDW25SCADA01 + IDWWDW25SCADA02 · PT. Cistech Alpha Indonesia · Rev.00</p>
 </footer>
 
 <script>
-// ── STATE ─────────────────────────────────────────────────────
-let A = {}, V = {};  // results from each calc
+/* ════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════ */
+let A = {};  // ABB result
+let V = {};  // VC-8000 result
 
-// ── TAB ───────────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   TAB
+════════════════════════════════════════════════════════════ */
 function switchTab(t) {
   ['abb','vc','comb'].forEach(x => {
     document.getElementById('pane-'+x).classList.remove('show');
-    const b = document.getElementById('tab-btn-'+x);
-    b.className = 'stab';
+    document.getElementById('tb-'+x).className = 'stab';
   });
   document.getElementById('pane-'+t).classList.add('show');
-  document.getElementById('tab-btn-'+t).className = 'stab active-'+t;
+  document.getElementById('tb-'+t).className = 'stab a'+t[0];
 }
 
-// ── SYNC RANGE ────────────────────────────────────────────────
-function syncR(rid, vid, suffix) {
-  document.getElementById(vid).textContent = document.getElementById(rid).value + suffix;
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════ */
+function sr(rid, vid, sfx) {
+  document.getElementById(vid).textContent = document.getElementById(rid).value + sfx;
 }
+function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function st(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
 
-// ── HELPERS ───────────────────────────────────────────────────
-function gv(id)  { return parseFloat(document.getElementById(id).value) || 0; }
-function st(id, v) { const el = document.getElementById(id); if(el) el.textContent = v; }
-function fGB(bytes) {
-  const gb = bytes / 1073741824;
-  if (gb < 0.001) return (bytes/1048576).toFixed(3) + ' MB';
-  if (gb < 1)     return gb.toFixed(4) + ' GB';
-  if (gb < 1000)  return gb.toFixed(2) + ' GB';
-  return (gb/1024).toFixed(2) + ' TB';
+// Format bytes → human readable
+function fB(bytes) {
+  if (bytes <= 0)       return '0 B';
+  const gb = bytes / 1_073_741_824;
+  const mb = bytes / 1_048_576;
+  if (gb >= 1000) return (gb / 1024).toFixed(2) + ' TB';
+  if (gb >= 1)    return gb.toFixed(2) + ' GB';
+  if (mb >= 1)    return mb.toFixed(1) + ' MB';
+  return (bytes / 1024).toFixed(0) + ' KB';
 }
-function fN(n)   { return Number(n.toFixed(0)).toLocaleString('id-ID'); }
-function fY(days){ 
-  if (days < 30)   return days.toFixed(0) + ' hari';
-  if (days < 365)  return (days/30).toFixed(1) + ' bulan';
-  if (days < 3650) return (days/365).toFixed(1) + ' tahun';
-  return (days/365).toFixed(0) + ' tahun';
+// Format GB number
+function fGB(gb) {
+  if (gb >= 1000) return (gb/1024).toFixed(2) + ' TB';
+  if (gb >= 1)    return gb.toFixed(2) + ' GB';
+  return (gb * 1024).toFixed(0) + ' MB';
 }
-function pct(a,b) { return Math.min((a/b)*100, 100); }
-function updateBar(segId, lblId, pctVal, totalGB) {
-  const el = document.getElementById(segId);
-  const cl = pctVal > 80 ? 'danger' : pctVal > 60 ? 'warn' : '';
-  el.style.width = Math.min(pctVal, 100) + '%';
-  if (totalGB < 1) st(lblId, (totalGB*1024).toFixed(0)+'MB');
-  else             st(lblId, totalGB.toFixed(1)+' GB');
+// Format days → retention string
+function fRet(days) {
+  if (days >= 365*100) return (days/365).toFixed(0) + ' tahun';
+  if (days >= 365*2)   return (days/365).toFixed(1) + ' tahun';
+  if (days >= 365)     return (days/365).toFixed(1) + ' tahun';
+  if (days >= 30)      return (days/30).toFixed(1)  + ' bulan';
+  return days.toFixed(0) + ' hari';
 }
+// Format number with locale
+function fN(n) { return Math.max(0, Math.floor(n)).toLocaleString('id-ID'); }
+
+// Assess retention
 function assess(retYears) {
-  if (retYears >= 10)  return '<span style="color:var(--ok);font-weight:700">✅ Sangat Aman ('+retYears.toFixed(1)+' thn)</span>';
-  if (retYears >= 5)   return '<span style="color:var(--ok);font-weight:700">✅ Aman ('+retYears.toFixed(1)+' thn)</span>';
-  if (retYears >= 2)   return '<span style="color:var(--warn);font-weight:700">⚠️ Perhatikan ('+retYears.toFixed(1)+' thn)</span>';
+  if (retYears >= 10) return '<span style="color:var(--ok);font-weight:700">✅ Sangat Aman ('+retYears.toFixed(1)+' thn)</span>';
+  if (retYears >= 5)  return '<span style="color:var(--ok);font-weight:700">✅ Aman ('+retYears.toFixed(1)+' thn)</span>';
+  if (retYears >= 2)  return '<span style="color:var(--warn);font-weight:700">⚠️ Perhatikan ('+retYears.toFixed(1)+' thn)</span>';
   return '<span style="color:var(--danger);font-weight:700">🔴 Kritis! ('+retYears.toFixed(1)+' thn)</span>';
 }
 
-// ── CALC ABB ──────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   CALCULATE ABB
+   
+   FORMULA (benar):
+   available    = diskTotal - diskUsed - (diskTotal × reserve%)
+   rawPerDay    = tags × (86400 ÷ scanSec) × bpe
+   afterExc     = rawPerDay × (1 − exc%)
+   afterComp    = afterExc ÷ compRatio
+   netPerDay    = afterComp × (1 + overhead%)   ← overhead di RATE
+   retDays      = available ÷ netPerDay
+   maxTags5yr   = available ÷ (netPerDayPerTag × 5 × 365)
+════════════════════════════════════════════════════════════ */
 function calcABB() {
   const diskTotalGB = gv('a_disk_total');
   const diskUsedGB  = gv('a_disk_used');
   const reservePct  = gv('a_reserve') / 100;
   const arcSizeMB   = gv('a_arcsize');
-  const ovhdPct     = gv('a_ovhd') / 100;
+  const ovhdPct     = gv('a_ovhd')    / 100;
   const tags        = gv('a_tags');
   const scanSec     = gv('a_scan');
   const bpe         = gv('a_bpe');
-  const excDrop     = gv('a_exc') / 100;
+  const excDrop     = gv('a_exc')     / 100;
   const compRatio   = gv('a_comp');
 
-  // Disk available
-  const diskTotal  = diskTotalGB * 1073741824;
-  const diskUsed   = diskUsedGB  * 1073741824;
-  const reserve    = diskTotal * reservePct;
-  const available  = diskTotal - diskUsed - reserve;
-  const availForPI = available / (1 + ovhdPct);  // net after overhead
+  // ── Step 1: Disk available (bytes) ──────────────────────────
+  const diskTotal  = diskTotalGB * 1_073_741_824;
+  const diskUsed   = diskUsedGB  * 1_073_741_824;
+  const reserve    = diskTotal   * reservePct;
+  const available  = diskTotal - diskUsed - reserve;        // bytes tersedia untuk PI
 
-  // Raw data rate per day per tag
-  const evPerSecPerTag = 1 / scanSec;            // events/sec/tag
-  const rawRatePerDay  = tags * evPerSecPerTag * 86400 * bpe;  // bytes/day total
+  // ── Step 2: Data rate per hari ───────────────────────────────
+  const evPerDayPerTag = 86400 / scanSec;                   // events/tag/hari
+  const rawPerDay      = tags * evPerDayPerTag * bpe;       // bytes/hari raw
 
-  // After exception
-  const afterExcRate   = rawRatePerDay * (1 - excDrop);
+  // ── Step 3: Setelah exception ────────────────────────────────
+  const afterExc   = rawPerDay * (1 - excDrop);             // bytes/hari setelah exception
 
-  // After swingdoor
-  const afterCompRate  = afterExcRate / compRatio;
+  // ── Step 4: Setelah swingdoor ────────────────────────────────
+  const afterComp  = afterExc / compRatio;                  // bytes/hari setelah compression
 
-  // Net bytes/day (what actually goes to archive)
-  const netPerDay      = afterCompRate;
+  // ── Step 5: + Overhead → net rate ───────────────────────────
+  const netPerDay  = afterComp * (1 + ovhdPct);             // bytes/hari actual di disk
 
-  // Retention in days
-  const retDays        = availForPI / netPerDay;
-  const retYears       = retDays / 365;
+  // ── Step 6: Hasil ────────────────────────────────────────────
+  const retDays     = available / netPerDay;
+  const retYears    = retDays / 365;
 
-  // Max tags for 5 years
-  const target5yr      = 5 * 365;
-  const netPerDayPerTag = (evPerSecPerTag * 86400 * bpe * (1-excDrop)) / compRatio;
-  const maxTags5yr     = Math.floor(availForPI / (netPerDayPerTag * target5yr));
+  // Net per tag per hari (untuk max tags)
+  const netPerDayPerTag = (evPerDayPerTag * bpe * (1 - excDrop) / compRatio) * (1 + ovhdPct);
+  const maxTags5yr      = available / (netPerDayPerTag * 5 * 365);
 
-  // Archive files
-  const arcSizeBytes   = arcSizeMB * 1048576;
-  const arcFiles       = Math.floor(availForPI / arcSizeBytes);
+  // Archive files yang bisa ditampung
+  const arcSizeBytes = arcSizeMB * 1_048_576;
+  const arcFiles     = Math.floor(available / arcSizeBytes);
 
-  // Disk viz pct
-  const piGB  = netPerDay * retDays / 1073741824;
-  const usedPct  = pct(diskUsed,  diskTotal) * 100 / 100;
-  const piPct    = pct(netPerDay * Math.min(retDays, 365*5), diskTotal);
+  // Simpan ke state
+  A = { diskTotalGB, diskUsedGB, reservePct, reserve, available,
+        rawPerDay, afterExc, afterComp, netPerDay, netPerDayPerTag,
+        retDays, retYears, maxTags5yr, arcFiles, arcSizeMB,
+        tags, scanSec, bpe, excDrop, compRatio, ovhdPct };
 
-  // Save
-  A = { diskTotalGB, diskUsedGB, reservePct, available, availForPI,
-        netPerDay, retDays, retYears, maxTags5yr, arcFiles,
-        tags, arcSizeMB, ovhdPct, excDrop, compRatio };
+  // ── Update label references ──────────────────────────────────
+  const availGB = available / 1_073_741_824;
+  st('a_tags_lbl',  tags);
+  st('a_arc_lbl',   (arcSizeMB/1024).toFixed(0));
+  document.getElementById('a_res_lbl').textContent  = gv('a_reserve');
+  document.getElementById('a_exc_lbl').textContent  = gv('a_exc');
+  document.getElementById('a_exc_pass').textContent = (100 - gv('a_exc'));
+  document.getElementById('a_comp_lbl').textContent = gv('a_comp');
+  document.getElementById('a_ovhd_lbl').textContent = gv('a_ovhd');
 
-  // Update labels
-  document.getElementById('a_res_pct_lbl').textContent = gv('a_reserve');
-  document.getElementById('a_exc_lbl').textContent     = gv('a_exc');
-  document.getElementById('a_comp_lbl').textContent    = gv('a_comp');
-  document.getElementById('a_ovhd_lbl').textContent    = gv('a_ovhd');
-  document.getElementById('a_arcsize_lbl').textContent = (arcSizeMB/1024).toFixed(0);
+  // ── Disk visual bar ──────────────────────────────────────────
+  const usedPct    = Math.max((diskUsed    / diskTotal) * 100, 1);
+  const reservePctShow = (reserve / diskTotal) * 100;
+  // PI segment = available sebagai % total (untuk visual representasi kapasitas)
+  const piPct      = Math.min((available   / diskTotal) * 100, 100 - usedPct - reservePctShow);
 
-  // Disk visual
-  st('a_dv_total',  diskTotalGB.toLocaleString());
-  st('a_dv_total2', diskTotalGB.toLocaleString() + ' GB');
-  const usedPctShow = Math.max(pct(diskUsed,  diskTotal)*100/100, 1);
-  const piPctShow   = Math.min(pct(availForPI, diskTotal)*100/100, 100 - usedPctShow);
-  document.getElementById('a_seg_used').style.width = usedPctShow.toFixed(1) + '%';
-  document.getElementById('a_seg_pi').style.width   = piPctShow.toFixed(1)   + '%';
-  const availGB = availForPI / 1073741824;
+  document.getElementById('a_seg_used').style.width    = usedPct.toFixed(1) + '%';
+  document.getElementById('a_seg_pi').style.width      = piPct.toFixed(1)   + '%';
+  document.getElementById('a_seg_reserve').style.width = reservePctShow.toFixed(1) + '%';
   st('a_seg_pi_lbl', availGB.toFixed(1) + ' GB');
-  st('a_dv_label',   'PI: ' + availGB.toFixed(1) + ' GB');
+  st('a_dv_total',   diskTotalGB.toLocaleString());
+  st('a_dv_end',     diskTotalGB.toLocaleString() + ' GB');
+  st('a_dv_mid',     'Available: ' + availGB.toFixed(1) + ' GB');
 
-  // Timeline
-  const piPctTL = Math.min(pct(availForPI, diskTotal)*100/100, 95 - usedPctShow);
-  document.getElementById('a_tl_used').style.width = usedPctShow.toFixed(1) + '%';
-  document.getElementById('a_tl_pi').style.width   = piPctTL.toFixed(1)     + '%';
-  st('a_tl_pi_lbl', availGB.toFixed(1) + ' GB');
-  st('a_tl_label', 'Available: ' + availGB.toFixed(1) + ' GB');
+  // ── Result cards ─────────────────────────────────────────────
+  st('a_r_avail',     availGB.toFixed(2) + ' GB');
+  st('a_r_arcfiles',  arcFiles > 0 ? arcFiles : '<1');
 
-  // Result cards
-  st('a_res_avail',    availGB.toFixed(2) + ' GB');
-  st('a_res_arcfiles', arcFiles);
-  st('a_res_retention', retYears >= 1 ? retYears.toFixed(1) : (retDays).toFixed(0));
-  document.getElementById('a_res_ret_unit').textContent = retYears >= 1 ? 'tahun' : 'hari';
-  st('a_res_maxtags',  fN(maxTags5yr));
+  const retDisp = retYears >= 1 ? retYears.toFixed(1) : retDays.toFixed(0);
+  const retUnit = retYears >= 1 ? 'tahun' : 'hari';
+  st('a_r_retention', retDisp);
+  document.getElementById('a_r_ret_unit').textContent = retUnit;
 
-  // Breakdown
-  st('a_t1', diskTotalGB.toLocaleString() + ' GB');
-  st('a_t2', '– ' + diskUsedGB.toLocaleString() + ' GB');
-  st('a_t3', '– ' + (reserve/1073741824).toFixed(1) + ' GB (' + (gv('a_reserve')) + '%)');
-  st('a_t4', availGB.toFixed(2) + ' GB');
-  st('a_t5', fGB(rawRatePerDay) + '/hari');
-  st('a_t6', fGB(afterExcRate) + '/hari');
-  st('a_t7', fGB(afterCompRate) + '/hari');
-  st('a_t8', fGB(afterCompRate * (1+ovhdPct)) + '/hari (incl. overhead)');
-  st('a_t9', fGB(netPerDayPerTag) + '/hari/tag');
-  st('a_t10', retYears.toFixed(1) + ' tahun (' + Math.round(retDays) + ' hari)');
+  const colorClass = retYears >= 5 ? 'c' : retYears >= 2 ? 'c warn' : 'c danger';
+  document.getElementById('a_r_retention').className = 'rbig ' + colorClass;
+  st('a_r_maxtags', fN(maxTags5yr));
+
+  // ── Breakdown table ──────────────────────────────────────────
+  st('a_t1',  diskTotalGB.toLocaleString() + ' GB');
+  st('a_t2',  '– ' + diskUsedGB.toLocaleString() + ' GB');
+  st('a_t3',  '– ' + (reserve/1_073_741_824).toFixed(2) + ' GB  (' + (reservePct*100).toFixed(0) + '% × ' + diskTotalGB + ' GB)');
+  st('a_t4',  availGB.toFixed(2) + ' GB');
+  st('a_t5',  fB(rawPerDay) + ' / hari');
+  st('a_t6',  fB(afterExc)  + ' / hari  [× ' + (1-excDrop).toFixed(2) + ' lolos]');
+  st('a_t7',  fB(afterComp) + ' / hari  [÷ ' + compRatio + 'x]');
+  st('a_t8',  fB(netPerDay) + ' / hari  [× ' + (1+ovhdPct).toFixed(2) + ' overhead]');
+  st('a_t9',  fB(netPerDayPerTag) + ' / hari / tag');
+  st('a_t10', retYears.toFixed(2) + ' tahun  (' + Math.round(retDays).toLocaleString('id-ID') + ' hari)');
   st('a_t11', fN(maxTags5yr) + ' tags');
 
-  // Callout
+  // ── Callout status ───────────────────────────────────────────
   const box = document.getElementById('a_callout');
   const msg = document.getElementById('a_callout_msg');
-  if (retYears >= 5) {
+  if (retYears >= 10) {
     box.className = 'callout ok';
-    msg.innerHTML = `<strong>✅ Storage ABB Aman</strong>Drive D (${diskTotalGB} GB) bisa menampung data ${retYears.toFixed(1)} tahun untuk ${tags} tags. Archive files: ${arcFiles} × ${(arcSizeMB/1024).toFixed(0)} GB.`;
+    msg.innerHTML = `<strong>✅ Kapasitas Sangat Aman</strong>Drive D (${diskTotalGB} GB) mampu menampung data selama <strong>${retYears.toFixed(1)} tahun</strong> untuk ${tags} tags dengan net rate ${fB(netPerDay)}/hari. Archive files: ${arcFiles} × ${(arcSizeMB/1024).toFixed(0)} GB.`;
+  } else if (retYears >= 5) {
+    box.className = 'callout ok';
+    msg.innerHTML = `<strong>✅ Kapasitas Aman</strong>Drive D mampu menampung <strong>${retYears.toFixed(1)} tahun</strong> data. Disarankan siapkan archive file baru sebelum archive aktif penuh.`;
   } else if (retYears >= 2) {
     box.className = 'callout warn';
-    msg.innerHTML = `<strong>⚠️ Retensi Terbatas — ${retYears.toFixed(1)} Tahun</strong>Pertimbangkan tambah kapasitas drive atau aktifkan Swingdoor compression (compressing=1) untuk menambah retensi.`;
+    msg.innerHTML = `<strong>⚠️ Retensi Terbatas — ${retYears.toFixed(1)} Tahun</strong>Pertimbangkan: (1) Aktifkan Swingdoor compression di tag ABB (set compressing=1), (2) Tambah kapasitas Drive D.`;
   } else {
     box.className = 'callout danger';
-    msg.innerHTML = `<strong>🔴 Storage Tidak Cukup! — ${retYears.toFixed(1)} Tahun</strong>Segera tambah kapasitas Drive D atau kurangi jumlah tag / turunkan scan rate.`;
+    msg.innerHTML = `<strong>🔴 Kapasitas Kritis! — ${retYears.toFixed(1)} Tahun</strong>Segera tambah kapasitas atau aktifkan compression. Net rate ${fB(netPerDay)}/hari terlalu besar untuk available ${availGB.toFixed(2)} GB.`;
   }
 
   updateCombined();
 }
 
-// ── CALC VC ───────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   CALCULATE VC-8000
+   
+   FORMULA (benar):
+   available      = diskTotal - diskUsed - (diskTotal × reserve%)
+   
+   -- Scalar --
+   scalarRawDay   = scalarTags × (86400 ÷ (1/rateHz)) × bpe
+                  = scalarTags × 86400 × rateHz × bpe
+   scalarAfterExc = scalarRawDay × (1 − exc%)
+   scalarAfterComp= scalarAfterExc ÷ compRatio
+   
+   -- Waveform --
+   waveDay        = waveTags × capturePerDay × bytesPerCapture
+   
+   -- Combined --
+   subTotal       = scalarAfterComp + waveDay
+   netPerDay      = subTotal × (1 + overhead%)   ← overhead di RATE
+   
+   retDays        = available ÷ netPerDay
+   maxScalarTags  = (available − waveDay×5×365) ÷ (netScalarPerTag × 5 × 365)
+════════════════════════════════════════════════════════════ */
 function calcVC() {
-  const diskTotalGB  = gv('v_disk_total');
-  const diskUsedGB   = gv('v_disk_used');
-  const reservePct   = gv('v_reserve') / 100;
-  const ovhdPct      = gv('v_ovhd') / 100;
-  const scalarTags   = gv('v_scalar_tags');
-  const rateHz       = gv('v_rate');
-  const bpe          = gv('v_bpe');
-  const excDrop      = gv('v_exc') / 100;
-  const compRatio    = gv('v_comp');
-  const waveTags     = gv('v_wave_tags');
-  const wavePerDay   = gv('v_wave_rate');
-  const waveBpe      = gv('v_wave_bpe');
+  const diskTotalGB = gv('v_disk_total');
+  const diskUsedGB  = gv('v_disk_used');
+  const reservePct  = gv('v_reserve')  / 100;
+  const ovhdPct     = gv('v_ovhd')     / 100;
+  const scalarTags  = gv('v_stags');
+  const rateHz      = gv('v_rate');
+  const bpe         = gv('v_bpe');
+  const excDrop     = gv('v_exc')      / 100;
+  const compRatio   = gv('v_comp');
+  const waveTags    = gv('v_wtags');
+  const wavePerDay  = gv('v_wrate');
+  const waveBpe     = gv('v_wbpe');
 
-  const diskTotal  = diskTotalGB * 1073741824;
-  const diskUsed   = diskUsedGB  * 1073741824;
-  const reserve    = diskTotal * reservePct;
+  // ── Step 1: Disk available ───────────────────────────────────
+  const diskTotal  = diskTotalGB * 1_073_741_824;
+  const diskUsed   = diskUsedGB  * 1_073_741_824;
+  const reserve    = diskTotal   * reservePct;
   const available  = diskTotal - diskUsed - reserve;
-  const availForPI = available / (1 + ovhdPct);
 
-  // Scalar rate/day
-  const scalarRawDay   = scalarTags * rateHz * 86400 * bpe;
-  const scalarAfterExc = scalarRawDay * (1 - excDrop);
-  const scalarAfterComp= scalarAfterExc / compRatio;
+  // ── Step 2–4: Scalar pipeline ────────────────────────────────
+  const evPerDayPerTag  = 86400 * rateHz;                    // events/tag/hari
+  const scalarRawDay    = scalarTags * evPerDayPerTag * bpe; // bytes/hari raw scalar
+  const scalarAfterExc  = scalarRawDay * (1 - excDrop);      // setelah exception
+  const scalarAfterComp = scalarAfterExc / compRatio;        // setelah swingdoor
 
-  // Waveform rate/day
-  const waveDay        = waveTags * wavePerDay * waveBpe;
+  // ── Step 5: Waveform ─────────────────────────────────────────
+  const waveDay = waveTags * wavePerDay * waveBpe;            // bytes/hari waveform
 
-  // Total net per day
-  const totalNetPerDay = scalarAfterComp + waveDay;
+  // ── Step 6: Subtotal + overhead → net ────────────────────────
+  const subTotal   = scalarAfterComp + waveDay;
+  const netPerDay  = subTotal * (1 + ovhdPct);               // bytes/hari actual di disk
 
-  // Retention
-  const retDays   = availForPI / totalNetPerDay;
-  const retYears  = retDays / 365;
+  // ── Step 7: Hasil ─────────────────────────────────────────────
+  const retDays  = available / netPerDay;
+  const retYears = retDays / 365;
 
-  // Max scalar tags for 5 years
-  const target5yr   = 5 * 365;
-  const perTagPerDay = (rateHz * 86400 * bpe * (1-excDrop)) / compRatio;
-  const waveFixed    = waveDay;  // waveform assumed fixed
-  const maxTags5yr   = Math.floor((availForPI - waveFixed * target5yr) / (perTagPerDay * target5yr));
+  // Net per scalar tag per hari (untuk max tags — waveform dianggap fixed)
+  const netScalarPerTag = (evPerDayPerTag * bpe * (1 - excDrop) / compRatio) * (1 + ovhdPct);
+  const waveFixed5yr    = waveDay * 5 * 365;
+  const maxScalarTags   = (available - waveFixed5yr) / (netScalarPerTag * 5 * 365);
 
-  // Disk viz
-  const availGB   = availForPI / 1073741824;
-  const usedPctShow = Math.max(pct(diskUsed, diskTotal)*100/100, 0.5);
-  const piPctShow   = Math.min(pct(availForPI, diskTotal)*100/100, 100 - usedPctShow);
+  // Simpan ke state
+  V = { diskTotalGB, diskUsedGB, reservePct, reserve, available,
+        scalarRawDay, scalarAfterExc, scalarAfterComp,
+        waveDay, subTotal, netPerDay, netScalarPerTag,
+        retDays, retYears, maxScalarTags,
+        scalarTags, waveTags, rateHz, bpe, excDrop, compRatio, ovhdPct,
+        wavePerDay, waveBpe };
 
-  V = { diskTotalGB, diskUsedGB, reservePct, available, availForPI,
-        scalarAfterComp, waveDay, totalNetPerDay, retDays, retYears,
-        maxTags5yr, scalarTags, waveTags, ovhdPct, excDrop, compRatio, perTagPerDay };
+  // ── Update label references ───────────────────────────────────
+  const availGB = available / 1_073_741_824;
+  st('v_tags_lbl', scalarTags + waveTags);
+  document.getElementById('v_res_lbl').textContent  = gv('v_reserve');
+  document.getElementById('v_exc_lbl').textContent  = gv('v_exc');
+  document.getElementById('v_comp_lbl').textContent = gv('v_comp');
+  document.getElementById('v_ovhd_lbl').textContent = gv('v_ovhd');
 
-  // Labels
-  document.getElementById('v_res_pct_lbl').textContent = gv('v_reserve');
-  document.getElementById('v_exc_lbl').textContent     = gv('v_exc');
-  document.getElementById('v_comp_lbl').textContent    = gv('v_comp');
-  document.getElementById('v_tags_total_lbl').textContent = scalarTags + waveTags;
+  // ── Disk visual bar ───────────────────────────────────────────
+  const usedPct       = Math.max((diskUsed / diskTotal) * 100, 0.5);
+  const reservePctShow= (reserve / diskTotal) * 100;
+  const piPct         = Math.min((available / diskTotal) * 100, 100 - usedPct - reservePctShow);
 
-  // Disk visual
-  st('v_dv_total',  diskTotalGB.toLocaleString());
-  st('v_dv_total2', diskTotalGB.toLocaleString() + ' GB');
-  document.getElementById('v_seg_used').style.width = usedPctShow.toFixed(1) + '%';
-  document.getElementById('v_seg_pi').style.width   = piPctShow.toFixed(1)   + '%';
+  document.getElementById('v_seg_used').style.width    = usedPct.toFixed(1)        + '%';
+  document.getElementById('v_seg_pi').style.width      = piPct.toFixed(1)          + '%';
+  document.getElementById('v_seg_reserve').style.width = reservePctShow.toFixed(1) + '%';
   st('v_seg_pi_lbl', availGB.toFixed(0) + ' GB');
-  st('v_dv_label',   'PI: ' + availGB.toFixed(0) + ' GB');
+  st('v_dv_total',   diskTotalGB.toLocaleString());
+  st('v_dv_end',     diskTotalGB.toLocaleString() + ' GB');
+  st('v_dv_mid',     'Available: ' + availGB.toFixed(0) + ' GB');
 
-  // Timeline
-  document.getElementById('v_tl_used').style.width = usedPctShow.toFixed(1) + '%';
-  document.getElementById('v_tl_pi').style.width   = piPctShow.toFixed(1)   + '%';
-  st('v_tl_pi_lbl', availGB.toFixed(0) + ' GB');
-  st('v_tl_label', 'Available: ' + availGB.toFixed(0) + ' GB');
+  // ── Result cards ──────────────────────────────────────────────
+  st('v_r_avail',   availGB.toFixed(0) + ' GB');
+  st('v_r_rate',    (netPerDay / 1_048_576).toFixed(2) + ' MB');
 
-  // Result cards
-  st('v_res_avail',    availGB.toFixed(0) + ' GB');
-  st('v_res_rate',     (totalNetPerDay/1073741824).toFixed(4) + ' GB');
-  st('v_res_retention', retYears >= 1 ? retYears.toFixed(1) : retDays.toFixed(0));
-  document.getElementById('v_res_ret_unit').textContent = retYears >= 1 ? 'tahun' : 'hari';
-  st('v_res_maxtags',  fN(Math.max(maxTags5yr, 0)));
+  const retDisp = retYears >= 1 ? retYears.toFixed(1) : retDays.toFixed(0);
+  const retUnit = retYears >= 1 ? 'tahun' : 'hari';
+  st('v_r_retention', retDisp);
+  document.getElementById('v_r_ret_unit').textContent = retUnit;
+  const colVC = retYears >= 5 ? 'c' : retYears >= 2 ? 'c' : 'c danger';
+  document.getElementById('v_r_retention').className = 'rbig ' + colVC;
+  st('v_r_maxtags', fN(maxScalarTags));
 
-  // Breakdown
-  st('v_t1', diskTotalGB.toLocaleString() + ' GB');
-  st('v_t2', '– ' + diskUsedGB.toLocaleString() + ' GB');
-  st('v_t3', '– ' + (reserve/1073741824).toFixed(0) + ' GB (' + gv('v_reserve') + '%)');
-  st('v_t4', availGB.toFixed(0) + ' GB');
-  st('v_t5', fGB(scalarRawDay) + '/hari');
-  st('v_t6', fGB(scalarAfterExc) + '/hari');
-  st('v_t7', fGB(scalarAfterComp) + '/hari');
-  st('v_t8', fGB(waveDay) + '/hari');
-  st('v_t9', fGB(totalNetPerDay * (1 + ovhdPct)) + '/hari (incl. overhead)');
-  st('v_t10', retYears.toFixed(1) + ' tahun (' + Math.round(retDays) + ' hari)');
-  st('v_t11', fN(Math.max(maxTags5yr, 0)) + ' scalar tags');
+  // ── Breakdown table ───────────────────────────────────────────
+  st('v_t1',  diskTotalGB.toLocaleString() + ' GB');
+  st('v_t2',  '– ' + diskUsedGB + ' GB');
+  st('v_t3',  '– ' + (reserve/1_073_741_824).toFixed(0) + ' GB  (' + (reservePct*100).toFixed(0) + '% × ' + diskTotalGB.toLocaleString() + ' GB)');
+  st('v_t4',  availGB.toFixed(0) + ' GB');
+  st('v_t5',  fB(scalarRawDay)    + ' / hari  [' + scalarTags + ' tags × ' + evPerDayPerTag.toLocaleString() + ' ev × ' + bpe + 'B]');
+  st('v_t6',  fB(scalarAfterExc)  + ' / hari  [× ' + (1-excDrop).toFixed(2) + ' lolos]');
+  st('v_t7',  fB(scalarAfterComp) + ' / hari  [÷ ' + compRatio + 'x]');
+  st('v_t8',  fB(waveDay)         + ' / hari  [' + waveTags + ' tags × ' + wavePerDay + ' cap × ' + waveBpe.toLocaleString() + 'B]');
+  st('v_t9',  fB(subTotal)        + ' / hari');
+  st('v_t10', fB(netPerDay)       + ' / hari  [× ' + (1+ovhdPct).toFixed(2) + ' overhead]');
+  st('v_t11', retYears.toFixed(2) + ' tahun  (' + Math.round(retDays).toLocaleString('id-ID') + ' hari)');
+  st('v_t12', fN(maxScalarTags)   + ' scalar tags');
 
-  // Callout
+  // ── Callout status ────────────────────────────────────────────
   const box = document.getElementById('v_callout');
   const msg = document.getElementById('v_callout_msg');
-  if (retYears >= 5) {
+  const rateDay_MB = netPerDay / 1_048_576;
+  if (retYears >= 10) {
     box.className = 'callout ok';
-    msg.innerHTML = `<strong>✅ Storage VC-8000 Aman</strong>Drive SCADA02 (${diskTotalGB.toLocaleString()} GB) menampung ${retYears.toFixed(1)} tahun data. Scalar: ${scalarTags} tags · Waveform: ${waveTags} tags.`;
+    msg.innerHTML = `<strong>✅ Kapasitas Sangat Aman</strong>Drive SCADA02 (${diskTotalGB.toLocaleString()} GB) mampu menampung <strong>${retYears.toFixed(1)} tahun</strong> data. Rate: ${rateDay_MB.toFixed(2)} MB/hari (scalar ${fB(scalarAfterComp)} + waveform ${fB(waveDay)}).`;
+  } else if (retYears >= 5) {
+    box.className = 'callout ok';
+    msg.innerHTML = `<strong>✅ Kapasitas Aman</strong>Drive SCADA02 mampu menampung <strong>${retYears.toFixed(1)} tahun</strong>. Waveform rate: ${fB(waveDay)}/hari, scalar: ${fB(scalarAfterComp)}/hari.`;
   } else if (retYears >= 2) {
     box.className = 'callout warn';
-    msg.innerHTML = `<strong>⚠️ Retensi Terbatas — ${retYears.toFixed(1)} Tahun</strong>Pertimbangkan kurangi waveform capture rate atau kurangi waveform BPE.`;
+    msg.innerHTML = `<strong>⚠️ Retensi Terbatas — ${retYears.toFixed(1)} Tahun</strong>Waveform berkontribusi ${fB(waveDay)}/hari. Kurangi waveform capture rate atau bytes per capture di SETPOINT config.`;
   } else {
     box.className = 'callout danger';
-    msg.innerHTML = `<strong>🔴 Storage VC-8000 Tidak Cukup! — ${retYears.toFixed(1)} Tahun</strong>Tambah kapasitas drive SCADA02 atau kurangi jumlah waveform tags.`;
+    msg.innerHTML = `<strong>🔴 Kapasitas Kritis! — ${retYears.toFixed(1)} Tahun</strong>Net rate ${rateDay_MB.toFixed(2)} MB/hari terlalu besar. Tambah storage SCADA02 atau kurangi waveform tags.`;
   }
 
   updateCombined();
 }
 
-// ── COMBINED ──────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   UPDATE COMBINED
+════════════════════════════════════════════════════════════ */
 function updateCombined() {
-  if (!A.availForPI || !V.availForPI) return;
+  if (!A.available || !V.available) return;
 
-  const abbAvailGB = A.availForPI / 1073741824;
-  const vcAvailGB  = V.availForPI / 1073741824;
+  const abbGB = A.available / 1_073_741_824;
+  const vcGB  = V.available / 1_073_741_824;
 
   // Hero
-  st('c_abb_avail', abbAvailGB.toFixed(1) + ' GB');
+  st('c_abb_avail', abbGB.toFixed(1) + ' GB');
   st('c_abb_ret',   A.retYears.toFixed(1) + ' thn');
-  st('c_vc_avail',  vcAvailGB.toFixed(0)  + ' GB');
+  st('c_vc_avail',  vcGB.toFixed(0)  + ' GB');
   st('c_vc_ret',    V.retYears.toFixed(1) + ' thn');
 
   // Detail ABB
-  st('ca_disk',   A.diskTotalGB + ' GB');
-  st('ca_used',   A.diskUsedGB  + ' GB');
-  st('ca_res',    (A.reservePct * 100).toFixed(0) + '%');
-  st('ca_avail',  abbAvailGB.toFixed(2) + ' GB');
-  st('ca_rate',   fGB(A.netPerDay) + '/hari');
-  st('ca_ret',    A.retYears.toFixed(1) + ' tahun');
-  st('ca_max',    fN(A.maxTags5yr) + ' tags');
-  st('ca_arc',    A.arcFiles + ' file × ' + (A.arcSizeMB/1024).toFixed(0) + ' GB');
+  st('ca_disk',  A.diskTotalGB + ' GB');
+  st('ca_used',  A.diskUsedGB  + ' GB');
+  st('ca_res',   (A.reservePct*100).toFixed(0) + '%  (– ' + (A.reserve/1_073_741_824).toFixed(1) + ' GB)');
+  st('ca_avail', abbGB.toFixed(2) + ' GB');
+  st('ca_rate',  fB(A.netPerDay) + ' / hari');
+  st('ca_exc',   (A.excDrop*100).toFixed(0) + '% drop  →  ' + ((1-A.excDrop)*100).toFixed(0) + '% lolos');
+  st('ca_comp',  A.compRatio + 'x');
+  st('ca_ovhd',  (A.ovhdPct*100).toFixed(0) + '%');
+  st('ca_ret',   A.retYears.toFixed(2) + ' tahun');
+  st('ca_max',   fN(A.maxTags5yr) + ' tags');
+  st('ca_arc',   A.arcFiles + ' file × ' + (A.arcSizeMB/1024).toFixed(0) + ' GB');
   document.getElementById('ca_assess').innerHTML = assess(A.retYears);
 
   // Detail VC
-  st('cv_disk',   V.diskTotalGB.toLocaleString() + ' GB');
-  st('cv_used',   V.diskUsedGB  + ' GB');
-  st('cv_res',    (V.reservePct * 100).toFixed(0) + '%');
-  st('cv_avail',  vcAvailGB.toFixed(0)  + ' GB');
-  st('cv_rate_s', fGB(V.scalarAfterComp) + '/hari (scalar)');
-  st('cv_rate_w', fGB(V.waveDay)         + '/hari (waveform)');
-  st('cv_ret',    V.retYears.toFixed(1)  + ' tahun');
-  st('cv_max',    fN(Math.max(V.maxTags5yr, 0)) + ' scalar tags');
+  st('cv_disk',    V.diskTotalGB.toLocaleString() + ' GB');
+  st('cv_used',    V.diskUsedGB  + ' GB');
+  st('cv_res',     (V.reservePct*100).toFixed(0) + '%  (– ' + (V.reserve/1_073_741_824).toFixed(0) + ' GB)');
+  st('cv_avail',   vcGB.toFixed(0) + ' GB');
+  st('cv_rate_s',  fB(V.scalarAfterComp) + ' / hari');
+  st('cv_rate_w',  fB(V.waveDay)         + ' / hari');
+  st('cv_rate_net',fB(V.netPerDay)        + ' / hari');
+  st('cv_ret',     V.retYears.toFixed(2) + ' tahun');
+  st('cv_max',     fN(V.maxScalarTags)   + ' scalar tags');
   document.getElementById('cv_assess').innerHTML = assess(V.retYears);
 
   // Recommendations
   let r = '';
-  const minRet = Math.min(A.retYears, V.retYears);
   if (A.retYears >= 5 && V.retYears >= 5) {
-    r += `<div class="callout ok"><span class="ci">✅</span><div class="ct"><strong>Kedua Server — Kapasitas Aman</strong>ABB: ${A.retYears.toFixed(1)} thn · VC-8000: ${V.retYears.toFixed(1)} thn. Backup harian 03:15 AM (INCREMENTAL) sudah berjalan di SCADA01.</div></div>`;
+    r += `<div class="callout ok"><span class="ci">✅</span><div class="ct"><strong>Kedua Server — Kapasitas Aman</strong>SCADA01 (ABB): ${A.retYears.toFixed(1)} thn · SCADA02 (VC-8000): ${V.retYears.toFixed(1)} thn.<br>Backup harian 03:15 AM INCREMENTAL sudah berjalan di SCADA01. Pastikan backup SCADA02 juga terjadwal.</div></div>`;
   }
   if (A.retYears < 5) {
-    r += `<div class="callout warn"><span class="ci">⚠️</span><div class="ct"><strong>ABB SCADA01 — Tingkatkan Kapasitas atau Aktifkan Compression</strong>Retensi hanya ${A.retYears.toFixed(1)} tahun. Opsi: (1) Aktifkan Swingdoor compression — set compressing=1 di tag ABB. (2) Tambah kapasitas Drive D. (3) Turunkan scan rate OPCInt.</div></div>`;
+    r += `<div class="callout warn"><span class="ci">⚠️</span><div class="ct"><strong>ABB SCADA01 — Retensi Rendah (${A.retYears.toFixed(1)} thn)</strong>Opsi perbaikan:<br>① Aktifkan Swingdoor — set compressing=1 di tag ABB (geser slider kompres ke 5–10x)<br>② Tambah kapasitas Drive D (saat ini 207 GB)<br>③ Turunkan scan rate OPCInt dari 1 detik</div></div>`;
   }
   if (V.retYears < 5) {
-    r += `<div class="callout warn"><span class="ci">⚠️</span><div class="ct"><strong>VC-8000 SCADA02 — Kurangi Waveform atau Tambah Drive</strong>Retensi ${V.retYears.toFixed(1)} tahun. Waveform data sangat mempengaruhi storage. Kurangi waveform capture rate atau bytes per capture di SETPOINT Connector config.</div></div>`;
+    r += `<div class="callout warn"><span class="ci">⚠️</span><div class="ct"><strong>VC-8000 SCADA02 — Retensi Rendah (${V.retYears.toFixed(1)} thn)</strong>Waveform berkontribusi ${fB(V.waveDay)}/hari dari total ${fB(V.netPerDay)}/hari.<br>① Kurangi waveform capture rate (saat ini ${V.wavePerDay}/hari)<br>② Kurangi bytes per waveform capture (saat ini ${V.waveBpe.toLocaleString()} bytes)<br>③ Tambah storage drive SCADA02</div></div>`;
   }
-  r += `<div class="callout info-c"><span class="ci">📋</span><div class="ct"><strong>As-Built Reference</strong>SCADA01: Archive aktif PISERVER_2026-01-28.arc (5.9% full, 10,240 MB). Drive D: 207 GB total, 10 GB used, 2,096 GB free. · SCADA02: Dell R760XS 2×3.84TB RAID1 ≈ 3,600 GB. AF DB Vibration, SETPOINT v8.6.240.0, 225 tags aktif.</div></div>`;
+
+  // As-built reference callout
+  r += `<div class="callout ic"><span class="ci">📋</span><div class="ct"><strong>As-Built Reference — Project Report Rev.00 · 13-Mar-2026</strong>SCADA01: Archive aktif PISERVER_2026-01-28_00-00-00.arc — 5.9% full dari 10,240 MB. Drive D: 207 GB total, 10 GB used. Backup daily 03:15 AM INCREMENTAL ✅<br>SCADA02: Dell R760XS 2×3.84TB RAID1 ≈ 3,600 GB usable. AF DB Vibration, SETPOINT v8.6.240.0, 225 tags aktif. Licensed PI tags: 6,000 (443 aktif).</div></div>`;
+
   document.getElementById('c_recs').innerHTML = r;
 }
 
-// ── COPY ──────────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   COPY FUNCTIONS
+════════════════════════════════════════════════════════════ */
 function copyABB() {
-  if (!A.availForPI) { alert('Hitung dulu!'); return; }
+  if (!A.available) { alert('Hitung dulu!'); return; }
+  const availGB = (A.available / 1_073_741_824).toFixed(2);
   const t = `=== ABB Storage (From Disk) — IDWWDW25SCADA01 ===
-Disk Total    : ${A.diskTotalGB} GB (Drive D:)
-OS + Used     : ${A.diskUsedGB} GB
+Tanggal       : ${new Date().toLocaleString('id-ID')}
+As-built      : Project Report Rev.00 · 13-Mar-2026
+
+[DISK]
+Total Drive D : ${A.diskTotalGB} GB
+OS + used     : ${A.diskUsedGB} GB
 Reserve       : ${(A.reservePct*100).toFixed(0)}%
-Available PI  : ${(A.availForPI/1073741824).toFixed(2)} GB
-Tags aktif    : ${A.tags}
-Rate/hari     : ${fGB(A.netPerDay)}
-Retensi       : ${A.retYears.toFixed(1)} tahun
-Max tags (5yr): ${fN(A.maxTags5yr)}
-Archive files : ${A.arcFiles} × ${(A.arcSizeMB/1024).toFixed(0)} GB
-Archive path  : D:\\PI\\arc
-Generated     : ${new Date().toLocaleString('id-ID')}`;
-  navigator.clipboard.writeText(t).then(()=>alert('✅ Copied!'));
+Available PI  : ${availGB} GB
+
+[DATA RATE]
+Raw/hari      : ${fB(A.rawPerDay)}/hari
+Setelah Exc   : ${fB(A.afterExc)}/hari  (${(A.excDrop*100).toFixed(0)}% drop)
+Setelah Comp  : ${fB(A.afterComp)}/hari  (÷${A.compRatio}x)
+Net/hari      : ${fB(A.netPerDay)}/hari  (+${(A.ovhdPct*100).toFixed(0)}% overhead)
+
+[HASIL]
+Retensi       : ${A.retYears.toFixed(2)} tahun  (${Math.round(A.retDays).toLocaleString()} hari)
+Max tags 5thn : ${fN(A.maxTags5yr)} tags
+Archive files : ${A.arcFiles} × ${(A.arcSizeMB/1024).toFixed(0)} GB  →  D:\\PI\\arc`;
+  navigator.clipboard.writeText(t).then(() => alert('✅ Copied!'));
 }
+
 function copyVC() {
-  if (!V.availForPI) { alert('Hitung dulu!'); return; }
+  if (!V.available) { alert('Hitung dulu!'); return; }
+  const availGB = (V.available / 1_073_741_824).toFixed(0);
   const t = `=== VC-8000 Storage (From Disk) — IDWWDW25SCADA02 ===
-Disk Total    : ${V.diskTotalGB.toLocaleString()} GB
-OS + Used     : ${V.diskUsedGB} GB
-Reserve       : ${(V.reservePct*100).toFixed(0)}%
-Available PI  : ${(V.availForPI/1073741824).toFixed(0)} GB
-Scalar tags   : ${V.scalarTags} | Waveform: ${V.waveTags}
-Scalar/hari   : ${fGB(V.scalarAfterComp)}
-Waveform/hari : ${fGB(V.waveDay)}
-Retensi       : ${V.retYears.toFixed(1)} tahun
-Max scalar(5yr): ${fN(Math.max(V.maxTags5yr,0))}
-AF Database   : Vibration · SETPOINT v8.6.240.0
-Generated     : ${new Date().toLocaleString('id-ID')}`;
-  navigator.clipboard.writeText(t).then(()=>alert('✅ Copied!'));
+Tanggal         : ${new Date().toLocaleString('id-ID')}
+As-built        : Project Report Rev.00 · 13-Mar-2026
+
+[DISK]
+Total SCADA02   : ${V.diskTotalGB.toLocaleString()} GB
+OS + used       : ${V.diskUsedGB} GB
+Reserve         : ${(V.reservePct*100).toFixed(0)}%
+Available PI    : ${availGB} GB
+
+[SCALAR TAGS — ${V.scalarTags} tags]
+Raw/hari        : ${fB(V.scalarRawDay)}/hari
+Setelah Exc     : ${fB(V.scalarAfterExc)}/hari  (${(V.excDrop*100).toFixed(0)}% drop)
+Setelah Comp    : ${fB(V.scalarAfterComp)}/hari  (÷${V.compRatio}x)
+
+[WAVEFORM TAGS — ${V.waveTags} tags]
+Rate/hari       : ${fB(V.waveDay)}/hari  (${V.wavePerDay} cap × ${V.waveBpe.toLocaleString()}B)
+
+[HASIL]
+Net/hari        : ${fB(V.netPerDay)}/hari  (+${(V.ovhdPct*100).toFixed(0)}% overhead)
+Retensi         : ${V.retYears.toFixed(2)} tahun  (${Math.round(V.retDays).toLocaleString()} hari)
+Max scalar 5thn : ${fN(V.maxScalarTags)} tags
+AF Database     : Vibration · SETPOINT v8.6.240.0`;
+  navigator.clipboard.writeText(t).then(() => alert('✅ Copied!'));
 }
+
 function copyAll() {
-  if (!A.availForPI || !V.availForPI) { alert('Hitung semua dulu!'); return; }
-  const t = `=== PIMS Wayang Windu — Storage Report (From Disk) ===
-Generated  : ${new Date().toLocaleString('id-ID')}
-Client     : Star Energy Geothermal Wayang Windu
-Implementor: PT Cistech Alpha Indonesia
+  if (!A.available || !V.available) { alert('Hitung semua dulu!'); return; }
+  const t = `=== PIMS Wayang Windu — Storage Report ===
+Tanggal      : ${new Date().toLocaleString('id-ID')}
+Client       : Star Energy Geothermal Wayang Windu
+Implementor  : PT Cistech Alpha Indonesia
+Dokumen      : Project Report Rev.00 · 13-Mar-2026
 
 --- IDWWDW25SCADA01 (ABB DCS) ---
-Disk       : ${A.diskTotalGB} GB  Available: ${(A.availForPI/1073741824).toFixed(2)} GB
-Tags       : ${A.tags}  Retensi: ${A.retYears.toFixed(1)} thn  Max: ${fN(A.maxTags5yr)} tags
-Archive    : ${A.arcFiles} file × ${(A.arcSizeMB/1024).toFixed(0)} GB → D:\\PI\\arc
+Disk         : ${A.diskTotalGB} GB  |  Available: ${(A.available/1_073_741_824).toFixed(2)} GB
+Net rate     : ${fB(A.netPerDay)}/hari
+Retensi      : ${A.retYears.toFixed(2)} tahun
+Max tags     : ${fN(A.maxTags5yr)} tags (untuk 5 tahun)
+Archive      : ${A.arcFiles} file × ${(A.arcSizeMB/1024).toFixed(0)} GB  →  D:\\PI\\arc
 
 --- IDWWDW25SCADA02 (VC-8000 SETPOINT) ---
-Disk       : ${V.diskTotalGB.toLocaleString()} GB  Available: ${(V.availForPI/1073741824).toFixed(0)} GB
-Tags       : ${V.scalarTags} scalar + ${V.waveTags} waveform
-Retensi    : ${V.retYears.toFixed(1)} thn  Max scalar: ${fN(Math.max(V.maxTags5yr,0))} tags
-AF DB      : Vibration · SETPOINT v8.6.240.0`;
-  navigator.clipboard.writeText(t).then(()=>alert('✅ Full report copied!'));
+Disk         : ${V.diskTotalGB.toLocaleString()} GB  |  Available: ${(V.available/1_073_741_824).toFixed(0)} GB
+Net rate     : ${fB(V.netPerDay)}/hari  (scalar ${fB(V.scalarAfterComp)} + wave ${fB(V.waveDay)})
+Retensi      : ${V.retYears.toFixed(2)} tahun
+Max scalar   : ${fN(V.maxScalarTags)} tags (untuk 5 tahun)
+AF DB        : Vibration · SETPOINT v8.6.240.0`;
+  navigator.clipboard.writeText(t).then(() => alert('✅ Full report copied!'));
 }
 
-// ── CALC ALL ──────────────────────────────────────────────────
-function calcAll() { calcABB(); calcVC(); updateCombined(); }
+/* ════════════════════════════════════════════════════════════
+   CALC ALL & AUTO-RUN
+════════════════════════════════════════════════════════════ */
+function calcAll() { calcABB(); calcVC(); }
 
-// Auto-run
 window.onload = calcAll;
 </script>
 </body>
