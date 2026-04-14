@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI Data Flow — Exception, Snapshot, Swingdoor & Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,300;0,600;0,700;0,900;1,300;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN SYSTEM ── */
+:root {
+  --ink:       #0f1923;
+  --ink2:      #1e2d3d;
+  --surface:   #f5f2ed;
+  --card:      #ffffff;
+  --border:    #e2ddd8;
+  --border2:   #c8c2bb;
+
+  /* Accent palette — industrial amber + teal */
+  --amber:     #c47f17;
+  --amber-lt:  #fef3d8;
+  --amber-md:  #fde68a;
+  --teal:      #0f766e;
+  --teal-lt:   #d1faf4;
+  --teal-md:   #99f6e4;
+  --red:       #b91c1c;
+  --red-lt:    #fee2e2;
+  --blue:      #1d4ed8;
+  --blue-lt:   #dbeafe;
+  --slate:     #475569;
+
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Fraunces', serif;
+  --sans: 'DM Sans', sans-serif;
+
+  --shadow-sm: 0 1px 3px rgba(15,25,35,.08);
+  --shadow:    0 4px 16px rgba(15,25,35,.1);
+  --shadow-lg: 0 12px 40px rgba(15,25,35,.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* ── STICKY NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245,242,237,.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--ink);
+  padding: 10px 0;
+}
+.nav-inner {
+  max-width: 1040px; margin: 0 auto; padding: 0 32px;
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+}
+.nav-logo {
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  color: var(--amber); letter-spacing: .08em; margin-right: 12px;
+  text-transform: uppercase;
+}
+.nav-link {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 5px 10px; border-radius: 4px;
+  color: var(--slate); text-decoration: none;
+  transition: all .2s; border: 1px solid transparent;
+}
+.nav-link:hover, .nav-link.active {
+  background: var(--ink); color: #fff; border-color: var(--ink);
+}
+
+/* ── HEADER ── */
+header {
+  max-width: 1040px; margin: 0 auto;
+  padding: 72px 32px 56px;
+  position: relative;
+}
+.header-eyebrow {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.header-eyebrow::after {
+  content: ''; flex: 1; max-width: 80px; height: 1px; background: var(--amber);
+}
+h1 {
+  font-family: var(--serif); font-size: clamp(36px,6vw,64px);
+  font-weight: 900; line-height: 1.05; color: var(--ink);
+  margin-bottom: 24px; letter-spacing: -.02em;
+}
+h1 em { font-style: italic; color: var(--teal); }
+.header-desc {
+  max-width: 620px; color: var(--slate); font-size: 16px; line-height: 1.7;
+}
+.header-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px;
+}
+.chip {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  padding: 5px 14px; border-radius: 100px;
+  border: 1.5px solid; letter-spacing: .04em; text-transform: uppercase;
+}
+.chip.amber  { background: var(--amber-lt); color: var(--amber);  border-color: var(--amber); }
+.chip.teal   { background: var(--teal-lt);  color: var(--teal);   border-color: var(--teal); }
+.chip.ink    { background: var(--ink);      color: #fff;          border-color: var(--ink); }
+.chip.red    { background: var(--red-lt);   color: var(--red);    border-color: var(--red); }
+.chip.blue   { background: var(--blue-lt);  color: var(--blue);   border-color: var(--blue); }
+
+/* Decorative vertical rule */
+.v-rule {
+  position: absolute; right: 32px; top: 40px; bottom: 0;
+  width: 1px; background: linear-gradient(to bottom, var(--border2), transparent);
+  display: none;
+}
+@media(min-width:768px) { .v-rule { display: block; } }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+
+/* ── SECTION ── */
+section {
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+.section-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+h2 {
+  font-family: var(--serif); font-size: clamp(26px,3.5vw,38px);
+  font-weight: 700; line-height: 1.15; color: var(--ink);
+  margin-bottom: 16px; letter-spacing: -.02em;
+}
+h2 .accent { color: var(--teal); }
+h3 {
+  font-family: var(--serif); font-size: 22px; font-weight: 700;
+  color: var(--ink); margin: 36px 0 12px; letter-spacing: -.01em;
+}
+h4 {
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--amber); text-transform: uppercase; letter-spacing: .06em;
+  margin: 24px 0 8px;
+}
+p { margin-bottom: 14px; color: var(--ink); }
+strong { font-weight: 600; color: var(--ink); }
+
+/* ── FLOW DIAGRAM ── */
+.flow-container {
+  background: var(--ink);
+  border-radius: 16px;
+  padding: 36px 32px;
+  margin: 32px 0;
+  overflow-x: auto;
+  box-shadow: var(--shadow-lg);
+}
+.flow-title {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: #64748b; margin-bottom: 28px;
+}
+.flow-row {
+  display: flex; align-items: center; gap: 0;
+  flex-wrap: nowrap; min-width: max-content;
+}
+.flow-node {
+  background: var(--ink2);
+  border: 1px solid #2d3f50;
+  border-radius: 10px;
+  padding: 14px 18px;
+  min-width: 140px;
+  text-align: center;
+  position: relative;
+  transition: border-color .2s;
+}
+.flow-node:hover { border-color: var(--amber); }
+.fn-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: #64748b; display: block; margin-bottom: 5px;
+}
+.fn-name {
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: #e2e8f0; display: block;
+}
+.fn-sub {
+  font-size: 11px; color: #64748b;
+  display: block; margin-top: 3px;
+}
+.flow-node.amber-node { border-color: var(--amber); background: rgba(196,127,23,.12); }
+.flow-node.amber-node .fn-name { color: var(--amber-md); }
+.flow-node.teal-node  { border-color: var(--teal); background: rgba(15,118,110,.12); }
+.flow-node.teal-node  .fn-name { color: var(--teal-md); }
+.flow-node.red-node   { border-color: var(--red); background: rgba(185,28,28,.12); }
+.flow-node.red-node   .fn-name { color: #fca5a5; }
+.flow-node.blue-node  { border-color: #3b82f6; background: rgba(59,130,246,.12); }
+.flow-node.blue-node  .fn-name { color: #93c5fd; }
+
+.flow-arrow {
+  color: #334155; font-size: 22px;
+  padding: 0 8px; flex-shrink: 0;
+  display: flex; align-items: center;
+}
+.flow-arrow.amber-arr { color: var(--amber); }
+.flow-arrow.teal-arr  { color: var(--teal); }
+.flow-arrow.red-arr   { color: var(--red); }
+
+.flow-label {
+  font-family: var(--mono); font-size: 9px; color: #475569;
+  text-align: center; margin-top: 5px; display: block;
+}
+
+/* ── COMPARISON TABLE ── */
+.cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 16px; margin: 24px 0;
+}
+.cmp-card {
+  border-radius: 12px; padding: 24px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .2s, border-color .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.cmp-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.cmp-card.amber::before { background: var(--amber); }
+.cmp-card.teal::before  { background: var(--teal); }
+.cmp-card.red::before   { background: var(--red); }
+.cmp-card.blue::before  { background: var(--blue); }
+.cmp-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.cmp-card:hover.amber { border-color: var(--amber); }
+.cmp-card:hover.teal  { border-color: var(--teal); }
+.cmp-card:hover.red   { border-color: var(--red); }
+.cmp-card:hover.blue  { border-color: var(--blue); }
+.cmp-icon { font-size: 28px; margin-bottom: 12px; }
+.cmp-title {
+  font-family: var(--serif); font-size: 18px; font-weight: 700;
+  margin-bottom: 8px; color: var(--ink);
+}
+.cmp-desc { font-size: 13.5px; color: var(--slate); line-height: 1.6; margin: 0; }
+
+/* ── PARAMETER TABLE ── */
+.param-table-wrap {
+  border-radius: 12px; overflow: hidden; margin: 20px 0;
+  border: 1.5px solid var(--border); box-shadow: var(--shadow-sm);
+}
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead th {
+  background: var(--ink); color: #e2e8f0;
+  font-family: var(--mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: .08em;
+  padding: 12px 16px; text-align: left;
+  border-bottom: 2px solid var(--amber);
+}
+td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafaf8; }
+td:first-child {
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  color: var(--teal); white-space: nowrap;
+}
+td code {
+  font-family: var(--mono); font-size: 12px;
+  background: var(--amber-lt); color: var(--amber);
+  padding: 2px 7px; border-radius: 4px;
+}
+
+/* ── CODE BLOCK ── */
+pre {
+  background: var(--ink);
+  border-left: 4px solid var(--amber);
+  border-radius: 10px;
+  padding: 20px 22px;
+  overflow-x: auto;
+  margin: 18px 0;
+  box-shadow: var(--shadow);
+}
+pre code {
+  font-family: var(--mono); font-size: 12.5px;
+  line-height: 1.8; color: #cbd5e1;
+}
+.cm  { color: #475569; }
+.kw  { color: var(--amber-md); font-weight: 600; }
+.val { color: #86efac; }
+.str { color: #6ee7b7; }
+.num { color: #93c5fd; }
+.cmt { color: #475569; font-style: italic; }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 10px; padding: 16px 20px;
+  margin: 20px 0; display: flex; gap: 14px; align-items: flex-start;
+}
+.callout.amber { background: var(--amber-lt); border-left: 4px solid var(--amber); }
+.callout.teal  { background: var(--teal-lt);  border-left: 4px solid var(--teal); }
+.callout.red   { background: var(--red-lt);   border-left: 4px solid var(--red); }
+.callout.blue  { background: var(--blue-lt);  border-left: 4px solid var(--blue); }
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout-body { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.7; }
+.callout-body strong { display: block; margin-bottom: 3px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; font-family: var(--mono); }
+
+/* ── STEP CARDS ── */
+.steps { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+.step {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color .2s, box-shadow .2s;
+}
+.step:hover { border-color: var(--teal); box-shadow: var(--shadow); }
+.step-num {
+  flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px;
+  background: var(--ink); color: #fff;
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.step-body { flex: 1; }
+.step-body h4 { margin: 0 0 6px; font-size: 14px; }
+.step-body p  { font-size: 13.5px; color: var(--slate); margin: 0; }
+
+/* ── VISUAL: Swingdoor ── */
+.swingdoor-visual {
+  background: var(--ink);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 24px 0;
+  box-shadow: var(--shadow-lg);
+  font-family: var(--mono);
+}
+.sd-title {
+  font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: #475569; margin-bottom: 24px;
+}
+.sd-timeline {
+  position: relative;
+  padding-bottom: 16px;
+}
+.sd-axis {
+  display: flex; align-items: flex-end; gap: 0;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.sd-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sd-bar {
+  width: 100%; background: var(--teal);
+  border-radius: 3px 3px 0 0;
+  position: relative; min-height: 4px;
+  transition: opacity .2s;
+}
+.sd-bar.stored { background: var(--amber); }
+.sd-bar.compressed { background: #3b82f6; opacity: .6; }
+.sd-bar.dropped { background: #475569; opacity: .4; }
+.sd-bar-label {
+  font-size: 8px; color: #64748b;
+  text-align: center; white-space: nowrap;
+}
+.sd-legend {
+  display: flex; gap: 20px; flex-wrap: wrap; margin-top: 16px;
+}
+.sd-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: #94a3b8;
+}
+.sd-legend-dot {
+  width: 10px; height: 10px; border-radius: 2px;
+}
+
+/* ── ARCHIVE VISUAL ── */
+.archive-visual {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  gap: 14px; margin: 24px 0;
+}
+.arc-file {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all .2s;
+}
+.arc-file:hover { border-color: var(--amber); box-shadow: var(--shadow); }
+.arc-file-icon { font-size: 28px; margin-bottom: 10px; }
+.arc-file-name { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
+.arc-file-desc { font-size: 12.5px; color: var(--slate); line-height: 1.5; }
+.arc-progress-bar {
+  height: 6px; background: var(--border); border-radius: 3px;
+  margin-top: 10px; overflow: hidden;
+}
+.arc-progress-fill {
+  height: 100%; background: var(--teal); border-radius: 3px;
+  transition: width 1s ease;
+}
+.arc-progress-fill.amber { background: var(--amber); }
+.arc-progress-fill.red   { background: var(--red); }
+
+/* ── HIGHLIGHT BOX ── */
+.highlight {
+  border-radius: 14px; padding: 28px 30px; margin: 24px 0;
+  position: relative; overflow: hidden;
+}
+.highlight.amber { background: var(--amber-lt); border: 1.5px solid rgba(196,127,23,.25); }
+.highlight.teal  { background: var(--teal-lt);  border: 1.5px solid rgba(15,118,110,.25); }
+.highlight h4 { margin: 0 0 12px; font-family: var(--serif); font-size: 17px; font-weight: 700; }
+.highlight.amber h4 { color: var(--amber); }
+.highlight.teal  h4 { color: var(--teal); }
+.highlight p { font-size: 14px; color: var(--ink); margin: 0; }
+
+/* ── LIST ── */
+ul.list { list-style: none; padding: 0; }
+ul.list li {
+  padding: 6px 0 6px 22px; position: relative;
+  font-size: 14px; color: var(--ink); border-bottom: 1px solid var(--border);
+}
+ul.list li:last-child { border-bottom: none; }
+ul.list li::before {
+  content: '▸'; position: absolute; left: 0; color: var(--amber);
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 48px 0 40px; text-align: center;
+  border-top: 2px solid var(--ink);
+  font-family: var(--mono); font-size: 11px;
+  color: var(--slate); background: var(--surface);
+}
+footer .ft-logo { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 32px 0; font-family: var(--mono); font-size: 10px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--slate);
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border2);
+}
+
+@media(max-width:600px) {
+  .flow-row { flex-direction: column; align-items: flex-start; min-width: unset; }
+  .flow-arrow { transform: rotate(90deg); align-self: center; }
+}
+@media print {
+  .nav { display: none !important; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <span class="nav-logo">PI System</span>
+    <a href="#overview"   class="nav-link">Overview</a>
+    <a href="#exception"  class="nav-link">Exception</a>
+    <a href="#snapshot"   class="nav-link">Snapshot</a>
+    <a href="#swingdoor"  class="nav-link">Swingdoor</a>
+    <a href="#archive"    class="nav-link">Archive</a>
+    <a href="#alur"       class="nav-link">Alur Lengkap</a>
+    <a href="#config"     class="nav-link">Konfigurasi</a>
+    <a href="#troubleshoot" class="nav-link">Troubleshoot</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="v-rule"></div>
+  <div class="header-eyebrow">PI System · Data Storage Mechanism</div>
+  <h1>Exception, Snapshot,<br><em>Swingdoor</em> & Archive</h1>
+  <p class="header-desc">
+    Panduan lengkap mekanisme bagaimana data sensor dari lapangan disaring, disimpan ke Snapshot,
+    dikompres dengan algoritma Swingdoor Trending, dan akhirnya tersimpan permanen di PI Archive —
+    konteks implementasi PIMS Wayang Windu, Star Energy Geothermal.
+  </p>
+  <div class="header-chips">
+    <span class="chip amber">Exception Reporting</span>
+    <span class="chip teal">Snapshot Subsystem</span>
+    <span class="chip ink">Swingdoor Algorithm</span>
+    <span class="chip red">Archive Storage</span>
+    <span class="chip blue">IDWWDW25SCADA01</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 00 — OVERVIEW
+═══════════════════════════════════════════════════════════════ -->
+<section id="overview">
+  <div class="wrap">
+    <div class="section-label">00 — Overview</div>
+    <h2>Gambaran Besar <span class="accent">Data Flow</span></h2>
+    <p>
+      Sebelum sebuah nilai sensor dari ABB DCS atau VC-8000 tersimpan permanen di PI Archive,
+      data melewati empat tahap filter dan penyimpanan bertingkat. Masing-masing tahap memiliki
+      peran spesifik — mulai dari penerimaan raw data, penyaringan perubahan signifikan,
+      penyimpanan sementara di memory, kompresi cerdas, hingga persistensi di disk.
+    </p>
+
+    <div class="flow-container reveal">
+      <div class="flow-title">// PI SYSTEM — COMPLETE DATA FLOW PIPELINE</div>
+      <div class="flow-row">
+        <div class="flow-node">
+          <span class="fn-label">Source</span>
+          <span class="fn-name">ABB DCS</span>
+          <span class="fn-sub">OPC DA · 172.18.1.37</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <span class="fn-label">Interface</span>
+          <span class="fn-name">OPCInt</span>
+          <span class="fn-sub">ABB-OPC · Scan</span>
+        </div>
+        <div class="flow-arrow amber-arr">→</div>
+        <div class="flow-node amber-node">
+          <span class="fn-label">Filter 1</span>
+          <span class="fn-name">Exception</span>
+          <span class="fn-sub">ExcDev · ExcMax</span>
+          <span class="flow-label">saring perubahan</span>
+        </div>
+        <div class="flow-arrow teal-arr">→</div>
+        <div class="flow-node teal-node">
+          <span class="fn-label">Memory</span>
+          <span class="fn-name">Snapshot</span>
+          <span class="fn-sub">pisnapss.exe</span>
+          <span class="flow-label">current value</span>
+        </div>
+        <div class="flow-arrow amber-arr">→</div>
+        <div class="flow-node amber-node">
+          <span class="fn-label">Filter 2</span>
+          <span class="fn-name">Swingdoor</span>
+          <span class="fn-sub">CompDev · CompMax</span>
+          <span class="flow-label">kompresi cerdas</span>
+        </div>
+        <div class="flow-arrow red-arr">→</div>
+        <div class="flow-node red-node">
+          <span class="fn-label">Permanent</span>
+          <span class="fn-name">Archive</span>
+          <span class="fn-sub">piarchss.exe</span>
+          <span class="flow-label">D:\PI\arc</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmp-grid reveal">
+      <div class="cmp-card amber">
+        <div class="cmp-icon">🔍</div>
+        <div class="cmp-title">Exception Reporting</div>
+        <p class="cmp-desc">Filter pertama — hanya loloskan data yang berubah cukup signifikan. Mencegah banjir data dari sensor yang nilainya stabil.</p>
+      </div>
+      <div class="cmp-card teal">
+        <div class="cmp-icon">⚡</div>
+        <div class="cmp-title">Snapshot</div>
+        <p class="cmp-desc">Database current value di memory — menyimpan nilai terkini setiap tag. Real-time, zero-latency, tidak persistent di disk.</p>
+      </div>
+      <div class="cmp-card red">
+        <div class="cmp-icon">📐</div>
+        <div class="cmp-title">Swingdoor Trending</div>
+        <p class="cmp-desc">Algoritma kompresi cerdas — hanya simpan titik data yang penting untuk merekonstruksi trend. Hemat storage 5–20×.</p>
+      </div>
+      <div class="cmp-card blue">
+        <div class="cmp-icon">🗄️</div>
+        <div class="cmp-title">Archive</div>
+        <p class="cmp-desc">Penyimpanan permanen time-series di disk. File .arc di D:\PI\arc, 10,240 MB/file, backup daily 03:15 AM.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 01 — EXCEPTION
+═══════════════════════════════════════════════════════════════ -->
+<section id="exception">
+  <div class="wrap">
+    <div class="section-label">01 — Exception Reporting</div>
+    <h2>Exception <span class="accent">Reporting</span></h2>
+    <p>
+      Exception Reporting adalah mekanisme filter di level PI Interface atau PI Buffer.
+      Tujuannya sederhana: <strong>jangan kirim data ke PI Server jika nilainya tidak berubah
+      secara signifikan</strong>. Ini adalah filter pertama dan paling fundamental dalam pipeline PI System.
+    </p>
+
+    <div class="callout amber reveal">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Analogi Exception</strong>
+        Bayangkan sensor tekanan membaca 10.001 bar, 10.002 bar, 10.001 bar setiap detik.
+        Tanpa exception reporting, PI Server kebanjiran data yang pada dasarnya
+        <em>tidak ada informasinya</em>. Exception Reporting memfilter: "kirim data hanya jika
+        berubah lebih dari 0.1 bar (ExcDev), atau sudah 600 detik sejak pengiriman terakhir (ExcMax)."
+      </div>
+    </div>
+
+    <h3>Cara Kerja Exception Reporting</h3>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Interface Membaca Raw Value</h4>
+          <p>OPCInt membaca nilai dari ABB DCS sesuai scan rate. Misal setiap 1 detik, sensor tekanan mengirim nilai baru via OPC DA dari alamat IP 172.18.1.37.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Bandingkan dengan Nilai Sebelumnya</h4>
+          <p>PI Interface membandingkan nilai baru dengan <em>nilai terakhir yang dikirim ke PI Server</em>. Jika selisihnya ≤ ExcDev, data <strong>tidak dikirim</strong> (di-drop).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Evaluasi ExcDev — Exception Deviation</h4>
+          <p>Threshold perubahan minimum. Satuan bisa absolut (Eng Units) atau persen dari span. Di Wayang Windu default: <code>excdev = 0.1</code> Eng Units untuk tag ABB.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Evaluasi ExcMax — Exception Maximum Time</h4>
+          <p>Maksimal waktu "diam" sebelum paksa kirim. Meskipun nilai tidak berubah, data tetap dikirim setiap ExcMax detik — sebagai bukti sensor masih hidup. Default di Wayang Windu: <code>excmax = 3600</code> detik (1 jam) untuk SETPOINT, dan dikonfigurasi berbeda untuk ABB.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Evaluasi ExcMin — Exception Minimum Time</h4>
+          <p>Minimum interval antar pengiriman. Mencegah "banjir" data jika sensor berubah sangat cepat. Default: <code>excmin = 0</code> (tidak ada pembatasan minimum).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>Data Lolos → Kirim ke Snapshot</h4>
+          <p>Jika data lulus exception check (berubah lebih dari ExcDev, atau waktu sudah melebihi ExcMax), data dikirim ke PI Server dan masuk ke Snapshot Subsystem.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Parameter Exception — Tag Wayang Windu</h3>
+    <div class="param-table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>Parameter</th><th>Tag ABB-OPC (Wayang Windu)</th><th>Tag SETPOINT</th><th>Fungsi</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>excdev</td><td><code>0.1</code> Eng Units</td><td>dikontrol SETPOINT</td><td>Deviation minimum untuk lolos exception</td></tr>
+          <tr><td>excmax</td><td>dikonfigurasi per tag</td><td><code>3600</code> detik</td><td>Paksa kirim setelah n detik meski tidak berubah</td></tr>
+          <tr><td>excmin</td><td><code>0</code></td><td><code>10</code> detik</td><td>Minimum interval antar pengiriman</td></tr>
+          <tr><td>excdevpercent</td><td><code>0</code> (absolute)</td><td><code>0</code></td><td>1 = gunakan % dari span; 0 = absolut</td></tr>
+          <tr><td>shutdown</td><td><code>On</code></td><td><code>—</code></td><td>Kirim nilai terakhir saat interface shutdown</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="reveal"><span class="cmt">/* Contoh: tag A1_PIT0610 — Control Oil Pressure */</span>
+<span class="kw">excdev</span>  = <span class="num">0.1</span>    <span class="cmt">/* berubah min 0.1 bar → lolos exception */</span>
+<span class="kw">excmax</span>  = <span class="num">600</span>    <span class="cmt">/* paksa kirim tiap 10 menit              */</span>
+<span class="kw">excmin</span>  = <span class="num">0</span>      <span class="cmt">/* tidak ada batas minimum                */</span>
+<span class="kw">span</span>    = <span class="num">100</span>   <span class="cmt">/* 0–100 bar                              */</span>
+
+<span class="cmt">/* Skenario:
+   t=0s  : nilai 50.0 bar → KIRIM (pertama kali)
+   t=1s  : nilai 50.05 bar → DROP  (Δ=0.05 < excdev 0.1)
+   t=2s  : nilai 50.12 bar → KIRIM (Δ=0.12 > excdev 0.1) ✓
+   t=602s: nilai 50.12 bar → KIRIM (excmax tercapai)      ✓
+*/</span></pre>
+
+    <div class="callout teal reveal">
+      <span class="callout-icon">📊</span>
+      <div class="callout-body">
+        <strong>Efek Exception pada Storage</strong>
+        Sensor tekanan yang stabil (berubah <0.1 bar) yang seharusnya mengirim 86,400 data/hari
+        (setiap detik) → dengan ExcMax=600 hanya mengirim <strong>144 data/hari</strong>.
+        Pengurangan 99.8% — tanpa kehilangan informasi penting.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 02 — SNAPSHOT
+═══════════════════════════════════════════════════════════════ -->
+<section id="snapshot">
+  <div class="wrap">
+    <div class="section-label">02 — Snapshot Subsystem</div>
+    <h2>Snapshot <span class="accent">Subsystem</span></h2>
+    <p>
+      Snapshot adalah <strong>database in-memory</strong> PI Server yang menyimpan nilai terkini
+      setiap PI Tag. Dikelola oleh service <code>pisnapss.exe</code> yang berjalan di IDWWDW25SCADA01.
+      Snapshot adalah "jendela real-time" yang dilihat oleh PI Vision, PI ProcessBook, dan semua
+      klien PI saat mereka menampilkan nilai <em>sekarang</em>.
+    </p>
+
+    <div class="callout amber reveal">
+      <span class="callout-icon">⚡</span>
+      <div class="callout-body">
+        <strong>Snapshot ≠ Archive</strong>
+        Snapshot hanya menyimpan <strong>1 nilai per tag</strong> — nilai terkini. Snapshot tidak
+        persistent: jika PI Server di-restart, Snapshot dikosongkan. Data historis tersimpan di
+        Archive. Snapshot adalah "RAM", Archive adalah "Hard Disk".
+      </div>
+    </div>
+
+    <h3>Struktur Snapshot</h3>
+    <div class="flow-container reveal">
+      <div class="flow-title">// SNAPSHOT SUBSYSTEM — IN-MEMORY STRUCTURE</div>
+      <div class="flow-row">
+        <div class="flow-node">
+          <span class="fn-label">Input</span>
+          <span class="fn-name">Exception</span>
+          <span class="fn-sub">data lolos filter</span>
+        </div>
+        <div class="flow-arrow teal-arr">→</div>
+        <div class="flow-node teal-node">
+          <span class="fn-label">pisnapss.exe</span>
+          <span class="fn-name">Snapshot DB</span>
+          <span class="fn-sub">RAM · in-memory</span>
+        </div>
+        <div class="flow-arrow teal-arr">↕</div>
+        <div class="flow-node teal-node">
+          <span class="fn-label">Read (fast)</span>
+          <span class="fn-name">PI Clients</span>
+          <span class="fn-sub">Vision · SMT · SDK</span>
+        </div>
+        <div class="flow-arrow teal-arr">→</div>
+        <div class="flow-node amber-node">
+          <span class="fn-label">Forward to</span>
+          <span class="fn-name">Compression</span>
+          <span class="fn-sub">Swingdoor filter</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node red-node">
+          <span class="fn-label">Persist to</span>
+          <span class="fn-name">Archive</span>
+          <span class="fn-sub">piarchss.exe</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Apa yang Ada di Snapshot?</h3>
+    <div class="param-table-wrap reveal">
+      <table>
+        <thead><tr><th>Komponen</th><th>Isi</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td>Value</td><td>Nilai numerik/string/digital terkini</td><td>Float32, Int32, Digital, String</td></tr>
+          <tr><td>Timestamp</td><td>Waktu nilai tersebut diterima</td><td>Resolusi 100 nanosecond</td></tr>
+          <tr><td>Quality</td><td>Status kualitas data</td><td>Good, Bad, Uncertain, Stale</td></tr>
+          <tr><td>Annotations</td><td>Catatan manual operator</td><td>Opsional, bisa dikosongkan</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Snapshot Event vs Time-Based</h3>
+    <div class="cmp-grid reveal">
+      <div class="cmp-card teal">
+        <div class="cmp-icon">📡</div>
+        <div class="cmp-title">Event-Driven (Advise)</div>
+        <p class="cmp-desc">Snapshot diupdate setiap ada perubahan dari interface — push model. Digunakan tag ABB dan SETPOINT di Wayang Windu (Location3=1=advise). Lebih efisien, latensi rendah.</p>
+      </div>
+      <div class="cmp-card amber">
+        <div class="cmp-icon">⏱️</div>
+        <div class="cmp-title">Polled (Scan)</div>
+        <p class="cmp-desc">Snapshot diupdate berdasarkan scan class — pull model. Interface query nilai setiap N detik. Digunakan jika sumber tidak support push notification.</p>
+      </div>
+    </div>
+
+    <h3>Snapshot di Wayang Windu</h3>
+    <div class="highlight teal reveal">
+      <h4>pisnapss.exe — IDWWDW25SCADA01</h4>
+      <p>Service Snapshot PI berjalan di PI Server <code>IDWWDW25SCADA01</code> versi <code>3.4.460.29</code>.
+      Saat ini menampung nilai terkini untuk <strong>443 tag aktif</strong> dari total 6,000 tag licensed.
+      Snapshot diisi dari dua sumber: OPCInt (215 tag ABB, pointsource=ABB-OPC) dan
+      SETPOINT Connector (225 tag VC-8000, pointsource=SETPOINT).</p>
+    </div>
+
+    <pre class="reveal"><span class="cmt">/* Cek nilai Snapshot via PICONFIG */</span>
+<span class="kw">piconfig</span>
+<span class="val">@output</span> <span class="str">snapshot.txt</span>
+<span class="val">@table</span> pids
+<span class="val">@istr</span> tag, value, time, questionable
+<span class="val">@ends</span>
+<span class="str">A1_PIT0610</span>
+<span class="str">A1_SY0410C</span>
+<span class="str">A1_EY2801A</span>
+<span class="val">@endt</span>
+
+<span class="cmt">/* Output contoh:
+   A1_PIT0610  | 50.23  | 17/02/2026 08:15:32 | 0
+   A1_SY0410C  | 3002.5 | 17/02/2026 08:15:33 | 0
+   A1_EY2801A  | 112.40 | 17/02/2026 08:15:31 | 0
+*/</span></pre>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 03 — SWINGDOOR
+═══════════════════════════════════════════════════════════════ -->
+<section id="swingdoor">
+  <div class="wrap">
+    <div class="section-label">03 — Swingdoor Trending</div>
+    <h2>Swingdoor <span class="accent">Trending Algorithm</span></h2>
+    <p>
+      Swingdoor Trending adalah algoritma kompresi data time-series yang dikembangkan OSIsoft
+      khusus untuk PI System. Ide utamanya: <strong>simpan hanya titik data yang dibutuhkan untuk
+      merekonstruksi trend asli dengan akurasi yang ditentukan</strong>. Titik data yang bisa
+      "diprediksi" dari interpolasi linear dua titik sebelumnya → tidak disimpan.
+    </p>
+
+    <div class="callout amber reveal">
+      <span class="callout-icon">🚪</span>
+      <div class="callout-body">
+        <strong>Mengapa Disebut "Swingdoor"?</strong>
+        Bayangkan ada dua pintu (swinging doors) yang terbuka di sekitar setiap titik data baru.
+        Selama titik baru masih berada "di antara kedua pintu" (dalam batas toleransi kompres dari
+        trend yang ada), titik tersebut <em>tidak disimpan</em>. Pintu baru hanya dibuat ketika
+        titik data keluar dari batas toleransi — menandakan trend telah berubah signifikan.
+      </div>
+    </div>
+
+    <h3>Cara Kerja Swingdoor</h3>
+
+    <div class="flow-container reveal">
+      <div class="flow-title">// SWINGDOOR — VISUAL CONCEPT</div>
+      <div style="color:#e2e8f0; font-family:var(--mono); font-size:12px; line-height:2; white-space:pre">
+<span style="color:#6ee7b7">Nilai asli:</span>  10.0  10.1  10.2  10.3  10.4  10.6  10.5  10.3  <span style="color:#f97316">11.5</span>  11.6  11.7
+<span style="color:#64748b">             ·     ·     ·     ·     ·     ·     ·     ·     ↑     ·     ·</span>
+<span style="color:#fde68a">Tersimpan:</span>  ●                                               ●     ●
+<span style="color:#64748b">             ↑                                               ↑     ↑</span>
+<span style="color:#64748b">           titik awal                                  keluar batas  titik baru</span>
+
+<span style="color:#6ee7b7">Interpolasi:</span> ─────────────────────────────────────────────/────────────
+<span style="color:#fde68a">CompDev:</span>     ═══════════════════════════════════════════   <span style="color:#f97316">← 11.5 melewati batas!</span>
+</div>
+    </div>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Titik Pertama Selalu Disimpan</h4>
+          <p>Ketika tag pertama kali menerima data, nilai pertama langsung dikirim ke Archive sebagai titik acuan (anchor point).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Hitung Batas Toleransi (Swingdoor)</h4>
+          <p>Dari titik terakhir yang disimpan, algoritma membuat "koridor toleransi" — sebuah rentang nilai yang diterima berdasarkan <strong>CompDev</strong> (compression deviation). Selama nilai baru masih masuk koridor ini (bisa dicapai dengan interpolasi linear), nilai tidak disimpan.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Cek CompDev — Compression Deviation</h4>
+          <p>Jika nilai baru <em>keluar dari koridor</em> (artinya trend berubah dan tidak bisa direpresentasikan oleh interpolasi linear dalam batas CompDev), titik sebelumnya disimpan ke Archive, dan koridor baru dibuka. Default tag ABB Wayang Windu: <code>compdev = 0.2</code> Eng Units.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Cek CompMax — Compression Maximum Time</h4>
+          <p>Sama seperti ExcMax, CompMax memaksa penyimpanan meskipun nilai stabil — agar ada data yang bisa dikonfirmasi aktif. Default SETPOINT Wayang Windu: <code>compmax = 3600</code> detik.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Data Lolos → Kirim ke piarchss</h4>
+          <p>Titik data yang "keluar koridor" (atau mencapai CompMax) dikirim oleh pisnapss ke piarchss untuk disimpan permanen di file .arc di disk.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Parameter Swingdoor — Wayang Windu</h3>
+    <div class="param-table-wrap reveal">
+      <table>
+        <thead><tr><th>Parameter</th><th>Tag ABB-OPC</th><th>Tag SETPOINT</th><th>Fungsi</th></tr></thead>
+        <tbody>
+          <tr><td>compressing</td><td><code>Off</code> (0)</td><td><code>On</code> (1)</td><td>Aktifkan Swingdoor compression atau tidak</td></tr>
+          <tr><td>compdev</td><td><code>0.2</code> Eng Units</td><td>dikontrol SETPOINT</td><td>Toleransi maksimal dari interpolasi linear</td></tr>
+          <tr><td>compmax</td><td>dikonfigurasi per tag</td><td><code>3600</code> detik</td><td>Paksa simpan ke archive setelah n detik</td></tr>
+          <tr><td>compmin</td><td><code>0</code></td><td><code>0</code></td><td>Minimum interval antar penyimpanan archive</td></tr>
+          <tr><td>compdevpercent</td><td><code>0</code></td><td><code>0</code></td><td>1 = gunakan % dari span; 0 = absolut</td></tr>
+          <tr><td>archiving</td><td><code>On</code> (1)</td><td><code>On</code> (1)</td><td>Aktifkan archiving untuk tag ini</td></tr>
+          <tr><td>step</td><td><code>Off</code> (0)</td><td><code>Off</code> (0)</td><td>On = step interpolation (untuk digital/status)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout teal reveal">
+      <span class="callout-icon">📉</span>
+      <div class="callout-body">
+        <strong>Rasio Kompresi Nyata</strong>
+        Pada implementasi tipikal PI System dengan Swingdoor: data analog yang masuk
+        Snapshot setelah Exception (misal 5,000 events/hari per tag) akan terkompresi
+        menjadi 200–500 events/hari di Archive — rasio kompresi <strong>10:1 hingga 25:1</strong>
+        tergantung "kebisingan" sensor. Untuk Wayang Windu dengan 443 tag aktif, ini berarti
+        penghematan storage yang sangat signifikan dari ukuran archive 10,240 MB.
+      </div>
+    </div>
+
+    <h3>Swingdoor vs Step Compression</h3>
+    <div class="cmp-grid reveal">
+      <div class="cmp-card amber">
+        <div class="cmp-icon">〰️</div>
+        <div class="cmp-title">Swingdoor (step=Off)</div>
+        <p class="cmp-desc">Untuk sensor analog — interpolasi LINEAR antar titik tersimpan. Digunakan untuk: tekanan (A1_PIT), temperatur (A1_TE), vibrasi (A1_YIY), flow (FIT). Semua tag ABB dan SETPOINT di Wayang Windu.</p>
+      </div>
+      <div class="cmp-card red">
+        <div class="cmp-icon">⬛</div>
+        <div class="cmp-title">Step Compression (step=On)</div>
+        <p class="cmp-desc">Untuk tag digital/status — interpolasi STEP (nilai konstan hingga berubah). Digunakan untuk: motor status (Running/Stopped), valve status (Open/Closed), alarm states. Nilai tidak pernah "di antara dua state".</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 04 — ARCHIVE
+═══════════════════════════════════════════════════════════════ -->
+<section id="archive">
+  <div class="wrap">
+    <div class="section-label">04 — Archive Storage</div>
+    <h2>PI Archive <span class="accent">Storage</span></h2>
+    <p>
+      Archive adalah penyimpanan permanen time-series data PI System. Data yang lolos dari
+      Swingdoor compression akhirnya tersimpan di file <code>.arc</code> di disk — tidak akan hilang
+      meski PI Server di-restart. Dikelola oleh service <code>piarchss.exe</code>.
+    </p>
+
+    <h3>Konfigurasi Archive — IDWWDW25SCADA01</h3>
+    <div class="archive-visual reveal">
+      <div class="arc-file">
+        <div class="arc-file-icon">📁</div>
+        <div class="arc-file-name">Archive Aktif</div>
+        <p class="arc-file-desc">PISERVER_2026-01-28_00-00-00.arc<br>Mulai: 28 Jan 2026<br>Durasi: 20d 08:14:05</p>
+        <div class="arc-progress-bar"><div class="arc-progress-fill amber" style="width:6%"></div></div>
+        <p style="font-size:11px;color:var(--slate);margin-top:5px;font-family:var(--mono)">5.9% full · 10,240 MB</p>
+      </div>
+      <div class="arc-file">
+        <div class="arc-file-icon">💾</div>
+        <div class="arc-file-name">Drive Storage</div>
+        <p class="arc-file-desc">Drive D: di IDWWDW25SCADA01<br>Total: 207 GB<br>Used: 10 GB</p>
+        <div class="arc-progress-bar"><div class="arc-progress-fill" style="width:5%"></div></div>
+        <p style="font-size:11px;color:var(--slate);margin-top:5px;font-family:var(--mono)">~5% used · 2,096 GB free</p>
+      </div>
+      <div class="arc-file">
+        <div class="arc-file-icon">🔄</div>
+        <div class="arc-file-name">Backup Schedule</div>
+        <p class="arc-file-desc">Backup Type: INCREMENTAL<br>Jadwal: Daily 03:15 AM<br>Status: ✅ Running</p>
+        <div class="arc-progress-bar"><div class="arc-progress-fill" style="width:100%"></div></div>
+        <p style="font-size:11px;color:var(--slate);margin-top:5px;font-family:var(--mono)">3 record backup sukses</p>
+      </div>
+      <div class="arc-file">
+        <div class="arc-file-icon">🏷️</div>
+        <div class="arc-file-name">Kapasitas Tag</div>
+        <p class="arc-file-desc">Licensed: 6,000 tags<br>Active streams: 443<br>ID: 10287114</p>
+        <div class="arc-progress-bar"><div class="arc-progress-fill amber" style="width:7.5%"></div></div>
+        <p style="font-size:11px;color:var(--slate);margin-top:5px;font-family:var(--mono)">7.4% kapasitas terpakai</p>
+      </div>
+    </div>
+
+    <h3>Struktur File Archive</h3>
+    <p>PI Archive terdiri dari dua jenis file yang bekerja bersama:</p>
+    <div class="param-table-wrap reveal">
+      <table>
+        <thead><tr><th>Komponen</th><th>Extension</th><th>Fungsi</th><th>Lokasi (Wayang Windu)</th></tr></thead>
+        <tbody>
+          <tr><td>Archive Data File</td><td><code>.arc</code></td><td>Menyimpan data time-series aktual — value, timestamp, quality</td><td>D:\PI\arc\PISERVER_2026-01-28_*.arc</td></tr>
+          <tr><td>Archive Index File</td><td><code>.idx</code></td><td>Index untuk query cepat berdasarkan waktu dan tag ID</td><td>D:\PI\arc\ (sama dengan .arc)</td></tr>
+          <tr><td>Snapshot File</td><td><code>.snp</code></td><td>Persistent snapshot untuk recovery setelah restart</td><td>D:\PI\dat\</td></tr>
+          <tr><td>PI Config</td><td><code>.dat</code></td><td>Konfigurasi tag, point database</td><td>D:\PI\dat\</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Life Cycle Archive</h3>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Archive Baru Dibuat (New Primary Archive)</h4>
+          <p>Saat archive aktif hampir penuh atau secara terjadwal, PI membuat archive baru. Di Wayang Windu ukuran per file = <code>10,240 MB</code>. Archive lama menjadi "read-only" dan tetap bisa di-query.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Data Ditulis ke Archive Primer (Primary Write)</h4>
+          <p>piarchss.exe menulis data dari Swingdoor compression ke archive aktif secara berurutan berdasarkan timestamp. Proses ini berlangsung terus menerus selama PI Server running.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Online Reprocessing (Backfill)</h4>
+          <p>Data yang datang terlambat (late arriving data, misal dari buffering saat PI Server sempat down) di-<em>reprocess</em> dan disisipkan ke archive sesuai timestamp-nya. Fitur ini terlihat di PI SMT sebagai "Online reprocessing".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Backup Archive (Incremental)</h4>
+          <p>Setiap hari pukul <code>03:15 AM</code>, PI menjalankan backup INCREMENTAL — hanya data baru sejak backup terakhir yang di-copy. Ini lebih efisien dari full backup. Di Wayang Windu sudah konfirm berjalan (backup history terlihat 3 record sukses).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Archive Swap (Auto atau Manual)</h4>
+          <p>Saat archive mencapai 100% penuh, PI otomatis swap ke archive baru (jika sudah disiapkan). Untuk Wayang Windu archive saat ini baru 5.9% — estimasi masih bisa menampung data bertahun-tahun.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Cara Buat Archive Baru (Manual)</h3>
+    <pre class="reveal"><span class="cmt">/* Via PI SMT (GUI): */</span>
+<span class="kw">PI SMT</span> → <span class="str">IDWWDW25SCADA01</span> → <span class="kw">Operation</span> → <span class="kw">Archives</span>
+→ Klik kanan → <span class="val">New Archive</span>
+→ Size: <span class="num">10240</span> MB
+→ Nama: <span class="str">PISERVER_2026-xx-xx_00-00-00.arc</span>
+→ Path: <span class="str">D:\PI\arc\</span>
+→ OK → Register → Set as Primary
+
+<span class="cmt">/* Via PICONFIG (command line): */</span>
+<span class="kw">piconfig</span>
+<span class="val">@table</span> PIarcfile
+<span class="val">@mode</span> create
+<span class="val">@istr</span> path, size, shift, primary
+<span class="str">D:\PI\arc\PISERVER_NEW.arc</span>, <span class="num">10240</span>, <span class="num">0</span>, <span class="num">1</span>
+<span class="val">@endt</span></pre>
+
+    <div class="callout red reveal">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Penting: Jangan Hapus File .arc Secara Manual!</strong>
+        File .arc yang dihapus dari Explorer tidak bisa di-recover. Untuk mengelola archive,
+        selalu gunakan PI SMT → Archives → Unregister terlebih dahulu sebelum menghapus file.
+        Archive yang masih terdaftar akan menyebabkan error query data jika file-nya hilang.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 05 — ALUR LENGKAP
+═══════════════════════════════════════════════════════════════ -->
+<section id="alur">
+  <div class="wrap">
+    <div class="section-label">05 — Alur Lengkap</div>
+    <h2>Alur Data <span class="accent">End-to-End</span></h2>
+    <p>Contoh nyata: sensor tekanan <strong>A1_PIT0620 (LUBRICATING OIL PRESSURE)</strong>
+    di STG #1, dari ABB DCS hingga tersimpan di Archive.</p>
+
+    <div class="flow-container reveal">
+      <div class="flow-title">// CONTOH: A1_PIT0620 — LUBRICATING OIL PRESSURE | IDWWDW25SCADA01</div>
+      <div style="color:#e2e8f0;font-family:var(--mono);font-size:11.5px;line-height:2.2;white-space:pre-wrap">
+<span style="color:#64748b">[ ABB DCS — 172.18.1.37 ]</span>
+  OPC Item: <span style="color:#fde68a">A1_PIT0620</span> | Value: <span style="color:#6ee7b7">50.23 bar</span> | Quality: Good
+  ↓  OPC DA subscription (advise)
+
+<span style="color:#64748b">[ OPCInt Interface — IDWWDW25SCADA01 ]</span>
+  PointSource: <span style="color:#fde68a">ABB-OPC</span> | Location3: <span style="color:#93c5fd">1</span> (advise mode)
+  ↓
+  <span style="color:#f97316">EXCEPTION CHECK:</span>
+    Nilai baru: <span style="color:#6ee7b7">50.23</span> | Nilai terakhir dikirim: <span style="color:#6ee7b7">50.10</span>
+    Delta: <span style="color:#6ee7b7">0.13</span> > excdev <span style="color:#fde68a">0.1</span> → ✅ LOLOS
+  ↓
+
+<span style="color:#64748b">[ Snapshot — pisnapss.exe ]</span>
+  Tag A1_PIT0620 diupdate:
+  Value: <span style="color:#6ee7b7">50.23 bar</span> | Time: <span style="color:#93c5fd">17/02/2026 08:15:32.1234567</span> | Quality: <span style="color:#6ee7b7">Good</span>
+  (PI Vision sekarang menampilkan: <span style="color:#6ee7b7">50.23 bar</span>)
+  ↓
+  <span style="color:#f97316">SWINGDOOR CHECK:</span>
+    Nilai 50.23 masih dalam toleransi interpolasi linear dari titik sebelumnya (50.10)?
+    Batas: ±compdev <span style="color:#fde68a">0.2</span> dari ekstrapolasi linear → prediksi: <span style="color:#6ee7b7">50.20</span>
+    50.23 - 50.20 = <span style="color:#6ee7b7">0.03</span> < compdev <span style="color:#fde68a">0.2</span> → ❌ TIDAK DISIMPAN (masih dalam koridor)
+  ↓ (lanjut akumulasi...)
+  
+  <span style="color:#64748b">... beberapa nilai berikutnya: 50.25, 50.27, 50.22 — semua masih dalam koridor ...</span>
+  
+  Nilai baru: <span style="color:#6ee7b7">50.65 bar</span> | prediksi: <span style="color:#6ee7b7">50.25</span>
+  50.65 - 50.25 = <span style="color:#f97316">0.40</span> > compdev <span style="color:#fde68a">0.2</span> → ✅ KELUAR KORIDOR → SIMPAN KE ARCHIVE
+  ↓
+
+<span style="color:#64748b">[ Archive — piarchss.exe → D:\PI\arc\PISERVER_2026-01-28.arc ]</span>
+  Stored event: <span style="color:#fde68a">A1_PIT0620</span> | <span style="color:#6ee7b7">50.65 bar</span> | <span style="color:#93c5fd">17/02/2026 08:15:45.0000000</span> | Quality: <span style="color:#6ee7b7">0 (Good)</span>
+</div>
+    </div>
+
+    <div class="callout teal reveal">
+      <span class="callout-icon">🧮</span>
+      <div class="callout-body">
+        <strong>Berapa Event Tersimpan per Tag per Hari?</strong>
+        Sensor tekanan yang berfluktuasi normal (±2 bar sepanjang hari):
+        Raw scan = 86,400 events/hari (tiap detik) →
+        Setelah Exception (excdev=0.1): ~5,000 events/hari →
+        Setelah Swingdoor (compdev=0.2): ~200–500 events/hari.
+        Efisiensi total: <strong>99.4–99.8%</strong> pengurangan storage tanpa kehilangan informasi penting.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 06 — KONFIGURASI
+═══════════════════════════════════════════════════════════════ -->
+<section id="config">
+  <div class="wrap">
+    <div class="section-label">06 — Konfigurasi</div>
+    <h2>Konfigurasi <span class="accent">Parameter</span></h2>
+    <p>Panduan konfigurasi parameter Exception dan Compression untuk tag di Wayang Windu
+    via PI SMT Point Builder.</p>
+
+    <h3>Tab Archive — PI SMT Point Builder</h3>
+    <div class="param-table-wrap reveal">
+      <table>
+        <thead><tr><th>Field di GUI</th><th>Attribute PI</th><th>Value (ABB Wayang Windu)</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td>Typical Value</td><td>typicalvalue</td><td><code>50</code></td><td>Nilai tipikal tag — digunakan compression reference</td></tr>
+          <tr><td>Zero</td><td>zero</td><td><code>0</code></td><td>Batas bawah engineering range</td></tr>
+          <tr><td>Span</td><td>span</td><td><code>100</code></td><td>Range total (zero to max)</td></tr>
+          <tr><td>Archiving</td><td>archiving</td><td><code>On</code></td><td>Aktifkan archiving untuk tag ini</td></tr>
+          <tr><td>Compressing</td><td>compressing</td><td><code>Off</code> (ABB) / <code>On</code> (SETPOINT)</td><td>Aktifkan Swingdoor compression</td></tr>
+          <tr><td>Exception Deviation</td><td>excdev</td><td><code>0.1</code></td><td>Min perubahan untuk lolos exception</td></tr>
+          <tr><td>Compression Deviation</td><td>compdev</td><td><code>0.2</code></td><td>Toleransi Swingdoor dari linear interpolation</td></tr>
+          <tr><td>Step</td><td>step</td><td><code>Off</code></td><td>Off=linear interp, On=step interp (digital)</td></tr>
+          <tr><td>Shutdown</td><td>shutdown</td><td><code>On</code></td><td>Kirim nilai saat interface shutdown</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Contoh Konfigurasi PICONFIG Bulk</h3>
+    <pre class="reveal"><span class="cmt">/* Set exception & compression untuk semua tag A1_ sekaligus */</span>
+<span class="kw">piconfig</span>
+<span class="val">@table</span> PIpoint
+<span class="val">@mode</span> edit
+<span class="val">@istr</span> tag, excdev, compdev, compressing, archiving, excmax, compmax, step, shutdown
+<span class="val">@ends</span>
+
+<span class="cmt">/* Tag analog ABB — pressure, temperature, flow */</span>
+<span class="str">A1_PIT0620</span>, <span class="num">0.1</span>, <span class="num">0.2</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">600</span>, <span class="num">600</span>, <span class="num">0</span>, <span class="num">1</span>
+<span class="str">A1_PIT0610</span>, <span class="num">0.1</span>, <span class="num">0.2</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">600</span>, <span class="num">600</span>, <span class="num">0</span>, <span class="num">1</span>
+<span class="str">A1_TE0401</span>,  <span class="num">0.1</span>, <span class="num">0.2</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">600</span>, <span class="num">600</span>, <span class="num">0</span>, <span class="num">1</span>
+
+<span class="cmt">/* Tag vibrasi — lebih sensitif, excdev lebih kecil */</span>
+<span class="str">A1_YIY0405A</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">600</span>, <span class="num">600</span>, <span class="num">0</span>, <span class="num">1</span>
+
+<span class="cmt">/* Tag digital — step compression ON */</span>
+<span class="str">A1_MOT_RUN</span>,  <span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">600</span>, <span class="num">600</span>, <span class="num">1</span>, <span class="num">1</span>
+
+<span class="val">@endt</span></pre>
+
+    <h3>Rekomendasi ExcDev per Jenis Sensor</h3>
+    <div class="param-table-wrap reveal">
+      <table>
+        <thead><tr><th>Jenis Sensor</th><th>Contoh Tag</th><th>ExcDev Rekomendasi</th><th>CompDev Rekomendasi</th></tr></thead>
+        <tbody>
+          <tr><td>Tekanan (bar)</td><td>A1_PIT0610, A1_PIT0620</td><td><code>0.1</code> bar</td><td><code>0.2</code> bar</td></tr>
+          <tr><td>Temperatur (°C)</td><td>A1_TE0401, A1_TE0403</td><td><code>0.1</code> °C</td><td><code>0.2</code> °C</td></tr>
+          <tr><td>Flow (kg/s)</td><td>FIT1005B, A1_FR1060</td><td><code>0.1</code> kg/s</td><td><code>0.2</code> kg/s</td></tr>
+          <tr><td>Shaft Vibration (µm)</td><td>A1_YIY0405A/B</td><td><code>1</code> µm</td><td><code>2</code> µm</td></tr>
+          <tr><td>Velocity Vibration (mm/s)</td><td>UNIT#1.5.2.Direct.0</td><td>auto (SETPOINT)</td><td>auto (SETPOINT)</td></tr>
+          <tr><td>Speed (rpm)</td><td>A1_SY0410C</td><td><code>1</code> rpm</td><td><code>2</code> rpm</td></tr>
+          <tr><td>Power (MW)</td><td>A1_EY2801A</td><td><code>0.1</code> MW</td><td><code>0.2</code> MW</td></tr>
+          <tr><td>Digital/Status</td><td>Motor RUN/STOP</td><td><code>0</code> (any change)</td><td><code>0</code>, step=On</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SECTION 07 — TROUBLESHOOT
+═══════════════════════════════════════════════════════════════ -->
+<section id="troubleshoot">
+  <div class="wrap">
+    <div class="section-label">07 — Troubleshooting</div>
+    <h2>Troubleshooting <span class="accent">Umum</span></h2>
+
+    <h3>Tag Muncul di Snapshot tapi Tidak di Archive</h3>
+    <div class="callout amber reveal">
+      <span class="callout-icon">🔍</span>
+      <div class="callout-body">
+        <strong>Penyebab Umum</strong>
+        <ul class="list" style="margin-top:8px">
+          <li><code>archiving = 0</code> — archiving dimatikan untuk tag tersebut</li>
+          <li><code>compmax</code> sangat besar dan nilai sangat stabil — Swingdoor belum trigger</li>
+          <li>piarchss.exe tidak berjalan — cek PI Services di PI SMT</li>
+          <li>Archive penuh dan belum ada archive baru yang disiapkan</li>
+        </ul>
+      </div>
+    </div>
+    <pre class="reveal"><span class="cmt">/* Diagnosa — cek attribute archiving dan compressing */</span>
+<span class="kw">piconfig</span>
+<span class="val">@table</span> PIpoint
+<span class="val">@mode</span> list
+<span class="val">@istr</span> tag, archiving, compressing, compdev, excdev
+<span class="val">@ends</span>
+<span class="str">A1_PIT0620</span>
+<span class="val">@endt</span>
+
+<span class="cmt">/* Jika archiving=0, fix: */</span>
+<span class="val">@mode</span> edit
+<span class="val">@istr</span> tag, archiving
+<span class="str">A1_PIT0620</span>, <span class="num">1</span>
+<span class="val">@endt</span></pre>
+
+    <h3>Data "Hilang" — Gap di Trend PI Vision</h3>
+    <div class="callout red reveal">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Kemungkinan Penyebab</strong>
+        <ul class="list" style="margin-top:8px">
+          <li>Interface OPCInt atau SETPOINT Connector stop → tidak ada data masuk ke Snapshot</li>
+          <li>PI Server down → PIBufss.exe menyimpan data sementara, akan di-backfill saat PI kembali online</li>
+          <li>ExcDev terlalu besar → terlalu banyak data di-drop, trend terlihat "kasar"</li>
+          <li>CompDev terlalu besar → detail trend hilang, hanya titik ekstrem yang tersimpan</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Snapshot Menunjukkan "No Data" atau "Pt Created"</h3>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Cek Interface Status</h4>
+          <p>PI SMT → IDWWDW25SCADA01 → Interfaces → pastikan OPCInt running dan connected ke 172.18.1.37.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Cek PI Trust</h4>
+          <p>PI SMT → Security → Trusts → pastikan Trust "ABB OPC FES" dengan IP 172.18.1.37 dalam status Enabled = True.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Verify Attribute Tag</h4>
+          <p>Cek <code>pointsource = ABB-OPC</code>, <code>instrumenttag</code> = exact OPC Item ID (case-sensitive), Location1=1, Location3=1.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Cek State and Bad Points</h4>
+          <p>PI SMT → Data → State and Bad Points → lihat apakah tag masuk kategori Comm Fail, Shutdown, atau System. Ini petunjuk root cause.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Archive Hampir Penuh</h3>
+    <pre class="reveal"><span class="cmt">/* Cek status archive via PI SMT:
+   PI SMT → IDWWDW25SCADA01 → Operation → Archives
+   Lihat kolom "% Full" — jika > 80%, siapkan archive baru */</span>
+
+<span class="cmt">/* Buat archive baru via PICONFIG: */</span>
+<span class="kw">piconfig</span>
+<span class="val">@table</span> PIarcfile
+<span class="val">@mode</span> create
+<span class="val">@istr</span> path, size, shift, primary
+<span class="str">D:\PI\arc\PISERVER_2026-NEW.arc</span>, <span class="num">10240</span>, <span class="num">0</span>, <span class="num">0</span>
+<span class="val">@endt</span>
+
+<span class="cmt">/* Register dan set sebagai primary: */</span>
+<span class="cmt">/* PI SMT → Archives → klik kanan file baru → Register → Set as Primary */</span></pre>
+
+    <div class="callout teal reveal">
+      <span class="callout-icon">📚</span>
+      <div class="callout-body">
+        <strong>Referensi Dokumen</strong><br>
+        PI Server: <code>IDWWDW25SCADA01</code> · PI Server v3.4.460.29<br>
+        Archive Path: <code>D:\PI\arc\</code> · Size: 10,240 MB · Current: 5.9% full<br>
+        Backup: Daily 03:15 AM INCREMENTAL · Status: Running ✅<br>
+        Source: Project Report Rev.00 · PT. Cistech Alpha Indonesia · 13-Mar-2026
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">PI System Data Flow</div>
+  <p>Exception · Snapshot · Swingdoor Trending · Archive</p>
+  <p style="margin-top:6px;color:#94a3b8;">
+    AVEVA OSIsoft PI System · Wayang Windu PIMS ·
+    PT. Cistech Alpha Indonesia · 2026
+  </p>
+</footer>
+
+<script>
+/* Scroll reveal */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* Active nav highlight */
+document.querySelectorAll('section[id]').forEach(sec => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' }).observe(sec);
+});
+
+/* Animate archive progress bars on scroll */
+const progressObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.arc-progress-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => { bar.style.width = w; }, 200);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.archive-visual').forEach(el => progressObs.observe(el));
+</script>
+</body>
+</html>
